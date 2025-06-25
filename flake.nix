@@ -2,17 +2,24 @@
   description = "A flake for my NixOS configurations";
 
   inputs = {
-    # NixOS official package source
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    # NixOS official package sources
+
+    # Stable
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+
+    # Unstable
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # Home Manager
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-25.05";
+      
+      # Make sure that nixpkgs.url and home-manager.url stay in sync and can work together
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... }@inputs: {
 
     nixosConfigurations = {
       powerhouse = nixpkgs.lib.nixosSystem {
@@ -35,6 +42,13 @@
       };
 
       # Addition systems here
+    };
+
+
+    # Create a VM for testing
+    packages.x86_64-linux = {
+      powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
+      powerhouse-container = self.nixosConfigurations.powerhouse.config.system.build.systemd-nspawn-bundle;
     };
   };
 }
