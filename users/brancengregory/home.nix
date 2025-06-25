@@ -29,7 +29,6 @@
     scc
     sesh
     sheldon
-    ss
     sshs
     starship
     sudo
