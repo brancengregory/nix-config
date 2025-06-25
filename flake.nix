@@ -48,7 +48,6 @@
     # Create a VM for testing
     packages.x86_64-linux = {
       powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
-      powerhouse-container = self.nixosConfigurations.powerhouse.config.system.build.toplevel;
     };
   };
 }
