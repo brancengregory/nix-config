@@ -5,11 +5,43 @@
   home.homeDirectory = "/home/brancengregory";
 
   home.packages = with pkgs; [
+    bat
+    eza
     fd
+    fzf
+    # ghostty maybe
     git
-    neovim
-    ripgrep
+    glow
     htop
+    hwatch
+    jaq
+    jnv
+    # lazygit maybe
+    # lazysql maybe
+    neovim
+    nmap
+    # ollama maybe
+    # opencode maybe
+    procs
+    # r maybe
+    # radian maybe
+    ripgrep
+    scc
+    sesh
+    sheldon
+    ss
+    sshs
+    starship
+    sudo
+    tealdeer
+    tmux
+    ttf-firacode-nerd
+    wireguard-tools
+    zoxide
+    zsh
+    zsh-autosuggestions
+    zsh-completions
+    zsh-fast-syntax-highlighting
   ];
 
   programs.git = {
