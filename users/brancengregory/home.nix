@@ -19,6 +19,7 @@
     # lazygit maybe
     # lazysql maybe
     neovim
+    nerd-fonts.fira-code
     nmap
     # ollama maybe
     # opencode maybe
@@ -42,13 +43,7 @@
     zsh-fast-syntax-highlighting
   ];
 
-  fonts.fonts = with pkgs; [
-    (nerdfonts.override {
-      fonts = [ 
-        "FiraCode"
-      ];
-    })
-  ];
+  fonts.fontconfig.enable = true;
 
   programs.git = {
     enable = true;
