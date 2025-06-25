@@ -34,13 +34,20 @@
     sudo
     tealdeer
     tmux
-    ttf-firacode-nerd
     wireguard-tools
     zoxide
     zsh
     zsh-autosuggestions
     zsh-completions
     zsh-fast-syntax-highlighting
+  ];
+
+  fonts.fonts = with pkgs; [
+    (nerdfonts.override {
+      fonts = [ 
+        "FiraCode"
+      ];
+    })
   ];
 
   programs.git = {
