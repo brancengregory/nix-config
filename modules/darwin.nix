@@ -7,7 +7,7 @@
 	system.primaryUser = "brancengregory";
 
 	# Set system defaults
-	system.defaults.screencapture.location = "~/Pictures/Screenshots";
+	system.defaults.screencapture.location = "~/Downloads";
 
 	# Ensure nix-daemon is running
 	nix.package = pkgs.nix;
