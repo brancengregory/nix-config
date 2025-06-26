@@ -10,16 +10,22 @@
     # Unstable
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Home Manager
+		# Darwin (Mac)
+		nix-darwin = {
+			url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+    	inputs.nixpkgs.follows = "nixpkgs";
+		};
+
+	  # Home Manager
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
-      
+
       # Make sure that nixpkgs.url and home-manager.url stay in sync and can work together
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, home-manager, ... }@inputs: {
 
     nixosConfigurations = {
       powerhouse = nixpkgs.lib.nixosSystem {
@@ -41,8 +47,30 @@
         ];
       };
 
-      # Addition systems here
+      # Additional NixOS systems here
     };
+
+
+		darwinConfigurations = {
+			turbine = nix-darwin.lib.darwinSystem {
+				system = "x86_64-darwin"; # Intel CPU
+
+				specialArgs = { inherit inputs; };
+
+				modules = [
+					./hosts/turbine/configuration.nix
+
+					# Add Home Manager support for MacOS
+					home-manager.darwinModules.home-manager {
+						home-manager.useGlobalPkgs = true;
+						home-manager.useUserPackages = true;
+						home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
+					}
+				];
+			};
+
+			# Additional Mac systems here
+		};
 
 
     # Create a VM for testing

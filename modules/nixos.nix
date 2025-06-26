@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, ... };
 
 {
-  # --- Localization ---
+	# --- Localization ---
 
   time.timeZone = "America/Chicago";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -13,7 +13,7 @@
   programs.zsh.enable = true;
 
 
-  # --- Networking --- 
+  # --- Networking ---
 
   # Use networkd, disabling conflicting services like dhcpcd
   networking.useNetworkd = true;
@@ -33,10 +33,5 @@
     shell = pkgs.zsh;
     initialPassword = "password";
   };
-
-
-  # --- Nix Features ---
-
-  nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }
+
