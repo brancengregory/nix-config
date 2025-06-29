@@ -92,7 +92,6 @@
 
 		# Homebrew taps (additional repositories)
 		taps = [
-			"homebrew/bundle"
 			"homebrew/services"
 		];
 
@@ -106,11 +105,10 @@
 		casks = [
 			# Development tools
 			"visual-studio-code"
-			"docker"
-			"docker-desktop"
 			"arduino-ide"
 			"android-platform-tools"
 			"github"
+			"podman-desktop"
 			"postman"
 			"dbeaver-community"
 			"db-browser-for-sqlite"
@@ -119,7 +117,7 @@
 
 			# Browsers
 			"firefox"
-			"firefox-developer-edition"
+			"firefox@developer-edition"
 			"google-chrome"
 			"brave-browser"
 			"tor-browser"
@@ -134,7 +132,6 @@
 			"twitch"
 
 			# Text editors and IDEs
-			"emacs"
 			"zed"
 			"ghostty"
 			"kitty"
@@ -143,13 +140,11 @@
 			# Productivity and utilities
 			"notion"
 			"obsidian"
-			"basecamp"
 			"toggl-track"
 			"zotero"
 			"activitywatch"
 			"tunnelblick"
 			"balenaetcher"
-			"podman-desktop"
 
 			# Media and entertainment
 			"vlc"
@@ -164,13 +159,11 @@
 			"qgis"
 			"positron"
 			"rstudio"
-			"knime"
-			"data-science-studio"
 			"r"
 			"miniconda"
 			"julia"
 			"google-earth-pro"
-			"kiwix"
+			"kiwix" # Offline wikipedia
 
 			# Creative tools
 			"blender"
@@ -201,7 +194,6 @@
 
 		# Mac App Store apps (requires mas CLI)
 		masApps = {
-			"AdGuard for Safari" = 1440147259;
 			"GarageBand" = 682658836;
 			"iMovie" = 408981434;
 			"Keynote" = 409183694;
