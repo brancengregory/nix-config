@@ -36,7 +36,6 @@
     	ripgrep
     	scc
     	sesh
-    	sheldon
     	sshs
     	tealdeer
     	tmux
@@ -69,6 +68,16 @@
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+    # Configure fzf for history search
+    historyWidgetOptions = [
+      "--sort"
+      "--exact"
+    ];
   };
 
   programs.starship = {
@@ -254,11 +263,14 @@
     };
   };
 
-  # Sheldon config file management
-  home.file.".config/sheldon/plugins.toml".source = ./sheldon.toml;
-
   programs.zsh = {
     enable = true;
+    
+    # Enable native home-manager zsh plugins
+    enableAutosuggestions = true;
+    enableCompletion = true;
+    syntaxHighlighting.enable = true;
+    historySubstringSearch.enable = true;
     
     # Shell aliases
     shellAliases = {
@@ -318,13 +330,6 @@
       setopt hist_verify              # Don't execute immediately upon history expansion
       setopt inc_append_history       # Write to history file immediately, not when shell quits
       setopt share_history            # Share history among all sessions
-
-      # Add history search keys
-      bindkey '^[[A' history-substring-search-up
-      bindkey '^[[B' history-substring-search-down
-
-      # Start sheldon for zsh plugins
-      eval "$(sheldon source)"
 
       # Environment variables
       export SSH_ASKPASS_REQUIRE=never
