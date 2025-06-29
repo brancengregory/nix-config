@@ -12,7 +12,7 @@
 
 		defaults = {
 			NSGlobalDomain = {
-				AppleInterfaceStyle = Dark;
+				AppleInterfaceStyle = "Dark";
 				ApplePressAndHoldEnabled = true;
 				AppleScrollerPagingBehavior = true;
 				AppleShowAllExtensions = true;
@@ -30,12 +30,12 @@
 				NSDocumentSaveNewDocumentsToCloud = false;
 				_HIHideMenuBar = true;
 				"com.apple.sound.beep.feedback" = 0;
-				"com.apple.sound.beep.volume" = 0;
+				"com.apple.sound.beep.volume" = 0.0;
 				"com.apple.swipescrolldirection" = false;
 				# "com.apple.trackpad.scaling" = ; # Add value
 			};
 			controlcenter = {
-				AirDrop = 24;
+				AirDrop = false;
 				BatteryShowPercentage = true;
 				Bluetooth = true;
 				Display = true;
@@ -82,7 +82,7 @@
 	# Homebrew configuration - let nix-darwin manage Homebrew
 	homebrew = {
 		enable = true;
-		
+
 		# Automatically cleanup unreferenced formulae and casks
 		onActivation = {
 			cleanup = "zap";
@@ -116,14 +116,14 @@
 			"db-browser-for-sqlite"
 			"ngrok"
 			"xquartz"
-			
+
 			# Browsers
 			"firefox"
 			"firefox-developer-edition"
 			"google-chrome"
 			"brave-browser"
 			"tor-browser"
-			
+
 			# Communication
 			"slack"
 			"discord"
@@ -132,14 +132,14 @@
 			"microsoft-teams"
 			"signal"
 			"twitch"
-			
+
 			# Text editors and IDEs
 			"emacs"
 			"zed"
 			"ghostty"
 			"kitty"
 			"iterm2"
-			
+
 			# Productivity and utilities
 			"notion"
 			"obsidian"
@@ -150,7 +150,7 @@
 			"tunnelblick"
 			"balenaetcher"
 			"podman-desktop"
-			
+
 			# Media and entertainment
 			"vlc"
 			"obs"
@@ -159,7 +159,7 @@
 			"minecraft"
 			"epic-games"
 			"openemu"
-			
+
 			# Science and research
 			"qgis"
 			"positron"
@@ -171,13 +171,13 @@
 			"julia"
 			"google-earth-pro"
 			"kiwix"
-			
+
 			# Creative tools
 			"blender"
 			"bitwig-studio"
 			"godot"
 			"tic80"
-			
+
 			# System tools and utilities
 			"syncthing"
 			"virtualbox"
@@ -186,14 +186,14 @@
 			"pgadmin4"
 			"mactex"
 			"google-cloud-sdk"
-			
+
 			# Fonts
 			"font-fira-code-nerd-font"
 			"font-roboto-mono"
 			"font-lato"
 			"font-fanwood-text"
 			"font-league-spartan"
-			
+
 			# Java runtime environments
 			"temurin@8"
 			"java"
