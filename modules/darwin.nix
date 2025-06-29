@@ -76,6 +76,63 @@
 		};
 	};
 
+	# Homebrew configuration - let nix-darwin manage Homebrew
+	homebrew = {
+		enable = true;
+		
+		# Automatically cleanup unreferenced formulae and casks
+		onActivation = {
+			cleanup = "zap";
+			autoUpdate = true;
+			upgrade = true;
+		};
+
+		# Homebrew taps (additional repositories)
+		taps = [
+			"homebrew/bundle"
+			"homebrew/services"
+		];
+
+		# CLI packages from Homebrew (use sparingly, prefer nixpkgs)
+		brews = [
+			# Add CLI tools that aren't available or don't work well in nixpkgs
+			# Example: "mas" # Mac App Store CLI
+		];
+
+		# GUI applications (casks) - this is Homebrew's strength
+		casks = [
+			# Development tools
+			# "visual-studio-code"
+			# "docker"
+			
+			# Browsers
+			# "firefox"
+			# "google-chrome"
+			
+			# Communication
+			# "slack"
+			# "discord"
+			# "zoom"
+			
+			# Utilities
+			# "1password"
+			# "alfred"
+			# "raycast"
+			
+			# Media
+			# "vlc"
+			# "spotify"
+			
+			# Add your preferred GUI applications here
+			# Uncomment the ones you want to install
+		];
+
+		# Mac App Store apps (requires mas CLI)
+		masApps = {
+			# Example: "Xcode" = 497799835;
+		};
+	};
+
 	# Ensure nix-daemon is running
 	nix.package = pkgs.nix;
 
