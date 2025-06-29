@@ -36,16 +36,12 @@
     	ripgrep
     	scc
     	sesh
-    	sheldon
     	sshs
     	tealdeer
     	tmux
     	wireguard-tools
     	zoxide
     	zsh
-    	zsh-autosuggestions
-    	zsh-completions
-    	zsh-fast-syntax-highlighting
   	]
 		++ (if pkgs.stdenv.isLinux then
 			[
@@ -67,6 +63,21 @@
     enable = true;
     userName = "Brancen Gregory";
     userEmail = "brancengregory@gmail.com";
+  };
+
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+    # Configure fzf for history search
+    historyWidgetOptions = [
+      "--sort"
+      "--exact"
+    ];
   };
 
   programs.starship = {
@@ -255,6 +266,12 @@
   programs.zsh = {
     enable = true;
     
+    # Enable native home-manager zsh plugins
+    enableAutosuggestions = true;
+    enableCompletion = true;
+    syntaxHighlighting.enable = true;
+    historySubstringSearch.enable = true;
+    
     # Shell aliases
     shellAliases = {
       cl = "clear";
@@ -290,9 +307,6 @@
       extended = true;
     };
 
-    # Additional zsh options
-    historySubstringSearch.enable = true;
-    
     # Custom functions and additional configuration
     initContent = ''
       # Autocompletion
@@ -316,16 +330,6 @@
       setopt hist_verify              # Don't execute immediately upon history expansion
       setopt inc_append_history       # Write to history file immediately, not when shell quits
       setopt share_history            # Share history among all sessions
-
-      # Add history search keys
-      bindkey '^[[A' history-substring-search-up
-      bindkey '^[[B' history-substring-search-down
-
-      # Add zoxide
-      eval "$(zoxide init zsh)"
-
-      # Start sheldon for zsh plugins
-      eval "$(sheldon source)"
 
       # Environment variables
       export SSH_ASKPASS_REQUIRE=never
