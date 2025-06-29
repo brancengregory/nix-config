@@ -92,7 +92,6 @@
 
 		# Homebrew taps (additional repositories)
 		taps = [
-			"homebrew/bundle"
 			"homebrew/services"
 		];
 
