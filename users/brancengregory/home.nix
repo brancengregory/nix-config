@@ -102,7 +102,7 @@
       '';
 
       # Disable the blank line at the start of the prompt
-      # add_newline = false;
+      add_newline = false;
 
       hostname = {
         ssh_symbol = "🌐";
