@@ -3,6 +3,9 @@
 {
 	nix.enable = true;
 
+	# Enable Linux builder for cross-compilation and Linux package building
+	nix.linux-builder.enable = true;
+
 	system = {
 		# Set the primary user for user-specific system settings
 		primaryUser = "brancengregory";
