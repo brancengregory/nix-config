@@ -112,7 +112,7 @@
     historySubstringSearch.enable = true;
     
     # Custom functions and additional configuration
-    initExtra = ''
+    initContent = ''
       # Autocompletion
       autoload -Uz compinit && compinit
 
