@@ -31,7 +31,7 @@
     	# ollama maybe
     	# opencode maybe
     	procs
-    	r
+      r
     	radian
     	ripgrep
     	scc
