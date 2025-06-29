@@ -23,7 +23,7 @@
     	hwatch
     	jaq
     	jnv
-    	# lazygit maybe
+    	lazygit
     	# lazysql maybe
     	neovim
     	nerd-fonts.fira-code
