@@ -102,29 +102,98 @@
 		# GUI applications (casks) - this is Homebrew's strength
 		casks = [
 			# Development tools
-			# "visual-studio-code"
-			# "docker"
+			"visual-studio-code"
+			"docker"
+			"docker-desktop"
+			"arduino-ide"
+			"android-platform-tools"
+			"github"
+			"postman"
+			"dbeaver-community"
+			"db-browser-for-sqlite"
+			"ngrok"
+			"xquartz"
 			
 			# Browsers
-			# "firefox"
-			# "google-chrome"
+			"firefox"
+			"firefox-developer-edition"
+			"google-chrome"
+			"brave-browser"
+			"tor-browser"
 			
 			# Communication
-			# "slack"
-			# "discord"
-			# "zoom"
+			"slack"
+			"discord"
+			"telegram"
+			"messenger"
+			"microsoft-teams"
+			"signal"
+			"twitch"
 			
-			# Utilities
-			# "1password"
-			# "alfred"
-			# "raycast"
+			# Text editors and IDEs
+			"emacs"
+			"zed"
+			"ghostty"
+			"kitty"
+			"iterm2"
 			
-			# Media
-			# "vlc"
-			# "spotify"
+			# Productivity and utilities
+			"notion"
+			"obsidian"
+			"basecamp"
+			"toggl-track"
+			"zotero"
+			"activitywatch"
+			"tunnelblick"
+			"balenaetcher"
+			"podman-desktop"
 			
-			# Add your preferred GUI applications here
-			# Uncomment the ones you want to install
+			# Media and entertainment
+			"vlc"
+			"obs"
+			"webtorrent"
+			"steam"
+			"minecraft"
+			"epic-games"
+			"openemu"
+			
+			# Science and research
+			"qgis"
+			"positron"
+			"rstudio"
+			"knime"
+			"data-science-studio"
+			"r"
+			"miniconda"
+			"julia"
+			"google-earth-pro"
+			"kiwix"
+			
+			# Creative tools
+			"blender"
+			"bitwig-studio"
+			"godot"
+			"tic80"
+			
+			# System tools and utilities
+			"syncthing"
+			"virtualbox"
+			"parsec"
+			"libreoffice"
+			"pgadmin4"
+			"mactex"
+			"google-cloud-sdk"
+			
+			# Fonts
+			"font-fira-code-nerd-font"
+			"font-roboto-mono"
+			"font-lato"
+			"font-fanwood-text"
+			"font-league-spartan"
+			
+			# Java runtime environments
+			"temurin@8"
+			"java"
 		];
 
 		# Mac App Store apps (requires mas CLI)
