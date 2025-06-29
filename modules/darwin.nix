@@ -79,6 +79,140 @@
 		};
 	};
 
+	# Homebrew configuration - let nix-darwin manage Homebrew
+	homebrew = {
+		enable = true;
+		
+		# Automatically cleanup unreferenced formulae and casks
+		onActivation = {
+			cleanup = "zap";
+			autoUpdate = true;
+			upgrade = true;
+		};
+
+		# Homebrew taps (additional repositories)
+		taps = [
+			"homebrew/bundle"
+			"homebrew/services"
+		];
+
+		# CLI packages from Homebrew (use sparingly, prefer nixpkgs)
+		brews = [
+			# Add CLI tools that aren't available or don't work well in nixpkgs
+			"mas" # Mac App Store CLI
+		];
+
+		# GUI applications (casks) - this is Homebrew's strength
+		casks = [
+			# Development tools
+			"visual-studio-code"
+			"docker"
+			"docker-desktop"
+			"arduino-ide"
+			"android-platform-tools"
+			"github"
+			"postman"
+			"dbeaver-community"
+			"db-browser-for-sqlite"
+			"ngrok"
+			"xquartz"
+			
+			# Browsers
+			"firefox"
+			"firefox-developer-edition"
+			"google-chrome"
+			"brave-browser"
+			"tor-browser"
+			
+			# Communication
+			"slack"
+			"discord"
+			"telegram"
+			"messenger"
+			"microsoft-teams"
+			"signal"
+			"twitch"
+			
+			# Text editors and IDEs
+			"emacs"
+			"zed"
+			"ghostty"
+			"kitty"
+			"iterm2"
+			
+			# Productivity and utilities
+			"notion"
+			"obsidian"
+			"basecamp"
+			"toggl-track"
+			"zotero"
+			"activitywatch"
+			"tunnelblick"
+			"balenaetcher"
+			"podman-desktop"
+			
+			# Media and entertainment
+			"vlc"
+			"obs"
+			"webtorrent"
+			"steam"
+			"minecraft"
+			"epic-games"
+			"openemu"
+			
+			# Science and research
+			"qgis"
+			"positron"
+			"rstudio"
+			"knime"
+			"data-science-studio"
+			"r"
+			"miniconda"
+			"julia"
+			"google-earth-pro"
+			"kiwix"
+			
+			# Creative tools
+			"blender"
+			"bitwig-studio"
+			"godot"
+			"tic80"
+			
+			# System tools and utilities
+			"syncthing"
+			"virtualbox"
+			"parsec"
+			"libreoffice"
+			"pgadmin4"
+			"mactex"
+			"google-cloud-sdk"
+			
+			# Fonts
+			"font-fira-code-nerd-font"
+			"font-roboto-mono"
+			"font-lato"
+			"font-fanwood-text"
+			"font-league-spartan"
+			
+			# Java runtime environments
+			"temurin@8"
+			"java"
+		];
+
+		# Mac App Store apps (requires mas CLI)
+		masApps = {
+			"AdGuard for Safari" = 1440147259;
+			"GarageBand" = 682658836;
+			"iMovie" = 408981434;
+			"Keynote" = 409183694;
+			"Magnet" = 441258766;
+			"Numbers" = 409203825;
+			"Pages" = 409201541;
+			"Toggl Track" = 1291898086;
+			"WireGuard" = 1451685025;
+		};
+	};
+
 	# Ensure nix-daemon is running
 	nix.package = pkgs.nix;
 

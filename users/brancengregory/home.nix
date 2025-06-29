@@ -7,6 +7,9 @@
 		else if pkgs.stdenv.isDarwin then "/Users/brancengregory"
 		else throw "Unsupported OS for this home-manager configuration";
 
+  # Prefer nixpkgs packages over Homebrew when possible
+  # GUI applications should be managed via Homebrew casks in darwin.nix
+  # CLI tools should generally be managed here via nixpkgs
   home.packages = with pkgs;
 		[
     	bat
