@@ -43,9 +43,6 @@
     	wireguard-tools
     	zoxide
     	zsh
-    	zsh-autosuggestions
-    	zsh-completions
-    	zsh-fast-syntax-highlighting
   	]
 		++ (if pkgs.stdenv.isLinux then
 			[
@@ -67,6 +64,11 @@
     enable = true;
     userName = "Brancen Gregory";
     userEmail = "brancengregory@gmail.com";
+  };
+
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
   };
 
   programs.starship = {
@@ -252,6 +254,9 @@
     };
   };
 
+  # Sheldon config file management
+  home.file.".config/sheldon/plugins.toml".source = ./sheldon.toml;
+
   programs.zsh = {
     enable = true;
     
@@ -290,9 +295,6 @@
       extended = true;
     };
 
-    # Additional zsh options
-    historySubstringSearch.enable = true;
-    
     # Custom functions and additional configuration
     initContent = ''
       # Autocompletion
@@ -320,9 +322,6 @@
       # Add history search keys
       bindkey '^[[A' history-substring-search-up
       bindkey '^[[B' history-substring-search-down
-
-      # Add zoxide
-      eval "$(zoxide init zsh)"
 
       # Start sheldon for zsh plugins
       eval "$(sheldon source)"
