@@ -198,7 +198,15 @@
 
 		# Mac App Store apps (requires mas CLI)
 		masApps = {
-			# Example: "Xcode" = 497799835;
+			"AdGuard for Safari" = 1440147259;
+			"GarageBand" = 682658836;
+			"iMovie" = 408981434;
+			"Keynote" = 409183694;
+			"Magnet" = 441258766;
+			"Numbers" = 409203825;
+			"Pages" = 409201541;
+			"Toggl Track" = 1291898086;
+			"WireGuard" = 1451685025;
 		};
 	};
 
