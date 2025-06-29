@@ -96,7 +96,7 @@
 		# CLI packages from Homebrew (use sparingly, prefer nixpkgs)
 		brews = [
 			# Add CLI tools that aren't available or don't work well in nixpkgs
-			# Example: "mas" # Mac App Store CLI
+			"mas" # Mac App Store CLI
 		];
 
 		# GUI applications (casks) - this is Homebrew's strength
