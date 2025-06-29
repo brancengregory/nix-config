@@ -89,12 +89,13 @@
       tre = "eza --tree --level=3 --icons --git-ignore";
       r = "radian";
       md = "glow";
-      ports = "ss -tuln";
       g = "lazygit";
     } // (if pkgs.stdenv.isLinux then {
       open = "xdg-open";
+      ports = "ss -tuln";
     } else {
       # macOS uses native open command
+      ports = "netstat -anv | grep -E 'LISTEN|Proto'";
     });
 
     # History configuration
