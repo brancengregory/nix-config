@@ -267,7 +267,7 @@
     enable = true;
     
     # Enable native home-manager zsh plugins
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     enableCompletion = true;
     syntaxHighlighting.enable = true;
     historySubstringSearch.enable = true;
