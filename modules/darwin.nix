@@ -189,7 +189,6 @@
 
 			# Java runtime environments
 			"temurin@8"
-			"java"
 		];
 
 		# Mac App Store apps (requires mas CLI)
