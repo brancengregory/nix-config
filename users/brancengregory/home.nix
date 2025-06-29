@@ -31,8 +31,8 @@
     	# ollama maybe
     	# opencode maybe
     	procs
-    	# r maybe
-    	# radian maybe
+    	r
+    	radian
     	ripgrep
     	scc
     	sesh

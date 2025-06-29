@@ -159,7 +159,6 @@
 			"qgis"
 			"positron"
 			"rstudio"
-			"r"
 			"miniconda"
 			"julia"
 			"google-earth-pro"
