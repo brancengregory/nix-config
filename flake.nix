@@ -86,7 +86,7 @@
       turbine-darwin = self.darwinConfigurations.turbine.system;
 
       # Validation: Check darwin configs without building
-      turbine-check = self.darwinConfigurations.turbine.config.system.build.toplevel.drvPath;
+      turbine-check = self.darwinConfigurations.turbine.config.system.build.toplevel;
     };
 
     # Enable cross-compilation for darwin packages on Linux
