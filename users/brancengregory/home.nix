@@ -36,6 +36,7 @@
       (rWrapper.override {
         packages = with rPackages; [
           dplyr
+          readr
         ];
       })
       # radian
