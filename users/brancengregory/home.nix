@@ -12,6 +12,7 @@
   # CLI tools should generally be managed here via nixpkgs
   home.packages = with pkgs;
 		[
+      alejandra
     	bat
     	eza
     	fd
