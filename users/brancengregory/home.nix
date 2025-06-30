@@ -32,8 +32,11 @@
       # ollama maybe
       # opencode maybe
       procs
-      R
-      # rWrapper
+      (rWrapper.override {
+        packages = with rPackages; [
+          dplyr
+        ];
+      })
       # radian
       ripgrep
       scc
