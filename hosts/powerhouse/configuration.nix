@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   imports = [
     ../../modules/common.nix # Universal settings
     ../../modules/nixos.nix # Common NixOS settings

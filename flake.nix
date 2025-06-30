@@ -10,13 +10,13 @@
     # Unstable
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-		# Darwin (Mac)
-		nix-darwin = {
-			url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
-    	inputs.nixpkgs.follows = "nixpkgs";
-		};
+    # Darwin (Mac)
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-	  # Home Manager
+    # Home Manager
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
 
@@ -25,12 +25,18 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, home-manager, ... }@inputs: {
-
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-unstable,
+    nix-darwin,
+    home-manager,
+    ...
+  } @ inputs: {
     nixosConfigurations = {
       powerhouse = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit inputs; }; # Pass inputs to modules
+        specialArgs = {inherit inputs;}; # Pass inputs to modules
         modules = [
           # 1. Import main config for this host
           ./hosts/powerhouse/configuration.nix
@@ -50,36 +56,35 @@
       # Additional NixOS systems here
     };
 
+    darwinConfigurations = {
+      turbine = nix-darwin.lib.darwinSystem {
+        system = "x86_64-darwin"; # Intel CPU
 
-		darwinConfigurations = {
-			turbine = nix-darwin.lib.darwinSystem {
-				system = "x86_64-darwin"; # Intel CPU
+        specialArgs = {inherit inputs;};
 
-				specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/turbine/configuration.nix
 
-				modules = [
-					./hosts/turbine/configuration.nix
+          # Add Home Manager support for MacOS
+          home-manager.darwinModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
+          }
+        ];
+      };
 
-					# Add Home Manager support for MacOS
-					home-manager.darwinModules.home-manager {
-						home-manager.useGlobalPkgs = true;
-						home-manager.useUserPackages = true;
-						home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
-					}
-				];
-			};
-
-			# Additional Mac systems here
-		};
-
+      # Additional Mac systems here
+    };
 
     # Create a VM for testing and cross-compilation targets
     packages.x86_64-linux = {
       powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
-      
+
       # Cross-compilation: Build darwin configurations from Linux
       turbine-darwin = self.darwinConfigurations.turbine.system;
-      
+
       # Validation: Check darwin configurations without building
       turbine-check = self.darwinConfigurations.turbine.config.system.build.toplevel.drvPath;
     };

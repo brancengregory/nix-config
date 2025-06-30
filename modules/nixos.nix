@@ -1,17 +1,13 @@
-{ pkgs, ... }:
-
-{
-	# --- Localization ---
+{pkgs, ...}: {
+  # --- Localization ---
 
   time.timeZone = "America/Chicago";
   i18n.defaultLocale = "en_US.UTF-8";
-
 
   # --- Shell ---
 
   # Enable system-wide integration for Zsh
   programs.zsh.enable = true;
-
 
   # --- Networking ---
 
@@ -24,14 +20,12 @@
   # Using systemd-resolved for DNS
   services.resolved.enable = true;
 
-
   # --- User Account ---
 
   users.users.brancengregory = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    extraGroups = ["wheel"];
     shell = pkgs.zsh;
     initialPassword = "password";
   };
 }
-

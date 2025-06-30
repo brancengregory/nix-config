@@ -1,63 +1,63 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   home.username = "brancengregory";
   home.homeDirectory =
-		if pkgs.stdenv.isLinux then "/home/brancengregory"
-		else if pkgs.stdenv.isDarwin then "/Users/brancengregory"
-		else throw "Unsupported OS for this home-manager configuration";
+    if pkgs.stdenv.isLinux
+    then "/home/brancengregory"
+    else if pkgs.stdenv.isDarwin
+    then "/Users/brancengregory"
+    else throw "Unsupported OS for this home-manager configuration";
 
   # Prefer nixpkgs packages over Homebrew when possible
   # GUI applications should be managed via Homebrew casks in darwin.nix
   # CLI tools should generally be managed here via nixpkgs
   home.packages = with pkgs;
-		[
+    [
       alejandra
-    	bat
-    	eza
-    	fd
-    	fzf
-    	# ghostty maybe
-    	git
-    	glow
-    	htop
-    	hwatch
-    	jaq
-    	jnv
-    	lazygit
-    	# lazysql maybe
-    	neovim
-    	nerd-fonts.fira-code
-    	nmap
-    	# ollama maybe
-    	# opencode maybe
-    	procs
+      bat
+      eza
+      fd
+      fzf
+      # ghostty maybe
+      git
+      glow
+      htop
+      hwatch
+      jaq
+      jnv
+      lazygit
+      # lazysql maybe
+      neovim
+      nerd-fonts.fira-code
+      nmap
+      # ollama maybe
+      # opencode maybe
+      procs
       R
       # rWrapper
       radian
-    	ripgrep
-    	scc
-    	sesh
-    	sshs
-    	tealdeer
-    	tmux
-    	wireguard-tools
-    	zoxide
-    	zsh
-  	]
-		++ (if pkgs.stdenv.isLinux then
-			[
-				# Linux specific packages
-				sudo
-			]
-		else if pkgs.stdenv.isDarwin then
-			[
-				# Mac specific packages
-				# mas-cli maybe
-			]
-		else
-			throw "Unsupported OS for this home-manager configuration"
-		);
+      ripgrep
+      scc
+      sesh
+      sshs
+      tealdeer
+      tmux
+      wireguard-tools
+      zoxide
+      zsh
+    ]
+    ++ (
+      if pkgs.stdenv.isLinux
+      then [
+        # Linux specific packages
+        sudo
+      ]
+      else if pkgs.stdenv.isDarwin
+      then [
+        # Mac specific packages
+        # mas-cli maybe
+      ]
+      else throw "Unsupported OS for this home-manager configuration"
+    );
 
   fonts.fontconfig.enable = true;
 
@@ -85,7 +85,8 @@
   programs.starship = {
     enable = true;
     settings = {
-      format = ""
+      format =
+        ""
         + "[](#9A348E)"
         + "$os"
         + "$hostname"
@@ -111,8 +112,7 @@
         + "$docker_context"
         + "[](fg:#06969A bg:#33658A)"
         + "$time"
-        + "[ ](fg:#33658A)"
-      ;
+        + "[ ](fg:#33658A)";
 
       # Disable the blank line at the start of the prompt
       add_newline = false;
@@ -152,7 +152,7 @@
         format = "[ $path ]($style)";
         truncation_length = 3;
         truncation_symbol = "…/";
-        
+
         # Here is how you can shorten some long paths by text replacement
         # similar to mapped_locations in Oh My Posh:
         substitutions = {
@@ -267,37 +267,43 @@
 
   programs.zsh = {
     enable = true;
-    
+
     # Enable native home-manager zsh plugins
     autosuggestion.enable = true;
     enableCompletion = true;
     syntaxHighlighting.enable = true;
     historySubstringSearch.enable = true;
-    
+
     # Shell aliases
-    shellAliases = {
-      cl = "clear";
-      v = "nvim";
-      cd = "z";
-      "/" = "cd /";
-      "~" = "cd ~";
-      ".." = "cd ..";
-      "..." = "cd ../..";
-      reload = "source ~/.zshrc";
-      l = "ls";
-      ls = "eza -al --git --icons=always";
-      cat = "bat";
-      tre = "eza --tree --level=3 --icons --git-ignore";
-      r = "radian";
-      md = "glow";
-      g = "lazygit";
-    } // (if pkgs.stdenv.isLinux then {
-      open = "xdg-open";
-      ports = "ss -tuln";
-    } else {
-      # macOS uses native open command
-      ports = "netstat -anv | grep -E 'LISTEN|Proto'";
-    });
+    shellAliases =
+      {
+        cl = "clear";
+        v = "nvim";
+        cd = "z";
+        "/" = "cd /";
+        "~" = "cd ~";
+        ".." = "cd ..";
+        "..." = "cd ../..";
+        reload = "source ~/.zshrc";
+        l = "ls";
+        ls = "eza -al --git --icons=always";
+        cat = "bat";
+        tre = "eza --tree --level=3 --icons --git-ignore";
+        r = "radian";
+        md = "glow";
+        g = "lazygit";
+      }
+      // (
+        if pkgs.stdenv.isLinux
+        then {
+          open = "xdg-open";
+          ports = "ss -tuln";
+        }
+        else {
+          # macOS uses native open command
+          ports = "netstat -anv | grep -E 'LISTEN|Proto'";
+        }
+      );
 
     # History configuration
     history = {
@@ -336,26 +342,30 @@
       # Environment variables
       export SSH_ASKPASS_REQUIRE=never
       export GPG_TTY=$(tty)
-      ${if pkgs.stdenv.isLinux then ''
-        export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-        gpg-connect-agent updatestartuptty /bye
+      ${
+        if pkgs.stdenv.isLinux
+        then ''
+          export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+          gpg-connect-agent updatestartuptty /bye
 
-        # Make sure sudo works well in tmux
-        if [ -n "$TMUX" ]; then
-          stty sane
-        fi
+          # Make sure sudo works well in tmux
+          if [ -n "$TMUX" ]; then
+            stty sane
+          fi
 
-        export PROJ_DATA=/usr/share/proj
-      '' else ''
-        # macOS specific environment variables would go here if needed
-      ''}
+          export PROJ_DATA=/usr/share/proj
+        ''
+        else ''
+          # macOS specific environment variables would go here if needed
+        ''
+      }
 
       # Conda initialization (if available)
       [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
       export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
     '';
 
-    # Additional PATH entries  
+    # Additional PATH entries
     sessionVariables = {
       PATH = "$PATH:$HOME/.cargo/bin:$HOME/go/bin:$HOME/.local/bin";
     };

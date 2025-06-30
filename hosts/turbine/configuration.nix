@@ -1,10 +1,8 @@
-{ pkgs, ... }:
+{pkgs, ...}: {
+  imports = [
+    ../../modules/common.nix # Universal settings
+    ../../modules/darwin.nix # Common MacOS settings
+  ];
 
-{
-	imports = [
-		../../modules/common.nix  # Universal settings
-		../../modules/darwin.nix  # Common MacOS settings
-	];
-
-	system.stateVersion = 5;
+  system.stateVersion = 5;
 }
