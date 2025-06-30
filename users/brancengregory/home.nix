@@ -20,6 +20,7 @@
       # ghostty maybe
       git
       glow
+      gnupg
       htop
       hwatch
       jaq
@@ -31,6 +32,7 @@
       nmap
       # ollama maybe
       # opencode maybe
+      openssh
       procs
       (rWrapper.override {
         packages = with rPackages; [
@@ -52,11 +54,13 @@
       if pkgs.stdenv.isLinux
       then [
         # Linux specific packages
+        pinentry-gtk2
         sudo
       ]
       else if pkgs.stdenv.isDarwin
       then [
         # Mac specific packages
+        pinentry_mac
         # mas-cli maybe
       ]
       else throw "Unsupported OS for this home-manager configuration"
@@ -68,6 +72,139 @@
     enable = true;
     userName = "Brancen Gregory";
     userEmail = "brancengregory@gmail.com";
+    signing = {
+      key = null; # Let GPG choose the default signing key
+      signByDefault = true;
+    };
+    extraConfig = {
+      gpg.program = "gpg2";
+    };
+  };
+
+  # Comprehensive GPG configuration
+  programs.gpg = {
+    enable = true;
+
+    # GPG configuration settings
+    settings = {
+      # Use modern algorithms and stronger defaults
+      personal-cipher-preferences = "AES256 AES192 AES";
+      personal-digest-preferences = "SHA512 SHA384 SHA256";
+      personal-compress-preferences = "ZLIB BZIP2 ZIP Uncompressed";
+      default-preference-list = "SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed";
+      cipher-algo = "AES256";
+      digest-algo = "SHA512";
+      cert-digest-algo = "SHA512";
+      compress-algo = "ZLIB";
+      disable-cipher-algo = "3DES";
+      weak-digest = "SHA1";
+      s2k-mode = "3";
+      s2k-digest-algo = "SHA512";
+      s2k-count = "65011712";
+
+      # Display options
+      fixed-list-mode = true;
+      keyid-format = "0xlong";
+      list-options = "show-uid-validity";
+      verify-options = "show-uid-validity";
+      with-fingerprint = true;
+
+      # Behavior
+      require-cross-certification = true;
+      no-symkey-cache = true;
+      use-agent = true;
+      throw-keyids = true;
+
+      # Keyserver settings (using keys.openpgp.org as default)
+      keyserver = "hkps://keys.openpgp.org";
+      keyserver-options = "no-honor-keyserver-url include-revoked";
+    };
+  };
+
+  # SSH configuration with GPG agent integration
+  programs.ssh = {
+    enable = true;
+
+    # Global SSH client configuration
+    extraConfig = ''
+      # Security settings
+      Protocol 2
+      HashKnownHosts yes
+      VisualHostKey yes
+      PasswordAuthentication no
+      ChallengeResponseAuthentication no
+      StrictHostKeyChecking ask
+      VerifyHostKeyDNS yes
+      ForwardAgent no
+      ForwardX11 no
+      ForwardX11Trusted no
+      ServerAliveInterval 300
+      ServerAliveCountMax 2
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+      KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+      HostKeyAlgorithms ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512
+      PubkeyAcceptedKeyTypes ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512
+    '';
+
+    # Common host configurations
+    matchBlocks = {
+      "github.com" = {
+        hostname = "github.com";
+        user = "git";
+        identitiesOnly = true;
+        # Use GPG SSH key for GitHub
+        extraOptions = {
+          PreferredAuthentications = "publickey";
+        };
+      };
+
+      "gitlab.com" = {
+        hostname = "gitlab.com";
+        user = "git";
+        identitiesOnly = true;
+        extraOptions = {
+          PreferredAuthentications = "publickey";
+        };
+      };
+
+      # Template for personal servers
+      "*.local" = {
+        user = "brancengregory";
+        identitiesOnly = true;
+      };
+    };
+  };
+
+  # GPG Agent configuration for SSH and GPG operations
+  services.gpg-agent = {
+    enable = true;
+    enableSshSupport = true;
+    enableScDaemon = true;
+
+    # Platform-specific pinentry programs (updated option name)
+    pinentry.package =
+      if pkgs.stdenv.isLinux
+      then pkgs.pinentry-gtk2
+      else if pkgs.stdenv.isDarwin
+      then pkgs.pinentry_mac
+      else throw "Unsupported OS for GPG agent configuration";
+
+    # Agent settings
+    defaultCacheTtl = 28800; # 8 hours
+    defaultCacheTtlSsh = 28800; # 8 hours
+    maxCacheTtl = 86400; # 24 hours
+    maxCacheTtlSsh = 86400; # 24 hours
+
+    # Extra configuration
+    extraConfig = ''
+      allow-preset-passphrase
+      no-allow-external-cache
+      enforce-passphrase-constraints
+      min-passphrase-len 12
+      min-passphrase-nonalpha 2
+      check-passphrase-pattern
+    '';
   };
 
   programs.zoxide = {
@@ -342,14 +479,18 @@
       setopt inc_append_history       # Write to history file immediately, not when shell quits
       setopt share_history            # Share history among all sessions
 
-      # Environment variables
+      # Environment variables for unified GPG/SSH strategy
       export SSH_ASKPASS_REQUIRE=never
       export GPG_TTY=$(tty)
+
+      # Initialize GPG agent and SSH support
+      gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+
       ${
         if pkgs.stdenv.isLinux
         then ''
+          # Linux: Use GPG agent for SSH authentication
           export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-          gpg-connect-agent updatestartuptty /bye
 
           # Make sure sudo works well in tmux
           if [ -n "$TMUX" ]; then
@@ -359,7 +500,11 @@
           export PROJ_DATA=/usr/share/proj
         ''
         else ''
-          # macOS specific environment variables would go here if needed
+          # macOS: Use GPG agent for SSH authentication
+          export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+          # Ensure GPG agent is running
+          gpgconf --launch gpg-agent
         ''
       }
 
