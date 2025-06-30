@@ -34,7 +34,7 @@
       procs
       R
       # rWrapper
-      radian
+      # radian
       ripgrep
       scc
       sesh
