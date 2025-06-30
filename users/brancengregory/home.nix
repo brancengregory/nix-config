@@ -85,7 +85,6 @@
     enable = true;
     settings = {
       format = ''
-        [](#9A348E)\
         $os\
         $hostname\
         [](bg:#DA627D fg:#9A348E)\
