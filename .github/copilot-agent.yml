@@ -1,0 +1,186 @@
+# GitHub Copilot Coding Agent Environment Configuration
+# This file configures the development environment for the Copilot coding agent
+# to enable crucial dev tools like `nix flake check` and other Nix development commands.
+
+# Development environment configuration
+environment:
+  # Use the Nix-enabled development shell defined in flake.nix
+  shell: |
+    # Install Nix with flakes support if not already available
+    if ! command -v nix &> /dev/null; then
+      echo "Installing Nix with flakes support..."
+      # Try Determinate Systems installer first (recommended)
+      if curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm; then
+        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      else
+        # Fallback to official installer
+        echo "Falling back to official Nix installer..."
+        sh <(curl -L https://nixos.org/nix/install) --daemon --yes
+        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      fi
+    fi
+    
+    # Ensure Nix is in PATH
+    export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+    
+    # Enable experimental features for flakes
+    mkdir -p ~/.config/nix
+    echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+    
+    # Source Nix environment if needed
+    if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+      source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    fi
+    
+    # Enter the development shell which provides all necessary tools
+    nix develop --command bash
+
+  # Environment variables needed for development
+  variables:
+    NIX_CONFIG: "experimental-features = nix-command flakes"
+    # Ensure proper PATH for Nix tools
+    NIX_PATH: ""
+    # Prevent Nix from using /nix/var/nix/profiles/per-user paths
+    NIX_USER_PROFILE_DIR: "/nix/var/nix/profiles/default"
+    
+# Commands that should be available in the development environment
+commands:
+  # Core Nix commands
+  - name: "nix flake check"
+    description: "Check flake syntax and evaluate all outputs"
+    
+  - name: "nix develop"
+    description: "Enter the development shell with all tools"
+    
+  - name: "nix build"
+    description: "Build Nix expressions and packages"
+
+  # Just command runner shortcuts
+  - name: "just help"
+    description: "Show all available development commands"
+    
+  - name: "just check"
+    description: "Check flake syntax (alias for nix flake check)"
+    
+  - name: "just check-darwin"
+    description: "Validate nix-darwin config (fast validation)"
+    
+  - name: "just build-darwin"
+    description: "Cross-compile full nix-darwin config from Linux"
+    
+  - name: "just build-linux"
+    description: "Build NixOS VM for testing"
+    
+  - name: "just format"
+    description: "Format Nix files using alejandra"
+    
+  - name: "just test"
+    description: "Run cross-compilation tests"
+    
+  - name: "just clean"
+    description: "Clean build results and artifacts"
+
+# Setup commands to run when initializing the environment
+setup:
+  - description: "Initialize Nix development environment"
+    run: |
+      # Ensure we're in the repository root
+      cd $GITHUB_WORKSPACE || cd /workspace
+      
+      # Verify flake.nix exists
+      if [[ ! -f flake.nix ]]; then
+        echo "Error: flake.nix not found in current directory"
+        exit 1
+      fi
+      
+      # Check if Nix is available and working
+      if command -v nix &> /dev/null; then
+        echo "✅ Nix is available"
+        nix --version
+      else
+        echo "❌ Nix is not available"
+        exit 1
+      fi
+      
+      # Verify flake syntax
+      echo "🔍 Checking flake syntax..."
+      nix flake check --no-build || {
+        echo "❌ Flake syntax check failed"
+        exit 1
+      }
+      
+      # Display available commands
+      echo "🚀 Development environment ready!"
+      echo "💡 Available commands:"
+      if command -v just &> /dev/null; then
+        just help
+      else
+        echo "  - nix flake check (check flake syntax)"
+        echo "  - nix develop (enter dev shell)"
+        echo "  - nix build .#<package> (build packages)"
+      fi
+
+# Tools and packages that should be available
+tools:
+  - nix
+  - just
+  - alejandra
+  - nixos-rebuild
+  - nix-output-monitor
+  - git
+
+# File patterns that indicate this is a Nix project
+project_patterns:
+  - "flake.nix"
+  - "flake.lock"
+  - "*.nix"
+  - "justfile"
+
+# Documentation and help
+help:
+  description: |
+    This is a Nix configuration repository with support for:
+    - NixOS configurations (Linux)
+    - nix-darwin configurations (macOS)
+    - Cross-compilation between platforms
+    - Home Manager for user-specific configs
+    
+    Key development workflows:
+    1. Use `just help` to see all available commands
+    2. Use `just check` or `nix flake check` to validate configurations
+    3. Use `just format` to format Nix files
+    4. Use `just test` to run cross-compilation tests
+    5. Use `just build-darwin` for cross-platform building
+    
+    The development shell (via `nix develop`) provides all necessary tools
+    including nix, just, alejandra formatter, and build utilities.
+    
+  quick_start: |
+    # Quick start commands:
+    nix flake check          # Validate all configurations
+    just help               # Show available commands  
+    just check-darwin       # Quick darwin config check
+    just format             # Format Nix files
+    just test               # Run tests
+    
+  troubleshooting: |
+    Common issues and solutions:
+    
+    1. "nix: command not found"
+       - The Copilot agent should automatically install Nix
+       - If needed, manually run: source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    
+    2. "experimental features not enabled"
+       - Run: echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+    
+    3. "just: command not found" 
+       - Enter dev shell first: nix develop
+       - Or run commands via: nix develop -c just <command>
+    
+    4. Flake evaluation errors
+       - Check syntax: nix flake check --no-build
+       - Update inputs: nix flake update
+    
+    5. Build failures
+       - Clean previous builds: just clean
+       - Check available packages: nix flake show

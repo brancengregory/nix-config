@@ -18,4 +18,5 @@ A set of configs for my machines:
 
 - [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
 - [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux
+- [GitHub Copilot Agent](docs/COPILOT_AGENT.md) - Development environment for Copilot coding agent
 
