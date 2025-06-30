@@ -32,8 +32,11 @@
       # ollama maybe
       # opencode maybe
       procs
-      R
-      # rWrapper
+      (rWrapper.override {
+        packages = with rPackages; [
+          dplyr
+        ];
+      })
       # radian
       ripgrep
       scc
@@ -289,7 +292,7 @@
         ls = "eza -al --git --icons=always";
         cat = "bat";
         tre = "eza --tree --level=3 --icons --git-ignore";
-        r = "radian";
+        r = "R";
         md = "glow";
         g = "lazygit";
       }
