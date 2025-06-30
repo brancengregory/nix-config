@@ -5,7 +5,7 @@
 # Development environment configuration
 environment:
   # Use GitHub Actions to set up Nix environment reliably
-  # This leverages cachix/install-nix-action for robust installation
+  # This leverages DeterminateSystems/nix-installer-action for robust installation
   setup_workflow: ".github/workflows/setup-nix-env.yml"
   
   # Simple shell environment that assumes Nix is properly set up
@@ -77,8 +77,8 @@ commands:
 setup:
   - description: "Setup Nix environment using GitHub Actions"
     run: |
-      echo "🔧 Setting up Nix environment using cachix/install-nix-action..."
-      echo "📋 This uses the reliable GitHub Actions approach instead of manual installation"
+      echo "🔧 Setting up Nix environment using DeterminateSystems/nix-installer-action..."
+      echo "📋 This uses the reliable Determinate Systems approach for faster, more robust installation"
       
       # If running in GitHub Actions environment, Nix should already be set up
       if [[ -n "$GITHUB_ACTIONS" ]]; then
@@ -155,12 +155,13 @@ help:
     - Home Manager for user-specific configs
     
     Environment Setup:
-    This repository uses GitHub Actions (cachix/install-nix-action) for reliable
+    This repository uses GitHub Actions (DeterminateSystems/nix-installer-action) for reliable
     Nix installation instead of manual shell scripts. This approach:
-    - Is faster and more reliable
-    - Handles edge cases better  
+    - Is faster and more reliable than other methods
+    - Handles edge cases better with the Determinate Systems installer
     - Avoids firewall issues with manual installers
-    - Uses proven, well-tested installation methods
+    - Uses proven, well-tested installation methods from Determinate Systems
+    - Includes automatic caching via magic-nix-cache-action
     
     Key development workflows:
     1. Use `just help` to see all available commands
@@ -206,6 +207,7 @@ help:
        - Check available packages: nix flake show
        
     6. GitHub Actions setup issues
-       - Ensure cachix/install-nix-action@v31 is used
+       - Ensure DeterminateSystems/nix-installer-action@main is used
        - Check workflow logs for detailed error messages
        - Verify GitHub token permissions for private repos
+       - Magic Nix Cache provides automatic caching for faster builds

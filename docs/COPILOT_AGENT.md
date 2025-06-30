@@ -6,13 +6,13 @@ This repository is configured with a GitHub Copilot coding agent environment tha
 
 The Copilot agent environment automatically provides:
 
-- **Nix with flakes support** - Reliable installation using cachix/install-nix-action
+- **Nix with flakes support** - Reliable installation using DeterminateSystems/nix-installer-action
 - **Development shell** - Access to all tools via `nix develop`
 - **Command runner** - `just` for convenient development commands
 - **Code formatting** - `alejandra` Nix formatter
 - **Cross-compilation** - Build and validate configs across platforms
 - **Testing framework** - Automated validation and testing
-- **Binary caching** - Fast builds with cachix integration
+- **Binary caching** - Fast builds with magic-nix-cache-action
 
 ## Available Commands
 
@@ -40,8 +40,8 @@ just clean              # Clean build results and artifacts
 The environment uses GitHub Actions for reliable setup:
 
 1. **GitHub Actions Workflow** - `.github/workflows/setup-nix-env.yml` uses:
-   - `cachix/install-nix-action@v31` for reliable Nix installation
-   - `cachix/cachix-action@v15` for binary caching
+   - `DeterminateSystems/nix-installer-action@main` for reliable, fast Nix installation
+   - `DeterminateSystems/magic-nix-cache-action@main` for automatic binary caching
    - Proper flakes configuration and validation
 
 2. **Simplified Agent Config** - `.github/copilot-agent.yml` references the workflow
@@ -109,8 +109,9 @@ This script checks:
 
 **GitHub Actions setup issues**
 - Check workflow logs for detailed error messages
-- Ensure `cachix/install-nix-action@v31` is used
+- Ensure `DeterminateSystems/nix-installer-action@main` is used
 - Verify GitHub token permissions for private repositories
+- Magic Nix Cache provides automatic caching for faster builds
 
 **Build failures**
 - Clean previous builds: `just clean`

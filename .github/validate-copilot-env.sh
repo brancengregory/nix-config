@@ -109,8 +109,8 @@ fi
 echo
 echo "🎉 Copilot agent environment validation completed successfully!"
 echo "💡 The environment uses GitHub Actions for reliable setup:"
-echo "  - cachix/install-nix-action@v31 for fast, reliable Nix installation"
-echo "  - cachix/cachix-action@v15 for binary caching"
+echo "  - DeterminateSystems/nix-installer-action@main for fast, reliable Nix installation"
+echo "  - DeterminateSystems/magic-nix-cache-action@main for automatic binary caching"
 echo "  - Automatic flakes support and configuration"
 echo "  - Works around firewall restrictions"
 echo
