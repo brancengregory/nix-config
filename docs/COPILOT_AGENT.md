@@ -37,66 +37,65 @@ just clean              # Clean build results and artifacts
 
 ## Environment Setup
 
-The environment uses GitHub Actions for reliable setup:
+The environment uses GitHub Copilot's official setup workflow approach:
 
-1. **GitHub Actions Workflow** - `.github/workflows/setup-nix-env.yml` uses:
+1. **Copilot Setup Steps** - `.github/workflows/copilot-setup-steps.yml` follows GitHub's official documentation and uses:
    - `DeterminateSystems/nix-installer-action@main` for reliable, fast Nix installation
    - `DeterminateSystems/magic-nix-cache-action@main` for automatic binary caching
    - Proper flakes configuration and validation
 
-2. **Simplified Agent Config** - `.github/copilot-agent.yml` references the workflow
-3. **Development Shell** - The agent enters the Nix development shell defined in `flake.nix`
-4. **Tool Access** - All development tools become available (just, alejandra, etc.)
+2. **Development Shell** - The agent enters the Nix development shell defined in `flake.nix`
+3. **Tool Access** - All development tools become available (just, alejandra, etc.)
 
-### Benefits of GitHub Actions Approach
+### Benefits of GitHub Copilot Setup Approach
 
-- **Reliability** - Uses proven, well-tested installation methods
+- **Official** - Follows GitHub's official documentation for Copilot setup steps
+- **Simple** - Single workflow file instead of multiple configuration files
+- **Reliable** - Uses proven, well-tested installation methods
 - **Speed** - Fast installation (~4s on Linux, ~20s on macOS)
 - **Caching** - Binary cache integration for faster builds
-- **Maintenance** - No custom installation scripts to maintain
+- **Maintenance** - Minimal configuration to maintain
 - **Compatibility** - Works around firewall restrictions
 
 ## Configuration Files
 
 ### Primary Configuration
-- `.github/copilot-agent.yml` - Copilot agent environment configuration
-- `.github/workflows/setup-nix-env.yml` - GitHub Actions workflow for Nix setup
+- `.github/workflows/copilot-setup-steps.yml` - GitHub Copilot setup workflow following official documentation
 
 ### Supporting Files
-- `.github/validate-copilot-env.sh` - Environment validation script
 - `flake.nix` - Nix flake with development shell definition
 - `justfile` - Development command shortcuts
 
-The environment configuration includes:
-- **Available commands** - All development commands with descriptions
-- **Setup validation** - Automatic checks to ensure everything works
-- **Documentation** - Help and troubleshooting information
+The setup provides:
+- **Automatic Nix installation** - Uses DeterminateSystems actions for reliable setup
+- **Development shell access** - All tools available via `nix develop`
+- **Flake validation** - Ensures configuration syntax is correct
 
 ## Validation
 
-You can validate the environment setup using:
+The copilot-setup-steps.yml workflow automatically validates the environment by:
+
+- ✅ Installing Nix with flakes support
+- ✅ Checking flake syntax with `nix flake check`
+- ✅ Entering development shell to verify tools are available
+
+You can manually run the workflow to test the setup:
 
 ```bash
-.github/validate-copilot-env.sh
+gh workflow run copilot-setup-steps.yml
 ```
-
-This script checks:
-- ✅ Essential files are present (`flake.nix`, `justfile`, etc.)
-- ✅ Configuration file syntax is valid
-- ✅ GitHub Actions workflow is properly configured
-- ✅ Nix commands work correctly (if Nix is available)
 
 ## Troubleshooting
 
 ### Common Issues
 
 **"nix: command not found"**
-- Run the setup workflow: `gh workflow run setup-nix-env.yml`
+- The copilot-setup-steps.yml workflow automatically installs Nix
 - Or manually install: `curl -L https://nixos.org/nix/install | sh`
 - Source environment: `source ~/.nix-profile/etc/profile.d/nix.sh`
 
 **"experimental features not enabled"**
-- The GitHub Actions workflow handles this automatically
+- The copilot-setup-steps.yml workflow handles this automatically
 - Manual fix: `echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf`
 
 **"just: command not found"**
