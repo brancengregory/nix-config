@@ -292,7 +292,7 @@
         ls = "eza -al --git --icons=always";
         cat = "bat";
         tre = "eza --tree --level=3 --icons --git-ignore";
-        r = "R";
+        r = "radian";
         md = "glow";
         g = "lazygit";
       }
