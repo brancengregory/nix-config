@@ -11,6 +11,6 @@
   # Boot configuration - using GRUB as required by the error message
   boot.loader.grub = {
     enable = true;
-    devices = [ "/dev/sda" ]; # This satisfies the boot.loader.grub.devices requirement
+    devices = ["/dev/sda"]; # This satisfies the boot.loader.grub.devices requirement
   };
 }
