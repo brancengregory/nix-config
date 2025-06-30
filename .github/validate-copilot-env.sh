@@ -30,12 +30,28 @@ else
     exit 1
 fi
 
+# Check if GitHub Actions workflow exists
+if [[ -f .github/workflows/setup-nix-env.yml ]]; then
+    echo "✅ Found .github/workflows/setup-nix-env.yml - GitHub Actions setup workflow is present"
+else
+    echo "❌ Missing .github/workflows/setup-nix-env.yml workflow"
+    exit 1
+fi
+
 # Validate YAML syntax of copilot-agent.yml (basic check)
 if command -v python3 &> /dev/null; then
     if python3 -c "import yaml; yaml.safe_load(open('.github/copilot-agent.yml'))" 2>/dev/null; then
         echo "✅ copilot-agent.yml has valid YAML syntax"
     else
         echo "❌ copilot-agent.yml has invalid YAML syntax"
+        exit 1
+    fi
+    
+    # Validate GitHub Actions workflow YAML syntax
+    if python3 -c "import yaml; yaml.safe_load(open('.github/workflows/setup-nix-env.yml'))" 2>/dev/null; then
+        echo "✅ setup-nix-env.yml has valid YAML syntax"
+    else
+        echo "❌ setup-nix-env.yml has invalid YAML syntax"
         exit 1
     fi
 else
@@ -48,6 +64,7 @@ essential_files=(
     "flake.lock" 
     "justfile"
     ".github/copilot-agent.yml"
+    ".github/workflows/setup-nix-env.yml"
 )
 
 missing_files=()
@@ -91,16 +108,18 @@ fi
 
 echo
 echo "🎉 Copilot agent environment validation completed successfully!"
-echo "💡 The environment is configured to provide:"
-echo "  - Nix with flakes support"
-echo "  - Development shell with essential tools (just, alejandra, etc.)"
-echo "  - Cross-compilation capabilities"
-echo "  - Validation and testing commands"
+echo "💡 The environment uses GitHub Actions for reliable setup:"
+echo "  - cachix/install-nix-action@v31 for fast, reliable Nix installation"
+echo "  - cachix/cachix-action@v15 for binary caching"
+echo "  - Automatic flakes support and configuration"
+echo "  - Works around firewall restrictions"
 echo
 echo "🚀 Key commands available to the Copilot agent:"
 echo "  - nix flake check"
 echo "  - just help"
 echo "  - just check-darwin"
-echo "  - just build-darwin"
+echo "  - just build-darwin" 
 echo "  - just format"
 echo "  - just test"
+echo
+echo "🔧 Setup workflow: gh workflow run setup-nix-env.yml"

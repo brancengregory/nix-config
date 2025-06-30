@@ -6,12 +6,13 @@ This repository is configured with a GitHub Copilot coding agent environment tha
 
 The Copilot agent environment automatically provides:
 
-- **Nix with flakes support** - Automatically installed and configured
+- **Nix with flakes support** - Reliable installation using cachix/install-nix-action
 - **Development shell** - Access to all tools via `nix develop`
 - **Command runner** - `just` for convenient development commands
 - **Code formatting** - `alejandra` Nix formatter
 - **Cross-compilation** - Build and validate configs across platforms
 - **Testing framework** - Automated validation and testing
+- **Binary caching** - Fast builds with cachix integration
 
 ## Available Commands
 
@@ -36,18 +37,37 @@ just clean              # Clean build results and artifacts
 
 ## Environment Setup
 
-The environment is automatically configured when the Copilot agent starts:
+The environment uses GitHub Actions for reliable setup:
 
-1. **Nix Installation** - If Nix is not available, it's automatically installed with flakes support
-2. **Configuration** - Experimental features are enabled for flakes and commands
+1. **GitHub Actions Workflow** - `.github/workflows/setup-nix-env.yml` uses:
+   - `cachix/install-nix-action@v31` for reliable Nix installation
+   - `cachix/cachix-action@v15` for binary caching
+   - Proper flakes configuration and validation
+
+2. **Simplified Agent Config** - `.github/copilot-agent.yml` references the workflow
 3. **Development Shell** - The agent enters the Nix development shell defined in `flake.nix`
 4. **Tool Access** - All development tools become available (just, alejandra, etc.)
 
-## Configuration File
+### Benefits of GitHub Actions Approach
 
-The environment is defined in `.github/copilot-agent.yml` which includes:
+- **Reliability** - Uses proven, well-tested installation methods
+- **Speed** - Fast installation (~4s on Linux, ~20s on macOS)
+- **Caching** - Binary cache integration for faster builds
+- **Maintenance** - No custom installation scripts to maintain
+- **Compatibility** - Works around firewall restrictions
 
-- **Environment setup** - Nix installation and configuration
+## Configuration Files
+
+### Primary Configuration
+- `.github/copilot-agent.yml` - Copilot agent environment configuration
+- `.github/workflows/setup-nix-env.yml` - GitHub Actions workflow for Nix setup
+
+### Supporting Files
+- `.github/validate-copilot-env.sh` - Environment validation script
+- `flake.nix` - Nix flake with development shell definition
+- `justfile` - Development command shortcuts
+
+The environment configuration includes:
 - **Available commands** - All development commands with descriptions
 - **Setup validation** - Automatic checks to ensure everything works
 - **Documentation** - Help and troubleshooting information
@@ -63,6 +83,7 @@ You can validate the environment setup using:
 This script checks:
 - ✅ Essential files are present (`flake.nix`, `justfile`, etc.)
 - ✅ Configuration file syntax is valid
+- ✅ GitHub Actions workflow is properly configured
 - ✅ Nix commands work correctly (if Nix is available)
 
 ## Troubleshooting
@@ -70,11 +91,13 @@ This script checks:
 ### Common Issues
 
 **"nix: command not found"**
-- The Copilot agent should automatically install Nix
-- If needed, manually source: `source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh`
+- Run the setup workflow: `gh workflow run setup-nix-env.yml`
+- Or manually install: `curl -L https://nixos.org/nix/install | sh`
+- Source environment: `source ~/.nix-profile/etc/profile.d/nix.sh`
 
 **"experimental features not enabled"**
-- Run: `echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf`
+- The GitHub Actions workflow handles this automatically
+- Manual fix: `echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf`
 
 **"just: command not found"**
 - Enter dev shell first: `nix develop`
@@ -83,6 +106,11 @@ This script checks:
 **Flake evaluation errors**
 - Check syntax: `nix flake check --no-build`
 - Update inputs: `nix flake update`
+
+**GitHub Actions setup issues**
+- Check workflow logs for detailed error messages
+- Ensure `cachix/install-nix-action@v31` is used
+- Verify GitHub token permissions for private repositories
 
 **Build failures**
 - Clean previous builds: `just clean`

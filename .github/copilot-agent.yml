@@ -4,35 +4,28 @@
 
 # Development environment configuration
 environment:
-  # Use the Nix-enabled development shell defined in flake.nix
+  # Use GitHub Actions to set up Nix environment reliably
+  # This leverages cachix/install-nix-action for robust installation
+  setup_workflow: ".github/workflows/setup-nix-env.yml"
+  
+  # Simple shell environment that assumes Nix is properly set up
   shell: |
-    # Install Nix with flakes support if not already available
+    # Ensure Nix environment is available
     if ! command -v nix &> /dev/null; then
-      echo "Installing Nix with flakes support..."
-      # Try Determinate Systems installer first (recommended)
-      if curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm; then
-        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      else
-        # Fallback to official installer
-        echo "Falling back to official Nix installer..."
-        sh <(curl -L https://nixos.org/nix/install) --daemon --yes
-        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      fi
+      echo "⚠️  Nix not found. Please ensure the setup workflow has run."
+      echo "📋 Run: gh workflow run setup-nix-env.yml"
+      exit 1
     fi
     
-    # Ensure Nix is in PATH
-    export PATH="/nix/var/nix/profiles/default/bin:$PATH"
-    
-    # Enable experimental features for flakes
-    mkdir -p ~/.config/nix
-    echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
-    
-    # Source Nix environment if needed
-    if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-      source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    # Verify flakes support
+    if ! nix flake --help &> /dev/null; then
+      echo "🔧 Enabling flakes support..."
+      mkdir -p ~/.config/nix
+      echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
     fi
     
     # Enter the development shell which provides all necessary tools
+    echo "🚀 Entering Nix development shell..."
     nix develop --command bash
 
   # Environment variables needed for development
@@ -82,14 +75,28 @@ commands:
 
 # Setup commands to run when initializing the environment
 setup:
-  - description: "Initialize Nix development environment"
+  - description: "Setup Nix environment using GitHub Actions"
+    run: |
+      echo "🔧 Setting up Nix environment using cachix/install-nix-action..."
+      echo "📋 This uses the reliable GitHub Actions approach instead of manual installation"
+      
+      # If running in GitHub Actions environment, Nix should already be set up
+      if [[ -n "$GITHUB_ACTIONS" ]]; then
+        echo "ℹ️  Running in GitHub Actions - Nix should be pre-configured"
+      else
+        echo "ℹ️  For local development, please run the setup workflow:"
+        echo "   gh workflow run setup-nix-env.yml"
+        echo "   Or use: nix develop (if Nix is already installed)"
+      fi
+      
+  - description: "Verify environment and show available commands"  
     run: |
       # Ensure we're in the repository root
       cd $GITHUB_WORKSPACE || cd /workspace
       
       # Verify flake.nix exists
       if [[ ! -f flake.nix ]]; then
-        echo "Error: flake.nix not found in current directory"
+        echo "❌ Error: flake.nix not found in current directory"
         exit 1
       fi
       
@@ -97,27 +104,29 @@ setup:
       if command -v nix &> /dev/null; then
         echo "✅ Nix is available"
         nix --version
+        
+        # Verify flake syntax
+        echo "🔍 Checking flake syntax..."
+        nix flake check --no-build || {
+          echo "❌ Flake syntax check failed"
+          exit 1
+        }
+        
+        # Display available commands
+        echo "🚀 Development environment ready!"
+        echo "💡 Available commands:"
+        nix develop --command bash -c "
+          if command -v just &> /dev/null; then
+            just help
+          else
+            echo '  - nix flake check (check flake syntax)'
+            echo '  - nix develop (enter dev shell)'
+            echo '  - nix build .#<package> (build packages)'
+          fi
+        "
       else
-        echo "❌ Nix is not available"
-        exit 1
-      fi
-      
-      # Verify flake syntax
-      echo "🔍 Checking flake syntax..."
-      nix flake check --no-build || {
-        echo "❌ Flake syntax check failed"
-        exit 1
-      }
-      
-      # Display available commands
-      echo "🚀 Development environment ready!"
-      echo "💡 Available commands:"
-      if command -v just &> /dev/null; then
-        just help
-      else
-        echo "  - nix flake check (check flake syntax)"
-        echo "  - nix develop (enter dev shell)"
-        echo "  - nix build .#<package> (build packages)"
+        echo "⚠️  Nix is not available. Please run the setup workflow first."
+        echo "📋 Command: gh workflow run setup-nix-env.yml"
       fi
 
 # Tools and packages that should be available
@@ -145,6 +154,14 @@ help:
     - Cross-compilation between platforms
     - Home Manager for user-specific configs
     
+    Environment Setup:
+    This repository uses GitHub Actions (cachix/install-nix-action) for reliable
+    Nix installation instead of manual shell scripts. This approach:
+    - Is faster and more reliable
+    - Handles edge cases better  
+    - Avoids firewall issues with manual installers
+    - Uses proven, well-tested installation methods
+    
     Key development workflows:
     1. Use `just help` to see all available commands
     2. Use `just check` or `nix flake check` to validate configurations
@@ -157,21 +174,24 @@ help:
     
   quick_start: |
     # Quick start commands:
-    nix flake check          # Validate all configurations
-    just help               # Show available commands  
-    just check-darwin       # Quick darwin config check
-    just format             # Format Nix files
-    just test               # Run tests
+    gh workflow run setup-nix-env.yml  # Setup environment (first time)
+    nix flake check                    # Validate all configurations
+    just help                         # Show available commands  
+    just check-darwin                 # Quick darwin config check
+    just format                       # Format Nix files
+    just test                         # Run tests
     
   troubleshooting: |
     Common issues and solutions:
     
     1. "nix: command not found"
-       - The Copilot agent should automatically install Nix
-       - If needed, manually run: source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+       - Run the setup workflow: gh workflow run setup-nix-env.yml
+       - Or manually install Nix: curl -L https://nixos.org/nix/install | sh
+       - Source environment: source ~/.nix-profile/etc/profile.d/nix.sh
     
     2. "experimental features not enabled"
-       - Run: echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+       - The setup workflow handles this automatically
+       - Manual fix: echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
     
     3. "just: command not found" 
        - Enter dev shell first: nix develop
@@ -184,3 +204,8 @@ help:
     5. Build failures
        - Clean previous builds: just clean
        - Check available packages: nix flake show
+       
+    6. GitHub Actions setup issues
+       - Ensure cachix/install-nix-action@v31 is used
+       - Check workflow logs for detailed error messages
+       - Verify GitHub token permissions for private repos
