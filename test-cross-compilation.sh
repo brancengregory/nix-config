@@ -55,6 +55,7 @@ echo
 echo "🎉 All tests passed! Cross-compilation setup is working correctly."
 echo
 echo "💡 To use the cross-compilation features:"
-echo "  - Run 'nix build .#turbine-darwin' to cross-compile the full darwin config"
-echo "  - Run 'nix build .#turbine-check' to validate the darwin config"
-echo "  - Run 'nix develop' to enter the development environment"
+echo "  - Run 'just build-darwin' to cross-compile the full darwin config"
+echo "  - Run 'just check-darwin' to validate the darwin config"
+echo "  - Run 'just dev' to enter the development environment"
+echo "  - Run 'just help' to see all available commands"

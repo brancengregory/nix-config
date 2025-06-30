@@ -95,14 +95,16 @@
         nixos-rebuild
         nix-output-monitor
         alejandra # Nix formatter
+        just # Command runner
       ];
       shellHook = ''
         echo "🚀 Cross-platform Nix development environment"
         echo "💡 Available commands:"
-        echo "  - nix build .#turbine-darwin (cross-compile darwin config)"
-        echo "  - nix build .#turbine-check (validate darwin config)"
-        echo "  - nix build .#powerhouse-vm (build NixOS VM)"
-        echo "  - alejandra . (format Nix files)"
+        echo "  - just build-darwin (cross-compile darwin config)"
+        echo "  - just check-darwin (validate darwin config)"
+        echo "  - just build-linux (build NixOS VM)"
+        echo "  - just format (format Nix files)"
+        echo "  - just help (show all commands)"
       '';
     };
   };
