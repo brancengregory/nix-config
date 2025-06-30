@@ -31,8 +31,9 @@
     	# ollama maybe
     	# opencode maybe
     	procs
-      r
-    	radian
+      R
+      # rWrapper
+      # radian
     	ripgrep
     	scc
     	sesh
