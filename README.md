@@ -12,8 +12,10 @@ A set of configurations for my machines:
 - **Home Manager integration**: User-specific configurations
 - **Homebrew support** (macOS): GUI applications and Mac-specific software
 - **Minimal approach**: Prefer nixpkgs over Homebrew when possible
+- **Cross-compilation**: Build and validate nix-darwin configs from Linux
 
 ## Documentation
 
 - [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
+- [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux
 

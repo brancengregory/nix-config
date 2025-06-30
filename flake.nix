@@ -73,9 +73,39 @@
 		};
 
 
-    # Create a VM for testing
+    # Create a VM for testing and cross-compilation targets
     packages.x86_64-linux = {
       powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
+      
+      # Cross-compilation: Build darwin configurations from Linux
+      turbine-darwin = self.darwinConfigurations.turbine.system;
+      
+      # Validation: Check darwin configurations without building
+      turbine-check = self.darwinConfigurations.turbine.config.system.build.toplevel.drvPath;
+    };
+
+    # Enable cross-compilation for darwin packages on Linux
+    packages.x86_64-darwin = {
+      turbine-darwin = self.darwinConfigurations.turbine.system;
+    };
+
+    # Development shells for cross-platform work
+    devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
+      buildInputs = with nixpkgs.legacyPackages.x86_64-linux; [
+        nixos-rebuild
+        nix-output-monitor
+        alejandra # Nix formatter
+        just # Command runner
+      ];
+      shellHook = ''
+        echo "🚀 Cross-platform Nix development environment"
+        echo "💡 Available commands:"
+        echo "  - just build-darwin (cross-compile darwin config)"
+        echo "  - just check-darwin (validate darwin config)"
+        echo "  - just build-linux (build NixOS VM)"
+        echo "  - just format (format Nix files)"
+        echo "  - just help (show all commands)"
+      '';
     };
   };
 }
