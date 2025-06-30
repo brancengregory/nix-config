@@ -182,12 +182,12 @@
     enableSshSupport = true;
     enableScDaemon = true;
 
-    # Platform-specific pinentry programs (updated option name)
+    # Platform-specific pinentry programs with tmux compatibility
     pinentry.package =
       if pkgs.stdenv.isLinux
-      then pkgs.pinentry-gtk2
+      then pkgs.pinentry-gtk2  # GTK pinentry works well with tmux on Linux
       else if pkgs.stdenv.isDarwin
-      then pkgs.pinentry_mac
+      then pkgs.pinentry_mac   # macOS native pinentry
       else throw "Unsupported OS for GPG agent configuration";
 
     # Agent settings
@@ -196,7 +196,7 @@
     maxCacheTtl = 86400; # 24 hours
     maxCacheTtlSsh = 86400; # 24 hours
 
-    # Extra configuration
+    # Extra configuration for tmux compatibility
     extraConfig = ''
       allow-preset-passphrase
       no-allow-external-cache
@@ -204,12 +204,68 @@
       min-passphrase-len 12
       min-passphrase-nonalpha 2
       check-passphrase-pattern
+      
+      # Tmux compatibility improvements
+      # Allow loopback pinentry for better tmux integration
+      allow-loopback-pinentry
+      
+      # Debug options (can be removed in production)
+      # debug-level guru
+      # log-file /tmp/gpg-agent.log
     '';
   };
 
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  # Tmux configuration optimized for GPG/SSH integration
+  programs.tmux = {
+    enable = true;
+    mouse = true;
+    clock24 = true;
+    
+    # Key bindings
+    keyMode = "vi";
+    prefix = "C-a";
+    
+    # Terminal and environment settings
+    terminal = "screen-256color";
+    
+    extraConfig = ''
+      # Enable true color support
+      set-option -sa terminal-overrides ",xterm*:Tc"
+      
+      # GPG/SSH integration improvements
+      set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
+      
+      # Hook to update GPG_TTY when switching panes/windows
+      set-hook -g pane-focus-in 'run-shell "[ -n \"$TMUX\" ] && export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+      
+      # Ensure shell integration works properly
+      set-option -g default-shell ${pkgs.zsh}/bin/zsh
+      
+      # Better pane splitting
+      bind | split-window -h -c "#{pane_current_path}"
+      bind - split-window -v -c "#{pane_current_path}"
+      
+      # Reload configuration
+      bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"
+      
+      # Status bar
+      set-option -g status-position top
+      set-option -g status-style "fg=#7C7D83,bg=#242631"
+      set-option -g status-left-length 50
+      set-option -g status-right-length 50
+      
+      # Window status
+      set-window-option -g window-status-current-style "fg=#E2E4E5,bg=#414550"
+      
+      # Pane borders
+      set-option -g pane-border-style "fg=#7C7D83"
+      set-option -g pane-active-border-style "fg=#E2E4E5"
+    '';
   };
 
   programs.fzf = {
@@ -432,6 +488,12 @@
         r = "radian";
         md = "glow";
         g = "lazygit";
+        
+        # GPG/SSH troubleshooting aliases
+        gpg-restart = "gpgconf --kill gpg-agent && gpgconf --launch gpg-agent";
+        gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
+        ssh-keys = "ssh-add -l";
+        gpg-refresh = "refresh_gpg";
       }
       // (
         if pkgs.stdenv.isLinux
@@ -481,10 +543,23 @@
 
       # Environment variables for unified GPG/SSH strategy
       export SSH_ASKPASS_REQUIRE=never
-      export GPG_TTY=$(tty)
-
-      # Initialize GPG agent and SSH support
-      gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+      
+      # Dynamic GPG_TTY handling for tmux compatibility
+      update_gpg_tty() {
+        export GPG_TTY=$(tty)
+        if [ -n "$GPG_AGENT_INFO" ] || pgrep -x gpg-agent >/dev/null 2>&1; then
+          gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+        fi
+      }
+      
+      # Set initial GPG_TTY and update it
+      update_gpg_tty
+      
+      # Update GPG_TTY when entering new shells (important for tmux)
+      if [ -n "$TMUX" ]; then
+        # In tmux, update GPG_TTY whenever we start a new shell
+        update_gpg_tty
+      fi
 
       ${
         if pkgs.stdenv.isLinux
@@ -492,9 +567,21 @@
           # Linux: Use GPG agent for SSH authentication
           export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 
-          # Make sure sudo works well in tmux
+          # Tmux-specific improvements
           if [ -n "$TMUX" ]; then
+            # Ensure SSH agent socket is available in tmux
+            if [ ! -S "$SSH_AUTH_SOCK" ]; then
+              export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+            fi
+            
+            # Make sure sudo and other commands work well in tmux
             stty sane
+            
+            # Create a function to refresh GPG agent in current tmux pane
+            refresh_gpg() {
+              update_gpg_tty
+              echo "GPG agent refreshed for current tmux pane"
+            }
           fi
 
           export PROJ_DATA=/usr/share/proj
@@ -505,6 +592,21 @@
 
           # Ensure GPG agent is running
           gpgconf --launch gpg-agent
+          
+          # Tmux-specific improvements for macOS
+          if [ -n "$TMUX" ]; then
+            # Verify SSH socket is accessible in tmux
+            if [ ! -S "$SSH_AUTH_SOCK" ]; then
+              export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+            fi
+            
+            # Create a function to refresh GPG agent in current tmux pane
+            refresh_gpg() {
+              update_gpg_tty
+              gpgconf --launch gpg-agent
+              echo "GPG agent refreshed for current tmux pane"
+            }
+          fi
         ''
       }
 

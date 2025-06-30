@@ -53,6 +53,29 @@ The strategy implements a modern, secure approach where:
 - **Smart Card Support**: Hardware token integration ready
 - **Agent Management**: Automatic startup and proper TTY handling
 
+### Tmux Configuration
+
+The strategy includes optimized tmux configuration with:
+
+```nix
+programs.tmux = {
+  enable = true;
+  # GPG/SSH integration improvements
+  extraConfig = ''
+    # Ensure environment variables are passed to new panes
+    set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
+    
+    # Hook to update GPG_TTY when switching panes
+    set-hook -g pane-focus-in 'run-shell "[ -n \"$TMUX\" ] && export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+  '';
+};
+```
+
+This ensures:
+- Environment variables are properly inherited in new tmux panes
+- GPG_TTY is automatically updated when switching between panes
+- SSH authentication works consistently across all tmux sessions
+
 ## Configuration Files
 
 The strategy is implemented across several configuration files:
@@ -110,6 +133,55 @@ git config --global user.signingkey YOUR_GPG_KEY_ID
 # Verify signing works
 git commit --allow-empty -m "Test GPG signing"
 git log --show-signature -1
+```
+
+## Tmux Integration
+
+The configuration includes comprehensive tmux support to ensure GPG and SSH work seamlessly within tmux sessions.
+
+### Tmux-Specific Features
+
+- **Dynamic GPG_TTY**: Automatically updates when switching tmux panes
+- **SSH agent socket management**: Ensures consistent SSH authentication in tmux
+- **Pinentry compatibility**: Configured to work properly with tmux sessions
+- **Automatic hooks**: Updates GPG agent state when switching panes
+
+### Usage in Tmux
+
+```bash
+# Start tmux session
+tmux new-session -s work
+
+# SSH from within tmux (works seamlessly)
+ssh git@github.com
+
+# Git operations work with automatic signing
+git commit -m "Update from tmux session"
+git push
+
+# If you encounter issues, refresh GPG state
+refresh_gpg
+```
+
+### Troubleshooting Tmux Issues
+
+If you encounter pinentry or authentication issues in tmux:
+
+```bash
+# Check GPG agent status
+gpg-status
+
+# Restart GPG agent if needed  
+gpg-restart
+
+# Manually refresh GPG state in current pane
+gpg-refresh
+
+# Check SSH keys are loaded
+ssh-keys
+
+# Verify SSH socket is correct
+echo $SSH_AUTH_SOCK
 ```
 
 ## Daily Usage
@@ -187,6 +259,11 @@ gpgconf --launch gpg-agent
 
 # Check agent status
 gpg-connect-agent 'keyinfo --list' /bye
+
+# Use helpful aliases
+gpg-restart  # Restart agent
+gpg-status   # Check status
+gpg-refresh  # Refresh in tmux pane
 ```
 
 ### SSH Authentication Problems
@@ -200,6 +277,50 @@ ssh-add -l
 
 # Force GPG agent refresh
 gpg-connect-agent updatestartuptty /bye
+
+# Use aliases for quick checks
+ssh-keys     # List SSH keys
+```
+
+### Tmux-Specific Issues
+
+**Problem**: Pinentry appears in wrong pane or doesn't appear at all
+
+```bash
+# Solution 1: Refresh GPG state in current pane
+refresh_gpg
+
+# Solution 2: Restart GPG agent completely  
+gpg-restart
+
+# Solution 3: Check GPG_TTY is set correctly
+echo $GPG_TTY
+```
+
+**Problem**: SSH authentication fails in tmux but works outside
+
+```bash
+# Check SSH socket in tmux session
+echo $SSH_AUTH_SOCK
+
+# Verify the socket file exists
+ls -la $SSH_AUTH_SOCK
+
+# If socket is missing, restart the session or refresh
+refresh_gpg
+```
+
+**Problem**: Git signing fails in tmux
+
+```bash
+# Check GPG agent can sign
+echo "test" | gpg --clearsign
+
+# Refresh GPG state if needed
+refresh_gpg
+
+# Test Git signing explicitly
+git commit --allow-empty -m "Test commit" --gpg-sign
 ```
 
 ### Platform-Specific Issues
