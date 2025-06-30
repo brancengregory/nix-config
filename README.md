@@ -1,6 +1,6 @@
 # Nix Config
 
-A set of configurations for my machines:
+A set of configs for my machines:
 
 - powerhouse (desktop) - NixOS
 - capacitor (server) - NixOS  
@@ -9,7 +9,7 @@ A set of configurations for my machines:
 ## Features
 
 - **Cross-platform**: Supports both NixOS and macOS
-- **Home Manager integration**: User-specific configurations
+- **Home Manager integration**: User-specific configs
 - **Homebrew support** (macOS): GUI applications and Mac-specific software
 - **Minimal approach**: Prefer nixpkgs over Homebrew when possible
 - **Cross-compilation**: Build and validate nix-darwin configs from Linux

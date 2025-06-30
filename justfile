@@ -4,8 +4,8 @@
 # Show available commands
 help:
     @echo "Available commands:"
-    @echo "  check-darwin    - Validate nix-darwin configuration (fast)"
-    @echo "  build-darwin    - Cross-compile full nix-darwin configuration"
+    @echo "  check-darwin    - Validate nix-darwin config (fast)"
+    @echo "  build-darwin    - Cross-compile full nix-darwin config"
     @echo "  build-linux     - Build NixOS VM"
     @echo "  dev             - Enter development shell"
     @echo "  check           - Check flake syntax"
@@ -13,11 +13,11 @@ help:
     @echo "  test            - Run cross-compilation tests"
     @echo "  format          - Format Nix files"
 
-# Validate nix-darwin configuration
+# Validate nix-darwin config
 check-darwin:
     nix build .#turbine-check
 
-# Cross-compile nix-darwin configuration from Linux
+# Cross-compile nix-darwin config from Linux
 build-darwin:
     nix build .#turbine-darwin
 

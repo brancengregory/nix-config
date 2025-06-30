@@ -2,7 +2,7 @@
   imports = [
     ../../modules/common.nix # Universal settings
     ../../modules/nixos.nix # Common NixOS settings
-    ./hardware-configuration.nix # Hardware-specific configuration
+    ./hardware.nix # Hardware-specific configuration
   ];
 
   networking.hostName = "powerhouse";

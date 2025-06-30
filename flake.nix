@@ -39,7 +39,7 @@
         specialArgs = {inherit inputs;}; # Pass inputs to modules
         modules = [
           # 1. Import main config for this host
-          ./hosts/powerhouse/configuration.nix
+          ./hosts/powerhouse/config.nix
 
           # 2. Add Home Manager as a module to this system
           home-manager.nixosModules.home-manager
@@ -63,7 +63,7 @@
         specialArgs = {inherit inputs;};
 
         modules = [
-          ./hosts/turbine/configuration.nix
+          ./hosts/turbine/config.nix
 
           # Add Home Manager support for MacOS
           home-manager.darwinModules.home-manager
@@ -82,10 +82,10 @@
     packages.x86_64-linux = {
       powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
 
-      # Cross-compilation: Build darwin configurations from Linux
+      # Cross-compilation: Build darwin configs from Linux
       turbine-darwin = self.darwinConfigurations.turbine.system;
 
-      # Validation: Check darwin configurations without building
+      # Validation: Check darwin configs without building
       turbine-check = self.darwinConfigurations.turbine.config.system.build.toplevel.drvPath;
     };
 
