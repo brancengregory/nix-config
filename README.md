@@ -3,7 +3,6 @@
 A set of configs for my machines:
 
 - powerhouse (desktop) - NixOS
-- capacitor (server) - NixOS
 - turbine (laptop) - macOS with nix-darwin
 
 ## Features
