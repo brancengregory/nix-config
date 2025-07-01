@@ -81,70 +81,57 @@
     };
   };
 
-  # Comprehensive GPG configuration
+  # Streamlined GPG configuration with essential security settings
   programs.gpg = {
     enable = true;
 
-    # GPG configuration settings
+    # Essential GPG configuration - optimized for performance and security
     settings = {
-      # Use modern algorithms and stronger defaults
+      # Modern algorithms (essential only)
       personal-cipher-preferences = "AES256 AES192 AES";
       personal-digest-preferences = "SHA512 SHA384 SHA256";
-      personal-compress-preferences = "ZLIB BZIP2 ZIP Uncompressed";
-      default-preference-list = "SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed";
       cipher-algo = "AES256";
       digest-algo = "SHA512";
       cert-digest-algo = "SHA512";
-      compress-algo = "ZLIB";
+      
+      # Disable weak algorithms
       disable-cipher-algo = "3DES";
       weak-digest = "SHA1";
-      s2k-mode = "3";
-      s2k-digest-algo = "SHA512";
-      s2k-count = "65011712";
 
-      # Display options
-      fixed-list-mode = true;
+      # Essential display and behavior options
       keyid-format = "0xlong";
-      list-options = "show-uid-validity";
-      verify-options = "show-uid-validity";
       with-fingerprint = true;
-
-      # Behavior
-      require-cross-certification = true;
-      no-symkey-cache = true;
       use-agent = true;
-      throw-keyids = true;
 
-      # Keyserver settings (using keys.openpgp.org as default)
+      # Keyserver settings
       keyserver = "hkps://keys.openpgp.org";
-      keyserver-options = "no-honor-keyserver-url include-revoked";
+      keyserver-options = "no-honor-keyserver-url";
     };
   };
 
-  # SSH configuration with GPG agent integration
+  # Streamlined SSH configuration with balanced security
   programs.ssh = {
     enable = true;
 
-    # Global SSH client configuration
+    # Security-focused SSH client configuration
     extraConfig = ''
-      # Security settings
+      # Core security settings
       Protocol 2
-      HashKnownHosts yes
-      VisualHostKey yes
       PasswordAuthentication no
       ChallengeResponseAuthentication no
       StrictHostKeyChecking ask
-      VerifyHostKeyDNS yes
+      HashKnownHosts yes
       ForwardAgent no
       ForwardX11 no
-      ForwardX11Trusted no
       ServerAliveInterval 300
       ServerAliveCountMax 2
-      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
-      KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
-      HostKeyAlgorithms ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512
-      PubkeyAcceptedKeyTypes ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512
+      
+      # Modern cryptography (essential algorithms only)
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes256-ctr
+      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
+      KexAlgorithms curve25519-sha256,diffie-hellman-group16-sha512
+      HostKeyAlgorithms ssh-ed25519,rsa-sha2-256,rsa-sha2-512
+      PubkeyAcceptedKeyTypes ssh-ed25519,rsa-sha2-256,rsa-sha2-512
     '';
 
     # Common host configurations
@@ -153,7 +140,6 @@
         hostname = "github.com";
         user = "git";
         identitiesOnly = true;
-        # Use GPG SSH key for GitHub
         extraOptions = {
           PreferredAuthentications = "publickey";
         };
@@ -176,37 +162,33 @@
     };
   };
 
-  # GPG Agent configuration for SSH and GPG operations
+  # Optimized GPG Agent configuration
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
     enableScDaemon = true;
 
-    # Platform-specific pinentry programs with tmux compatibility
-    pinentry.package = pkgs.pinentry-curses;  # Terminal-based pinentry for both platforms
+    # Platform-optimized pinentry with fallback to curses
+    pinentry.package = 
+      if pkgs.stdenv.isLinux then
+        pkgs.pinentry-curses  # Terminal-based for consistency
+      else
+        pkgs.pinentry-curses;  # curses works well on macOS too
 
-    # Agent settings
+    # Optimized cache settings
     defaultCacheTtl = 28800; # 8 hours
     defaultCacheTtlSsh = 28800; # 8 hours
     maxCacheTtl = 86400; # 24 hours
     maxCacheTtlSsh = 86400; # 24 hours
 
-    # Extra configuration for tmux and terminal compatibility
+    # Streamlined agent configuration
     extraConfig = ''
       allow-preset-passphrase
-      no-allow-external-cache
-      enforce-passphrase-constraints
-      min-passphrase-len 12
-      min-passphrase-nonalpha 2
-      check-passphrase-pattern
-      
-      # Terminal pinentry compatibility improvements
-      # Allow loopback pinentry for better terminal/tmux integration
       allow-loopback-pinentry
       
-      # Debug options (can be removed in production)
-      # debug-level guru
-      # log-file /tmp/gpg-agent.log
+      # Basic passphrase constraints
+      min-passphrase-len 12
+      min-passphrase-nonalpha 2
     '';
   };
 
@@ -232,13 +214,14 @@
       # Enable true color support
       set-option -sa terminal-overrides ",xterm*:Tc"
       
-      # GPG/SSH integration improvements
+      # GPG/SSH integration - streamlined environment passing
       set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
       
-      # Hook to update GPG_TTY when switching panes/windows
-      set-hook -g pane-focus-in 'run-shell "[ -n \"$TMUX\" ] && export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+      # Optimized GPG_TTY update - only when needed, not on every pane switch
+      set-hook -g session-created 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+      set-hook -g client-attached 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
       
-      # Ensure shell integration works properly
+      # Shell integration
       set-option -g default-shell ${pkgs.zsh}/bin/zsh
       
       # Better pane splitting
@@ -465,9 +448,10 @@
     syntaxHighlighting.enable = true;
     historySubstringSearch.enable = true;
 
-    # Shell aliases
+    # Streamlined shell aliases
     shellAliases =
       {
+        # Basic aliases
         cl = "clear";
         v = "nvim";
         cd = "z";
@@ -476,19 +460,22 @@
         ".." = "cd ..";
         "..." = "cd ../..";
         reload = "source ~/.zshrc";
+        
+        # Enhanced file operations
         l = "ls";
         ls = "eza -al --git --icons=always";
         cat = "bat";
         tre = "eza --tree --level=3 --icons --git-ignore";
-        r = "radian";
         md = "glow";
+        
+        # Development tools
+        r = "radian";
         g = "lazygit";
         
-        # GPG/SSH troubleshooting aliases
+        # GPG/SSH utilities (streamlined)
         gpg-restart = "gpgconf --kill gpg-agent && gpgconf --launch gpg-agent";
         gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
         ssh-keys = "ssh-add -l";
-        gpg-refresh = "refresh_gpg";
       }
       // (
         if pkgs.stdenv.isLinux
@@ -512,7 +499,7 @@
       extended = true;
     };
 
-    # Custom functions and additional configuration
+    # Streamlined shell initialization
     initContent = ''
       # Autocompletion
       autoload -Uz compinit && compinit
@@ -536,74 +523,50 @@
       setopt inc_append_history       # Write to history file immediately, not when shell quits
       setopt share_history            # Share history among all sessions
 
-      # Environment variables for unified GPG/SSH strategy
+      # Unified GPG/SSH environment setup
       export SSH_ASKPASS_REQUIRE=never
       
-      # Dynamic GPG_TTY handling for tmux compatibility
-      update_gpg_tty() {
+      # Optimized GPG_TTY handling
+      if [ -t 1 ]; then
         export GPG_TTY=$(tty)
-        if [ -n "$GPG_AGENT_INFO" ] || pgrep -x gpg-agent >/dev/null 2>&1; then
+        # Only update GPG agent if it's running (lazy initialization)
+        if pgrep -x gpg-agent >/dev/null 2>&1; then
           gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
         fi
-      }
-      
-      # Set initial GPG_TTY and update it
-      update_gpg_tty
-      
-      # Update GPG_TTY when entering new shells (important for tmux)
-      if [ -n "$TMUX" ]; then
-        # In tmux, update GPG_TTY whenever we start a new shell
-        update_gpg_tty
       fi
 
+      # Platform-specific configuration
       ${
         if pkgs.stdenv.isLinux
         then ''
           # Linux: Use GPG agent for SSH authentication
           export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-
-          # Tmux-specific improvements
-          if [ -n "$TMUX" ]; then
-            # Ensure SSH agent socket is available in tmux
-            if [ ! -S "$SSH_AUTH_SOCK" ]; then
-              export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-            fi
-            
-            # Make sure sudo and other commands work well in tmux
-            stty sane
-            
-            # Create a function to refresh GPG agent in current tmux pane
-            refresh_gpg() {
-              update_gpg_tty
-              echo "GPG agent refreshed for current tmux pane"
-            }
-          fi
-
           export PROJ_DATA=/usr/share/proj
         ''
         else ''
-          # macOS: Use GPG agent for SSH authentication
+          # macOS: Use GPG agent for SSH authentication  
           export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-
-          # Ensure GPG agent is running
-          gpgconf --launch gpg-agent
-          
-          # Tmux-specific improvements for macOS
-          if [ -n "$TMUX" ]; then
-            # Verify SSH socket is accessible in tmux
-            if [ ! -S "$SSH_AUTH_SOCK" ]; then
-              export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-            fi
-            
-            # Create a function to refresh GPG agent in current tmux pane
-            refresh_gpg() {
-              update_gpg_tty
-              gpgconf --launch gpg-agent
-              echo "GPG agent refreshed for current tmux pane"
-            }
-          fi
+          # Ensure GPG agent is running (lazy start)
+          gpgconf --launch gpg-agent 2>/dev/null || true
         ''
       }
+
+      # Tmux integration with performance optimization
+      if [ -n "$TMUX" ]; then
+        # Simplified refresh function for manual use
+        refresh_gpg() {
+          export GPG_TTY=$(tty)
+          if pgrep -x gpg-agent >/dev/null 2>&1; then
+            gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+            echo "GPG agent refreshed for current tmux pane"
+          else
+            echo "GPG agent not running"
+          fi
+        }
+        
+        # Ensure terminal is properly configured in tmux
+        [ -t 1 ] && stty sane 2>/dev/null || true
+      fi
 
       # Conda initialization (if available)
       [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh

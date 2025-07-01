@@ -1,14 +1,14 @@
 # Unified GPG/SSH Strategy
 
-This document outlines the comprehensive GPG/SSH configuration implemented across the entire nix-config ecosystem, providing secure, unified authentication and encryption for both Linux (powerhouse) and macOS (turbine) systems.
+This document outlines the streamlined GPG/SSH configuration implemented across the nix-config ecosystem, providing secure, unified authentication and encryption for both Linux (powerhouse) and macOS (turbine) systems.
 
 ## Overview
 
-The strategy implements a modern, secure approach where:
+The strategy implements a **performance-optimized, secure approach** where:
 
 - **GPG agent serves as the central authentication hub** for both GPG operations and SSH authentication
 - **Cross-platform compatibility** ensures consistent behavior on Linux and macOS  
-- **Security best practices** with modern algorithms and strong defaults
+- **Streamlined configuration** with essential security settings and optimized performance
 - **Unified configuration** managed through home-manager for consistency
 
 ## Architecture
@@ -33,48 +33,55 @@ The strategy implements a modern, secure approach where:
 
 ## Key Features
 
-### Security Configuration
+### Streamlined Security Configuration
 
-- **Modern Algorithms**: AES256, SHA512, Ed25519
-- **Strong Defaults**: Disable weak ciphers (3DES, SHA1)
-- **Key Security**: 8-24 hour cache TTL, secure passphrase requirements
-- **SSH Hardening**: Disabled password auth, modern cipher suites
+- **Essential Algorithms**: AES256, SHA512, Ed25519 (focused on widely-used, secure algorithms)
+- **Balanced SSH Settings**: Secure but not overly restrictive configurations
+- **Optimized Cache Settings**: 8-24 hour cache TTL for good balance of security and usability
+
+### Performance Optimizations
+
+- **Lazy GPG Agent Initialization**: Only starts/connects when needed
+- **Efficient Tmux Integration**: Uses session/client events instead of frequent pane switches
+- **Streamlined Environment Setup**: Reduced conditional logic and redundant checks
+- **Minimal Configuration**: Essential settings only, removing rarely-used options
 
 ### Cross-Platform Support
 
-- **Linux**: Terminal-based pinentry for consistent tmux operation
-- **macOS**: Terminal-based pinentry for unified shell experience  
-- **Unified Environment**: Consistent GPG_TTY and SSH_AUTH_SOCK setup
+- **Unified Pinentry**: Terminal-based pinentry-curses for consistent operation
+- **Platform-Specific Optimizations**: Tailored socket handling for Linux/macOS
+- **Consistent Shell Experience**: Same behavior across all platforms
 
 ### Integration Features
 
 - **Git Signing**: Automatic commit signing with GPG
 - **SSH Authentication**: GPG keys used for SSH instead of separate SSH keys
 - **Smart Card Support**: Hardware token integration ready
-- **Agent Management**: Automatic startup and proper TTY handling
+- **Agent Management**: Lazy startup and optimized TTY handling
 
-### Tmux Configuration
+### Optimized Tmux Configuration
 
-The strategy includes optimized tmux configuration with:
+The strategy includes performance-optimized tmux configuration with:
 
 ```nix
 programs.tmux = {
   enable = true;
-  # GPG/SSH integration improvements
   extraConfig = ''
-    # Ensure environment variables are passed to new panes
+    # Streamlined environment variable passing
     set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
     
-    # Hook to update GPG_TTY when switching panes
-    set-hook -g pane-focus-in 'run-shell "[ -n \"$TMUX\" ] && export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+    # Efficient GPG_TTY updates - only when creating sessions or attaching clients
+    set-hook -g session-created 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+    set-hook -g client-attached 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
   '';
 };
 ```
 
 This ensures:
 - Environment variables are properly inherited in new tmux panes
-- GPG_TTY is automatically updated when switching between panes
+- GPG_TTY is updated only when necessary (session creation/client attachment)
 - SSH authentication works consistently across all tmux sessions
+- **Performance improvement**: Eliminates expensive pane-focus-in hooks
 
 ## Configuration Files
 
@@ -137,14 +144,14 @@ git log --show-signature -1
 
 ## Tmux Integration
 
-The configuration includes comprehensive tmux support to ensure GPG and SSH work seamlessly within tmux sessions.
+The configuration includes performance-optimized tmux support to ensure GPG and SSH work seamlessly within tmux sessions.
 
-### Tmux-Specific Features
+### Optimized Tmux Features
 
-- **Dynamic GPG_TTY**: Automatically updates when switching tmux panes
+- **Lazy GPG_TTY Updates**: Updates GPG_TTY only when creating sessions or attaching clients, not on every pane switch
 - **SSH agent socket management**: Ensures consistent SSH authentication in tmux
-- **Pinentry compatibility**: Configured to work properly with tmux sessions
-- **Automatic hooks**: Updates GPG agent state when switching panes
+- **Terminal pinentry optimization**: Configured for efficient operation in tmux sessions
+- **Performance improvement**: Eliminates frequent hook executions that could slow down tmux
 
 ### Usage in Tmux
 
@@ -159,7 +166,7 @@ ssh git@github.com
 git commit -m "Update from tmux session"
 git push
 
-# If you encounter issues, refresh GPG state
+# If you encounter issues, manually refresh GPG state
 refresh_gpg
 ```
 
@@ -175,7 +182,7 @@ gpg-status
 gpg-restart
 
 # Manually refresh GPG state in current pane
-gpg-refresh
+refresh_gpg
 
 # Check SSH keys are loaded
 ssh-keys
