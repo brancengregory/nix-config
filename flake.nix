@@ -104,6 +104,7 @@
         nix-output-monitor
         alejandra # Nix formatter
         just # Command runner
+        mdbook # Documentation generator
       ];
       shellHook = ''
         echo "🚀 Cross-platform Nix development environment"
@@ -112,6 +113,8 @@
         echo "  - just check-darwin (validate darwin config)"
         echo "  - just build-linux (build NixOS VM)"
         echo "  - just format (format Nix files)"
+        echo "  - just docs-serve (serve documentation locally)"
+        echo "  - just docs-build (build documentation)"
         echo "  - just help (show all commands)"
       '';
     };

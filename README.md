@@ -17,6 +17,8 @@ A set of configs for my machines:
 
 ## Documentation
 
+📖 **[View the complete documentation site](https://brancengregory.github.io/nix-config/)**
+
 - [GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md) - Unified authentication and encryption across all systems
 - [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
 - [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux

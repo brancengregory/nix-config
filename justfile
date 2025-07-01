@@ -12,6 +12,10 @@ help:
     @echo "  clean           - Clean build results"
     @echo "  test            - Run cross-compilation tests"
     @echo "  format          - Format Nix files"
+    @echo "  docs-init       - Initialize mdBook documentation"
+    @echo "  docs-build      - Build documentation site"
+    @echo "  docs-serve      - Serve documentation locally"
+    @echo "  docs-clean      - Clean documentation build"
 
 # Validate nix-darwin config
 check-darwin:
@@ -44,3 +48,19 @@ test:
 # Format Nix files
 format:
     nix develop -c alejandra .
+
+# Initialize mdBook documentation
+docs-init:
+    nix develop -c mdbook init --theme docs
+
+# Build documentation site
+docs-build:
+    nix develop -c mdbook build
+
+# Serve documentation locally
+docs-serve:
+    nix develop -c mdbook serve --open
+
+# Clean documentation build
+docs-clean:
+    rm -rf docs/book
