@@ -1,2 +1,5 @@
 result
 *.qcow2
+
+# mdBook output
+docs/book/

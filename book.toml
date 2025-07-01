@@ -1,0 +1,26 @@
+[book]
+authors = ["brancengregory"]
+language = "en"
+multilingual = false
+src = "docs"
+title = "Nix Config Documentation"
+description = "Documentation for a cross-platform Nix configuration supporting NixOS and macOS"
+
+[build]
+build-dir = "docs/book"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/brancengregory/nix-config"
+edit-url-template = "https://github.com/brancengregory/nix-config/edit/main/{path}"
+
+[output.html.search]
+enable = true
+
+[output.html.fold]
+enable = true
+level = 0
+
+[output.html.print]
+enable = true
