@@ -54,13 +54,13 @@
       if pkgs.stdenv.isLinux
       then [
         # Linux specific packages
-        pinentry-gtk2
+        pinentry-curses
         sudo
       ]
       else if pkgs.stdenv.isDarwin
       then [
         # Mac specific packages
-        pinentry_mac
+        pinentry-curses
         # mas-cli maybe
       ]
       else throw "Unsupported OS for this home-manager configuration"
@@ -183,12 +183,7 @@
     enableScDaemon = true;
 
     # Platform-specific pinentry programs with tmux compatibility
-    pinentry.package =
-      if pkgs.stdenv.isLinux
-      then pkgs.pinentry-gtk2  # GTK pinentry works well with tmux on Linux
-      else if pkgs.stdenv.isDarwin
-      then pkgs.pinentry_mac   # macOS native pinentry
-      else throw "Unsupported OS for GPG agent configuration";
+    pinentry.package = pkgs.pinentry-curses;  # Terminal-based pinentry for both platforms
 
     # Agent settings
     defaultCacheTtl = 28800; # 8 hours
@@ -196,7 +191,7 @@
     maxCacheTtl = 86400; # 24 hours
     maxCacheTtlSsh = 86400; # 24 hours
 
-    # Extra configuration for tmux compatibility
+    # Extra configuration for tmux and terminal compatibility
     extraConfig = ''
       allow-preset-passphrase
       no-allow-external-cache
@@ -205,8 +200,8 @@
       min-passphrase-nonalpha 2
       check-passphrase-pattern
       
-      # Tmux compatibility improvements
-      # Allow loopback pinentry for better tmux integration
+      # Terminal pinentry compatibility improvements
+      # Allow loopback pinentry for better terminal/tmux integration
       allow-loopback-pinentry
       
       # Debug options (can be removed in production)

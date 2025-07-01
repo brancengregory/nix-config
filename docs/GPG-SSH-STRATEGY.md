@@ -42,8 +42,8 @@ The strategy implements a modern, secure approach where:
 
 ### Cross-Platform Support
 
-- **Linux**: GTK-based pinentry, systemd socket integration
-- **macOS**: Native pinentry, proper socket discovery
+- **Linux**: Terminal-based pinentry for consistent tmux operation
+- **macOS**: Terminal-based pinentry for unified shell experience  
 - **Unified Environment**: Consistent GPG_TTY and SSH_AUTH_SOCK setup
 
 ### Integration Features
