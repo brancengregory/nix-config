@@ -36,6 +36,7 @@
       # ollama maybe
       # opencode maybe
 			openssh
+			pinentry-curses
       procs
       (rWrapper.override {
         packages = with rPackages; [
@@ -70,14 +71,12 @@
       if pkgs.stdenv.isLinux
       then [
         # Linux specific packages
-				pinentry-gtk2
         sudo
       ]
       else if pkgs.stdenv.isDarwin
       then [
         # Mac specific packages
         # mas-cli maybe
-				pinentry_mac
       ]
       else throw "Unsupported OS for this home-manager configuration"
     );
@@ -197,13 +196,7 @@
     enableSshSupport = true;
     enableScDaemon = true;
 
-    # Platform-specific pinentry programs with tmux compatibility
-    pinentry.package =
-      if pkgs.stdenv.isLinux
-      then pkgs.pinentry-gtk2  # GTK pinentry works well with tmux on Linux
-      else if pkgs.stdenv.isDarwin
-      then pkgs.pinentry_mac   # macOS native pinentry
-      else throw "Unsupported OS for GPG agent configuration";
+    pinentry.package = pkgs.pinentry-curses;
 
     # Agent settings
     defaultCacheTtl = 28800; # 8 hours
