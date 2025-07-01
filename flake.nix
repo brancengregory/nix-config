@@ -50,7 +50,7 @@
             # 3. Import user specific Home Manager config
             home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
 
-						home-manager.backupFileExtension = "backup";
+            home-manager.backupFileExtension = "backup";
           }
         ];
       };
@@ -73,7 +73,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
-						home-manager.backupFileExtension = "backup";
+            home-manager.backupFileExtension = "backup";
           }
         ];
       };
