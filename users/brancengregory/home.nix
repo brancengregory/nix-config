@@ -27,6 +27,7 @@
       hwatch
       jaq
       jnv
+			just
       lazygit
       # lazysql maybe
       neovim
