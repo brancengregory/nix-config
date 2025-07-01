@@ -21,6 +21,7 @@
       # ghostty maybe
       git
       glow
+      gnupg
       htop
       hwatch
       jaq
@@ -32,6 +33,7 @@
       nmap
       # ollama maybe
       # opencode maybe
+      openssh
       procs
       (rWrapper.override {
         packages = with rPackages; [
@@ -54,11 +56,13 @@
       if pkgs.stdenv.isLinux
       then [
         # Linux specific packages
+        pinentry-curses
         sudo
       ]
       else if pkgs.stdenv.isDarwin
       then [
         # Mac specific packages
+        pinentry-curses
         # mas-cli maybe
       ]
       else throw "Unsupported OS for this home-manager configuration"
@@ -70,11 +74,195 @@
     enable = true;
     userName = "Brancen Gregory";
     userEmail = "brancengregory@gmail.com";
+    signing = {
+      key = null; # Let GPG choose the default signing key
+      signByDefault = true;
+    };
+    extraConfig = {
+      gpg.program = "gpg2";
+    };
+  };
+
+  # Comprehensive GPG configuration
+  programs.gpg = {
+    enable = true;
+
+    # GPG configuration settings
+    settings = {
+      # Use modern algorithms and stronger defaults
+      personal-cipher-preferences = "AES256 AES192 AES";
+      personal-digest-preferences = "SHA512 SHA384 SHA256";
+      personal-compress-preferences = "ZLIB BZIP2 ZIP Uncompressed";
+      default-preference-list = "SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed";
+      cipher-algo = "AES256";
+      digest-algo = "SHA512";
+      cert-digest-algo = "SHA512";
+      compress-algo = "ZLIB";
+      disable-cipher-algo = "3DES";
+      weak-digest = "SHA1";
+      s2k-mode = "3";
+      s2k-digest-algo = "SHA512";
+      s2k-count = "65011712";
+
+      # Display options
+      fixed-list-mode = true;
+      keyid-format = "0xlong";
+      list-options = "show-uid-validity";
+      verify-options = "show-uid-validity";
+      with-fingerprint = true;
+
+      # Behavior
+      require-cross-certification = true;
+      no-symkey-cache = true;
+      use-agent = true;
+      throw-keyids = true;
+
+      # Keyserver settings (using keys.openpgp.org as default)
+      keyserver = "hkps://keys.openpgp.org";
+      keyserver-options = "no-honor-keyserver-url include-revoked";
+    };
+  };
+
+  # SSH configuration with GPG agent integration
+  programs.ssh = {
+    enable = true;
+
+    # Global SSH client configuration
+    extraConfig = ''
+      # Security settings
+      Protocol 2
+      HashKnownHosts yes
+      VisualHostKey yes
+      PasswordAuthentication no
+      ChallengeResponseAuthentication no
+      StrictHostKeyChecking ask
+      VerifyHostKeyDNS yes
+      ForwardAgent no
+      ForwardX11 no
+      ForwardX11Trusted no
+      ServerAliveInterval 300
+      ServerAliveCountMax 2
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+      KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+      HostKeyAlgorithms ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512
+      PubkeyAcceptedKeyTypes ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512
+    '';
+
+    # Common host configurations
+    matchBlocks = {
+      "github.com" = {
+        hostname = "github.com";
+        user = "git";
+        identitiesOnly = true;
+        # Use GPG SSH key for GitHub
+        extraOptions = {
+          PreferredAuthentications = "publickey";
+        };
+      };
+
+      "gitlab.com" = {
+        hostname = "gitlab.com";
+        user = "git";
+        identitiesOnly = true;
+        extraOptions = {
+          PreferredAuthentications = "publickey";
+        };
+      };
+
+      # Template for personal servers
+      "*.local" = {
+        user = "brancengregory";
+        identitiesOnly = true;
+      };
+    };
+  };
+
+  # GPG Agent configuration for SSH and GPG operations
+  services.gpg-agent = {
+    enable = true;
+    enableSshSupport = true;
+    enableScDaemon = true;
+
+    # Platform-specific pinentry programs with tmux compatibility
+    pinentry.package = pkgs.pinentry-curses;  # Terminal-based pinentry for both platforms
+
+    # Agent settings
+    defaultCacheTtl = 28800; # 8 hours
+    defaultCacheTtlSsh = 28800; # 8 hours
+    maxCacheTtl = 86400; # 24 hours
+    maxCacheTtlSsh = 86400; # 24 hours
+
+    # Extra configuration for tmux and terminal compatibility
+    extraConfig = ''
+      allow-preset-passphrase
+      no-allow-external-cache
+      enforce-passphrase-constraints
+      min-passphrase-len 12
+      min-passphrase-nonalpha 2
+      check-passphrase-pattern
+      
+      # Terminal pinentry compatibility improvements
+      # Allow loopback pinentry for better terminal/tmux integration
+      allow-loopback-pinentry
+      
+      # Debug options (can be removed in production)
+      # debug-level guru
+      # log-file /tmp/gpg-agent.log
+    '';
   };
 
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  # Tmux configuration optimized for GPG/SSH integration
+  programs.tmux = {
+    enable = true;
+    mouse = true;
+    clock24 = true;
+    
+    # Key bindings
+    keyMode = "vi";
+    prefix = "C-a";
+    
+    # Terminal and environment settings
+    terminal = "screen-256color";
+    
+    extraConfig = ''
+      # Enable true color support
+      set-option -sa terminal-overrides ",xterm*:Tc"
+      
+      # GPG/SSH integration improvements
+      set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
+      
+      # Hook to update GPG_TTY when switching panes/windows
+      set-hook -g pane-focus-in 'run-shell "[ -n \"$TMUX\" ] && export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+      
+      # Ensure shell integration works properly
+      set-option -g default-shell ${pkgs.zsh}/bin/zsh
+      
+      # Better pane splitting
+      bind | split-window -h -c "#{pane_current_path}"
+      bind - split-window -v -c "#{pane_current_path}"
+      
+      # Reload configuration
+      bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"
+      
+      # Status bar
+      set-option -g status-position top
+      set-option -g status-style "fg=#7C7D83,bg=#242631"
+      set-option -g status-left-length 50
+      set-option -g status-right-length 50
+      
+      # Window status
+      set-window-option -g window-status-current-style "fg=#E2E4E5,bg=#414550"
+      
+      # Pane borders
+      set-option -g pane-border-style "fg=#7C7D83"
+      set-option -g pane-active-border-style "fg=#E2E4E5"
+    '';
   };
 
   programs.fzf = {
@@ -297,6 +485,12 @@
         r = "radian";
         md = "glow";
         g = "lazygit";
+        
+        # GPG/SSH troubleshooting aliases
+        gpg-restart = "gpgconf --kill gpg-agent && gpgconf --launch gpg-agent";
+        gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
+        ssh-keys = "ssh-add -l";
+        gpg-refresh = "refresh_gpg";
       }
       // (
         if pkgs.stdenv.isLinux
@@ -344,24 +538,72 @@
       setopt inc_append_history       # Write to history file immediately, not when shell quits
       setopt share_history            # Share history among all sessions
 
-      # Environment variables
+      # Environment variables for unified GPG/SSH strategy
       export SSH_ASKPASS_REQUIRE=never
-      export GPG_TTY=$(tty)
+      
+      # Dynamic GPG_TTY handling for tmux compatibility
+      update_gpg_tty() {
+        export GPG_TTY=$(tty)
+        if [ -n "$GPG_AGENT_INFO" ] || pgrep -x gpg-agent >/dev/null 2>&1; then
+          gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+        fi
+      }
+      
+      # Set initial GPG_TTY and update it
+      update_gpg_tty
+      
+      # Update GPG_TTY when entering new shells (important for tmux)
+      if [ -n "$TMUX" ]; then
+        # In tmux, update GPG_TTY whenever we start a new shell
+        update_gpg_tty
+      fi
+
       ${
         if pkgs.stdenv.isLinux
         then ''
+          # Linux: Use GPG agent for SSH authentication
           export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-          gpg-connect-agent updatestartuptty /bye
 
-          # Make sure sudo works well in tmux
+          # Tmux-specific improvements
           if [ -n "$TMUX" ]; then
+            # Ensure SSH agent socket is available in tmux
+            if [ ! -S "$SSH_AUTH_SOCK" ]; then
+              export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+            fi
+            
+            # Make sure sudo and other commands work well in tmux
             stty sane
+            
+            # Create a function to refresh GPG agent in current tmux pane
+            refresh_gpg() {
+              update_gpg_tty
+              echo "GPG agent refreshed for current tmux pane"
+            }
           fi
 
           export PROJ_DATA=/usr/share/proj
         ''
         else ''
-          # macOS specific environment variables would go here if needed
+          # macOS: Use GPG agent for SSH authentication
+          export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+          # Ensure GPG agent is running
+          gpgconf --launch gpg-agent
+          
+          # Tmux-specific improvements for macOS
+          if [ -n "$TMUX" ]; then
+            # Verify SSH socket is accessible in tmux
+            if [ ! -S "$SSH_AUTH_SOCK" ]; then
+              export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+            fi
+            
+            # Create a function to refresh GPG agent in current tmux pane
+            refresh_gpg() {
+              update_gpg_tty
+              gpgconf --launch gpg-agent
+              echo "GPG agent refreshed for current tmux pane"
+            }
+          fi
         ''
       }
 
