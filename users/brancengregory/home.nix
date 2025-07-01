@@ -54,6 +54,7 @@
       if pkgs.stdenv.isLinux
       then [
         # Linux specific packages
+        gnupg
         sudo
       ]
       else if pkgs.stdenv.isDarwin
@@ -324,6 +325,13 @@
     initContent = ''
       # Autocompletion
       autoload -Uz compinit && compinit
+
+      # Safety check for corrupt history file
+      if [[ -f "$HOME/.zshistory" ]] && ! zsh -n <(echo 'fc -R "$HOME/.zshistory"') 2>/dev/null; then
+        echo "Warning: Corrupt history file detected, creating fresh history file"
+        mv "$HOME/.zshistory" "$HOME/.zshistory.backup.$(date +%s)" 2>/dev/null || true
+        touch "$HOME/.zshistory"
+      fi
 
       # Custom function for reading files
       c() {
