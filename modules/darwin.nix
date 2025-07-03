@@ -156,6 +156,7 @@
       # Science and research
       "qgis"
       "positron"
+			"r"
       "rstudio"
       "miniconda"
       "julia"
