@@ -26,6 +26,7 @@
     isNormalUser = true;
     extraGroups = ["wheel"];
     shell = pkgs.zsh;
-    initialPassword = "password";
+    # Password should be set during initial setup, not hardcoded
+    # Use: sudo passwd brancengregory
   };
 }
