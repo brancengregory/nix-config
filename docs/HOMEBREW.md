@@ -10,13 +10,13 @@ This nix-darwin configuration includes Homebrew support for managing Mac applica
 
 ## Configuration Files
 
-- **`modules/darwin.nix`**: Contains Homebrew configuration (casks, brews, taps, masApps)
+- **`modules/os/darwin.nix`**: Contains Homebrew configuration (casks, brews, taps, masApps)
 - **`users/brancengregory/home.nix`**: Contains nixpkgs packages (CLI tools, fonts, etc.)
 
 ## Adding Applications
 
 ### GUI Applications (Recommended for Homebrew)
-Edit `modules/darwin.nix` and add applications to the `casks` list:
+Edit `modules/os/darwin.nix` and add applications to the `casks` list:
 
 ```nix
 casks = [

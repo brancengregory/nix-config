@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   imports = [
-    ../../modules/common.nix # Universal settings
-    ../../modules/nixos.nix # Common NixOS settings
+    ../../modules/os/common.nix # Universal settings
+    ../../modules/os/nixos.nix # Common NixOS settings
     ./hardware.nix # Hardware-specific configuration
   ];
 
