@@ -42,16 +42,6 @@ just dev
 # This provides tools like nixos-rebuild, nix-output-monitor, alejandra, and just
 ```
 
-### Testing
-Test the cross-compilation setup:
-
-```bash
-# Run the test script
-./test-cross-compilation.sh
-# Or
-just test
-```
-
 ## Linux Builder Setup
 
 For optimal performance when building nix-darwin configurations from Linux, you should set up nix-darwin's linux-builder feature. This enables remote building and improves cross-compilation performance.
