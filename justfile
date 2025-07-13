@@ -10,7 +10,6 @@ help:
     @echo "  dev             - Enter development shell"
     @echo "  check           - Check flake syntax"
     @echo "  clean           - Clean build results"
-    @echo "  test            - Run cross-compilation tests"
     @echo "  format          - Format Nix files"
     @echo "  docs-init       - Initialize mdBook documentation"
     @echo "  docs-build      - Build documentation site"
@@ -40,10 +39,6 @@ check:
 # Clean build results
 clean:
     rm -rf result*
-
-# Run cross-compilation tests
-test:
-    ./test-cross-compilation.sh
 
 # Format Nix files
 format:
