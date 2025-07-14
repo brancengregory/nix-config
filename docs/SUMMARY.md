@@ -2,6 +2,10 @@
 
 [Introduction](./README.md)
 
+# Architecture
+
+- [Module Architecture](./MODULES.md)
+
 # Configuration Guides
 
 - [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md)

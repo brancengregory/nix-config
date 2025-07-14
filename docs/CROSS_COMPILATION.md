@@ -30,6 +30,8 @@ just check-darwin
 # This is faster than a full build and useful for CI/testing
 ```
 
+**Note**: Some darwin packages with system-specific dependencies may fail during cross-compilation. The validation target helps catch syntax and basic configuration errors without requiring full package builds.
+
 ### Development Environment
 Use the provided development shell for cross-platform work:
 
