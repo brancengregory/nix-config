@@ -1,5 +1,5 @@
 { pkgs, ... }: {
-  home.package = with pkgs; [
+  home.packages = with pkgs; [
     gnupg
   ];
 
