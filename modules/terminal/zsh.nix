@@ -1,10 +1,10 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   home.packages = with pkgs; [
     fzf
     zoxide
     zsh
   ];
-  
+
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;

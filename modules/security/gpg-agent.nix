@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   # GPG Agent configuration for SSH and GPG operations
   services.gpg-agent = {
     enable = true;

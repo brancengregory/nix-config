@@ -1,5 +1,4 @@
 {pkgs, ...}: {
-
   imports = [
     ../../modules/fonts/default.nix
     ../../modules/terminal/zsh.nix
