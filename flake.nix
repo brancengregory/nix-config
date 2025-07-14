@@ -118,5 +118,10 @@
         echo "  - just help (show all commands)"
       '';
     };
+
+    formatter = {
+      x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
+      x86_64-darwin = nixpkgs.legacyPackages.x86_64-darwin.alejandra;
+    };
   };
 }
