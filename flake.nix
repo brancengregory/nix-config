@@ -36,10 +36,10 @@
     nixosConfigurations = {
       powerhouse = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs home-manager;}; # Pass inputs to modules
+        specialArgs = {inherit inputs;}; # Pass inputs to modules
         modules = [
-          ./hosts/powerhouse/config.nix
           home-manager.nixosModules.home-manager
+          ./hosts/powerhouse/config.nix
         ];
       };
 
@@ -50,11 +50,11 @@
       turbine = nix-darwin.lib.darwinSystem {
         system = "x86_64-darwin"; # Intel CPU
 
-        specialArgs = {inherit inputs home-manager;};
+        specialArgs = {inherit inputs;};
 
         modules = [
-          ./hosts/turbine/config.nix
           home-manager.darwinModules.home-manager
+          ./hosts/turbine/config.nix
         ];
       };
 
