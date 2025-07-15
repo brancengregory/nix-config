@@ -54,7 +54,7 @@
 
         modules = [
           ./hosts/turbine/config.nix
-          home-manager.nixosModules.home-manager
+          home-manager.darwinModules.home-manager
         ];
       };
 
