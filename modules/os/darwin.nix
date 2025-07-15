@@ -202,10 +202,6 @@
     };
   };
 
-  environment.shellAliases = {
-    ports = "netstat -anv | grep -E 'LISTEN|Proto'";
-  };
-
   # Ensure nix-daemon is running
   nix.package = pkgs.nix;
 

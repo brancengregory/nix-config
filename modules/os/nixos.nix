@@ -93,9 +93,4 @@
     dmidecode
     git
   ];
-
-  environment.shellAliases = {
-    ports = "ss -tuln";
-    open = "xdg-open";
-  };
 }

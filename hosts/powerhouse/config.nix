@@ -11,7 +11,7 @@
   home-manager.users.brancengregory = {
     imports = [
       ../../users/brancengregory/home.nix
-      ../../modules/desktop/hyprland.nix
+      #      ../../modules/desktop/hyprland.nix
     ];
   };
 
