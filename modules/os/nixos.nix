@@ -5,8 +5,6 @@
   i18n.defaultLocale = "en_US.UTF-8";
 
   # --- Shell ---
-
-  # Enable system-wide integration for Zsh
   programs.zsh.enable = true;
 
   # --- Networking ---
@@ -20,6 +18,36 @@
   # Using systemd-resolved for DNS
   services.resolved.enable = true;
 
+  # Using avahi for local network discovery (AirPla, Chromecast, etc.)
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    reflector = true;
+    publish = {
+      enable = true;
+      userServices = true;
+      hinfo = true;
+      domain = true;
+      addresses = true;
+    };
+    extraServiceFiles = {};
+    extraConfig = '''';
+  };
+
+  networking.firewall = {
+    enable = true;
+    package = pkgs.nftables;
+    allowedTCPPorts = [
+      22
+      80
+      443
+    ];
+    allowedUDPPorts = [
+      53
+      5353
+    ];
+  };
+
   # --- User Account ---
 
   users.users.brancengregory = {
@@ -30,4 +58,39 @@
     # Password should be set during initial setup, not hardcoded
     # Use: sudo passwd brancengregory
   };
+
+  # --- Audio ---
+
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+  };
+
+  # --- Printing ---
+
+  services.printing.enable = true;
+
+  # --- Garbage Collector
+
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+
+  environment.systemPackages = with pkgs; [
+    vim
+    wget
+    curl
+    htop
+    iotop
+    lsof
+    usbutils
+    pciutils
+    dmidecode
+    git
+  ];
 }

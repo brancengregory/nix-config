@@ -1,4 +1,23 @@
 {pkgs, ...}: {
+  home.packages = with pkgs; [
+    hyprland
+    waybar
+    rofi
+    # kitty
+    # swaybg
+    # grim
+    # slurp
+  ];
+
   # Hyprland window manager configuration
-  # TODO: Add hyprland configuration when needed
+  programs.hyprland = {
+    enable = true;
+    # Nvidia stuff here or in modules
+    # enable NvidiaPatches = true;
+    xwayland.enable = true;
+    extraConfig = ''
+      # monitor=,preferred,auto,1
+      # exec-once = waybar
+    '';
+  };
 }

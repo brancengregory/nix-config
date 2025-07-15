@@ -36,22 +36,10 @@
     nixosConfigurations = {
       powerhouse = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs;}; # Pass inputs to modules
+        specialArgs = {inherit inputs home-manager;}; # Pass inputs to modules
         modules = [
-          # 1. Import main config for this host
           ./hosts/powerhouse/config.nix
-
-          # 2. Add Home Manager as a module to this system
           home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-
-            # 3. Import user specific Home Manager config
-            home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
-
-            home-manager.backupFileExtension = "backup";
-          }
         ];
       };
 
@@ -62,19 +50,11 @@
       turbine = nix-darwin.lib.darwinSystem {
         system = "x86_64-darwin"; # Intel CPU
 
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs home-manager;};
 
         modules = [
           ./hosts/turbine/config.nix
-
-          # Add Home Manager support for MacOS
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.brancengregory = import ./users/brancengregory/home.nix;
-            home-manager.backupFileExtension = "backup";
-          }
+          home-manager.nixosModules.home-manager
         ];
       };
 

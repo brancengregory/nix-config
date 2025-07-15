@@ -1,16 +1,22 @@
-{pkgs, ...}: {
-  imports = [
-    ../../modules/fonts/default.nix
-    ../../modules/terminal/zsh.nix
-    ../../modules/terminal/starship.nix
-    ../../modules/terminal/tmux.nix
-    ../../modules/terminal/nvim.nix
-    ../../modules/security/gpg.nix
-    ../../modules/security/ssh.nix
-    ../../modules/security/gpg-agent.nix
-    ../../modules/network/wireguard.nix
-    ../../modules/programs/git.nix
-  ];
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}: {
+  imports =
+    [
+      ../../modules/fonts/default.nix
+      ../../modules/terminal/zsh.nix
+      ../../modules/terminal/starship.nix
+      ../../modules/terminal/tmux.nix
+      ../../modules/terminal/nvim.nix
+      ../../modules/security/gpg.nix
+      ../../modules/security/ssh.nix
+      ../../modules/security/gpg-agent.nix
+      ../../modules/network/wireguard.nix
+      ../../modules/programs/git.nix
+    ];
 
   home.username = "brancengregory";
   home.homeDirectory =
@@ -39,6 +45,7 @@
       just
 			libpq # Move elsewhere?
       # lazysql maybe
+      nh
       nmap
       # ollama maybe
       # opencode maybe
@@ -83,6 +90,8 @@
       ]
       else throw "Unsupported OS for this home-manager configuration"
     );
+
+  programs.command-not-found.enable = true;
 
   home.stateVersion = "25.05";
 }
