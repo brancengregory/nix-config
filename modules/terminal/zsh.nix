@@ -53,18 +53,7 @@
         gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
         ssh-keys = "ssh-add -l";
         gpg-refresh = "refresh_gpg";
-      }
-      // (
-        if pkgs.stdenv.isLinux
-        then {
-          open = "xdg-open";
-          ports = "ss -tuln";
-        }
-        else {
-          # macOS uses native open command
-          ports = "netstat -anv | grep -E 'LISTEN|Proto'";
-        }
-      );
+      };
 
     # History configuration
     history = {
