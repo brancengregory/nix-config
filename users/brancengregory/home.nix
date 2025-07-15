@@ -15,6 +15,8 @@
     ../../modules/programs/git.nix
   ];
 
+  programs.home-manager.enable = true;
+
   home.username = "brancengregory";
   home.homeDirectory =
     if pkgs.stdenv.isLinux
