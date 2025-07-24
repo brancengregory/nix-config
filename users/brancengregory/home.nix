@@ -44,6 +44,7 @@
       procs
       (rWrapper.override {
         packages = with rPackages; [
+					cli
           devtools
           dplyr
           fs
@@ -54,6 +55,7 @@
           readr
           renv
           rix
+					rlang
           scales
           stringr
           targets
