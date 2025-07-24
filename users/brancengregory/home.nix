@@ -37,6 +37,7 @@
       jaq
       jnv
       just
+			libpq # Move elsewhere?
       # lazysql maybe
       nmap
       # ollama maybe
