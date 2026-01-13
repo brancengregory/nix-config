@@ -77,6 +77,11 @@
           RPostgres
           RSQLite
           duckdb
+          # Production and Parallelism
+          crew
+          mirai
+          plumber
+          httr2
         ];
       })
       pkgs.radian
