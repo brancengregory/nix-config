@@ -17,6 +17,8 @@
 
   programs.home-manager.enable = true;
 
+  nixpkgs.config.allowUnfree = true;
+
   home.username = "brancengregory";
   home.homeDirectory =
     if pkgs.stdenv.isLinux
@@ -35,7 +37,7 @@
       bat
       eza
       fd
-      # ghostty maybe
+      ghostty
       glow
       htop
       hwatch
@@ -81,6 +83,10 @@
       then [
         # Linux specific packages
         sudo
+        google-chrome
+        slack
+        positron-bin
+        rustup
       ]
       else if pkgs.stdenv.isDarwin
       then [
