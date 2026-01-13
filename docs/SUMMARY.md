@@ -12,6 +12,7 @@
 - [Security Guidelines](./SECURITY.md)
 - [Homebrew Integration](./HOMEBREW.md)
 - [Cross-Platform Development](./CROSS_COMPILATION.md)
+- [Restic Backup Configuration](./RESTIC.md)
 
 # Development Environment
 
