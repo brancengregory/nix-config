@@ -14,6 +14,7 @@
         location = "bottom";
         height = 44;
         floating = false;
+        opacity = "opaque";
         widgets = [
           "org.kde.plasma.kickoff"
           "org.kde.plasma.pager"
