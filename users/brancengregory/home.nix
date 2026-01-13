@@ -75,6 +75,7 @@
           usethis
           readxl
           janitor
+          tidymodels
           # Database packages
           DBI
           RPostgres
