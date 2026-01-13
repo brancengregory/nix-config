@@ -12,9 +12,9 @@
       # GCS Repository
       repository = "gs:powerhouse-backup:/";
       
-      # Credentials (placeholders - create these files securely)
-      # passwordFile = "/etc/nixos/secrets/restic-password";
-      # environmentFile = "/etc/nixos/secrets/restic-env";
+      # Credentials (evaluation requires these to be set)
+      passwordFile = "/etc/nixos/secrets/restic-password";
+      environmentFile = "/etc/nixos/secrets/restic-env";
       
       paths = [ "/home/brancengregory" ];
       
