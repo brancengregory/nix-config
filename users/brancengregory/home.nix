@@ -57,6 +57,7 @@
       arrow-cpp
       (rWrapper.override {
         packages = with rPackages; [
+          tidyverse
           cli
           devtools
           dplyr
