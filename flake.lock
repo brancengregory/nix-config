@@ -74,6 +74,22 @@
         "type": "github"
       }
     },
+    "nvim-config": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765744766,
+        "narHash": "sha256-90qGxN96tpnJ8ZmXDGikL83vVyQP94uuLvg42VeW0vM=",
+        "owner": "brancengregory",
+        "repo": "nvim",
+        "rev": "ad555a329d4bda4c0645a3e4e6aefffa7d5c5f72",
+        "type": "github"
+      },
+      "original": {
+        "owner": "brancengregory",
+        "repo": "nvim",
+        "type": "github"
+      }
+    },
     "plasma-manager": {
       "inputs": {
         "home-manager": [
@@ -103,6 +119,7 @@
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "nvim-config": "nvim-config",
         "plasma-manager": "plasma-manager"
       }
     }

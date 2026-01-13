@@ -30,6 +30,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # Custom Neovim Configuration
+    nvim-config = {
+      url = "github:brancengregory/nvim";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -39,6 +45,7 @@
     nix-darwin,
     home-manager,
     plasma-manager,
+    nvim-config,
     ...
   } @ inputs: {
     nixosConfigurations = {
