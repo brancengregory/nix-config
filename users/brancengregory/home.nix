@@ -82,6 +82,8 @@
           mirai
           plumber
           httr2
+          shiny
+          bslib
         ];
       })
       pkgs.radian
