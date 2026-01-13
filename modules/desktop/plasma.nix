@@ -12,6 +12,8 @@
     kdePackages.gwenview
     kdePackages.spectacle
     darktable
+    obs-studio
+    libreoffice-qt6-fresh
     firefox
   ];
 }
