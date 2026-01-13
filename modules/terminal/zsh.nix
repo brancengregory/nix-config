@@ -53,9 +53,6 @@
         gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
         ssh-keys = "ssh-add -l";
         gpg-refresh = "refresh_gpg";
-
-        # History repair
-        fix-zsh-history = "mv ~/.zshistory ~/.zshistory_bad && strings ~/.zshistory_bad > ~/.zshistory && fc -R ~/.zshistory && echo 'History repaired.'";
       }
       // (
         if pkgs.stdenv.isLinux
