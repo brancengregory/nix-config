@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ../../modules/fonts/default.nix
     ../../modules/terminal/zsh.nix
@@ -16,8 +13,6 @@
   ];
 
   programs.home-manager.enable = true;
-
-  nixpkgs.config.allowUnfree = true;
 
   home.username = "brancengregory";
   home.homeDirectory =
@@ -44,7 +39,7 @@
       jaq
       jnv
       just
-			libpq # Move elsewhere?
+      libpq # Move elsewhere?
       # lazysql maybe
       nh
       nmap
@@ -53,7 +48,7 @@
       procs
       (rWrapper.override {
         packages = with rPackages; [
-					cli
+          cli
           devtools
           dplyr
           fs
@@ -64,7 +59,7 @@
           readr
           renv
           rix
-					rlang
+          rlang
           scales
           stringr
           targets
