@@ -49,7 +49,7 @@ lib.mkIf pkgs.stdenv.isLinux {
             config = {
               General = {
                 launchers = [
-                  "applications:org.kde.systemsettings.desktop"
+                  "applications:systemsettings.desktop"
                   "applications:org.kde.dolphin.desktop"
                   "applications:google-chrome.desktop"
                   "applications:com.mitchellh.ghostty.desktop"
