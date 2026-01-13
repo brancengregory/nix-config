@@ -53,6 +53,30 @@
                   pyproject = true;
                   build-system = [final.python3Packages.setuptools];
                 });
+                rPackages =
+                  prev.rPackages.override {
+                    overrides = {
+                      ojodb = prev.rPackages.buildRPackage {
+                        name = "ojodb";
+                        src = final.fetchFromGitHub {
+                          owner = "openjusticeok";
+                          repo = "ojodb";
+                          rev = "v2.11.0";
+                          sha256 = "sha256-Rk67O+B0p4X4+N9D8i3LpDIcFgln9AYB5A05VMkpCPw=";
+                        };
+                        propagatedBuildInputs = with final.rPackages; [
+                          DBI
+                          RPostgres
+                          dplyr
+                          dbplyr
+                          magrittr
+                          rlang
+                          stringr
+                          purrr
+                        ];
+                      };
+                    };
+                  };
               })
             ];
           }

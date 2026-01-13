@@ -90,6 +90,7 @@
           httr2
           shiny
           bslib
+          ojodb
         ];
       })
       pkgs.radian
