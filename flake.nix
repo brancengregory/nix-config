@@ -62,7 +62,7 @@
                           owner = "openjusticeok";
                           repo = "ojodb";
                           rev = "v2.11.0";
-                          sha256 = "sha256-Rk67O+B0p4X4+N9D8i3LpDIcFgln9AYB5A05VMkpCPw=";
+                          sha256 = "sha256-skH4+WV31l2AKsurZOlzLLZLR0R8JGddJMLWAp65IYQ=";
                         };
                         propagatedBuildInputs = with final.rPackages; [
                           DBI

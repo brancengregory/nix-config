@@ -80,7 +80,7 @@
     enableScDaemon = true;
 
     # Platform-optimized pinentry with fallback to curses
-    pinentryPackage =
+    pinentry.package =
       if pkgs.stdenv.isLinux
       then pkgs.pinentry-curses
       else pkgs.pinentry-curses;
