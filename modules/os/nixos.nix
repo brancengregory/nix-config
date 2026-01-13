@@ -58,6 +58,9 @@
     # Use: sudo passwd brancengregory
   };
 
+  # --- SSH ---
+  services.openssh.enable = true;
+
   # --- Audio ---
 
   services.pipewire = {
