@@ -54,6 +54,7 @@
       duckdb
       postgresql
       sqlite
+      arrow-cpp
       (rWrapper.override {
         packages = with rPackages; [
           cli
@@ -77,6 +78,7 @@
           RPostgres
           RSQLite
           duckdb
+          arrow
           # Production and Parallelism
           crew
           mirai
