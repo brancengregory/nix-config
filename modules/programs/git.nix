@@ -15,14 +15,16 @@
 
   programs.git = {
     enable = true;
-    userName = "Brancen Gregory";
-    userEmail = "brancengregory@gmail.com";
+    settings = {
+      user = {
+        name = "Brancen Gregory";
+        email = "brancengregory@gmail.com";
+      };
+      gpg.program = "gpg2";
+    };
     signing = {
       key = null; # Let GPG choose the default signing key
       signByDefault = true;
-    };
-    extraConfig = {
-      gpg.program = "gpg2";
     };
   };
 }

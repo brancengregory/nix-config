@@ -33,6 +33,7 @@
   # Streamlined SSH configuration with balanced security
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     extraConfig = ''
       # Core security settings
       Protocol 2
@@ -69,6 +70,9 @@
       "*.local" = {
         user = "brancengregory";
         identitiesOnly = true;
+      };
+      "*" = {
+        # Catch-all for global defaults if needed
       };
     };
   };
