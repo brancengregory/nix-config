@@ -30,6 +30,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # Radian Flake
+    radian-flake = {
+      url = "github:swt30/radian-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -39,6 +45,7 @@
     nix-darwin,
     home-manager,
     plasma-manager,
+    radian-flake,
     ...
   } @ inputs: {
     nixosConfigurations = {
