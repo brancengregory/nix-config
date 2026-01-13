@@ -3,9 +3,9 @@
   fonts.fontconfig.enable = true;
 
   # Install Fira Code Nerd Font
-  # home.packages = with pkgs; [
-  #   nerd-fonts.fira-code
-  # ];
+  home.packages = with pkgs; [
+    nerd-fonts.fira-code
+  ];
 
   # Optional: You can add more specific font configurations here
   # For example, if you wanted to define specific font aliases or preferences

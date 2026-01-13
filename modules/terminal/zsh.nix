@@ -88,16 +88,20 @@
       # Autocompletion
       autoload -Uz compinit && compinit
 
-      # Custom function for reading files
-      c() {
-        if [[ "$1" == *.md ]]; then
-          glow "$1"
-        else
-          bat "$1"
-        fi
-      }
-
-      # Yazi wrapper function
+               # Custom function for reading files
+               c() {
+                 if [[ "$1" == *.md ]]; then
+                   glow "$1"
+                 else
+                   bat "$1"
+                 fi
+               }
+      
+                        # Handle corrupt history file
+                        if ! fc -l 1 >/dev/null 2>&1 && [ -f ~/.zshistory ] && [ -s ~/.zshistory ]; then
+                          mv ~/.zshistory ~/.zshistory.bad.$(date +%s)
+                          touch ~/.zshistory
+                        fi      # Yazi wrapper function
       function f() {
       	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
       	yazi "$@" --cwd-file="$tmp"

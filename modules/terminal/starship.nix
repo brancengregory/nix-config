@@ -4,8 +4,9 @@
     settings = {
       format =
         ""
-        + "[](#9A348E)"
+        + "[](fg:#9A348E)"
         + "$os"
+        + "$username"
         + "$hostname"
         + "[](bg:#DA627D fg:#9A348E)"
         + "$directory"
@@ -37,18 +38,18 @@
       hostname = {
         ssh_symbol = "🌐";
         ssh_only = false;
-        format = "[$hostname ]($style)";
+        format = "[@$hostname ]($style)";
         disabled = false;
-        style = "bg:#9A348E";
+        style = "bg:#9A348E fg:#FFFFFF";
       };
 
       # You can also replace your username with a neat symbol like   or disable this
       # and use the os module below
       username = {
         show_always = true;
-        style_user = "bg:#9A348E";
-        style_root = "bg:#9A348E";
-        format = "[$user ]($style)";
+        style_user = "bg:#9A348E fg:#FFFFFF";
+        style_root = "bg:#9A348E fg:#FFFFFF";
+        format = "[$user]($style)";
         disabled = false;
       };
 
@@ -56,13 +57,13 @@
       # represents the current operating system
       os = {
         format = "[$symbol]($style)";
-        style = "bg:#9A348E";
-        disabled = false; # Disabled by default
+        style = "bg:#9A348E fg:#FFFFFF";
+        disabled = false;
         symbols = {
-          Windows = " ";
-          Arch = "🐧";
-          NixOS = " ";
-          Macos = " ";
+          NixOS = "❄️";
+          Macos = "🍎";
+          Linux = "🐧";
+          Windows = "🪟";
         };
       };
 
