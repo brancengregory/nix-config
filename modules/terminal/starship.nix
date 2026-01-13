@@ -61,6 +61,8 @@
         symbols = {
           Windows = " ";
           Arch = "🐧";
+          NixOS = " ";
+          Macos = " ";
         };
       };
 

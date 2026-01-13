@@ -117,7 +117,6 @@
         # Linux specific packages
         pinentry-curses
         sudo
-        google-chrome
         slack
         discord
         zoom-us
@@ -134,6 +133,17 @@
       ]
       else throw "Unsupported OS for this home-manager configuration"
     );
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "google-chrome.desktop";
+      "x-scheme-handler/http" = "google-chrome.desktop";
+      "x-scheme-handler/https" = "google-chrome.desktop";
+      "x-scheme-handler/about" = "google-chrome.desktop";
+      "x-scheme-handler/unknown" = "google-chrome.desktop";
+    };
+  };
 
   home.stateVersion = "25.11";
 

@@ -20,8 +20,8 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyo-night-dark.yaml";
 
     cursor = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Classic";
+      package = pkgs.kdePackages.breeze;
+      name = "Breeze_Snow";
       size = 24;
     };
 
@@ -62,7 +62,6 @@
       console.enable = true;
       gnome.enable = false;
       gtk.enable = true;
-      # We keep all KDE/Plasma related things disabled
     };
   };
 }
