@@ -51,6 +51,9 @@
       # opencode maybe
       procs
       yazi
+      duckdb
+      postgresql
+      sqlite
       (rWrapper.override {
         packages = with rPackages; [
           cli
@@ -69,6 +72,11 @@
           stringr
           targets
           usethis
+          # Database packages
+          DBI
+          RPostgres
+          RSQLite
+          duckdb
         ];
       })
       pkgs.radian
