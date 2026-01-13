@@ -1,10 +1,14 @@
-{pkgs, inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [
     ../../modules/os/common.nix # Universal settings
     ../../modules/os/darwin.nix # Common MacOS settings
   ];
 
-  home-manager.extraSpecialArgs = { inherit inputs; };
+  home-manager.extraSpecialArgs = {inherit inputs;};
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.users.brancengregory = {

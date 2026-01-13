@@ -1,4 +1,8 @@
-{pkgs, inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [
     ../../modules/fonts/default.nix
     ../../modules/desktop/plasma-home.nix
@@ -115,6 +119,8 @@
         sudo
         google-chrome
         slack
+        discord
+        zoom-us
         positron-bin
         rustup
         snapper-gui

@@ -1,15 +1,18 @@
-{ config, pkgs, ... }: {
-  
+{
+  config,
+  pkgs,
+  ...
+}: {
   # --- Prometheus (Metrics Database) ---
   services.prometheus = {
     enable = true;
     port = 9090;
-    
+
     # Exporters (Data Collectors)
     exporters = {
       node = {
         enable = true;
-        enabledCollectors = [ "systemd" ];
+        enabledCollectors = ["systemd"];
         port = 9100;
       };
     };
@@ -18,9 +21,11 @@
     scrapeConfigs = [
       {
         job_name = "node";
-        static_configs = [{
-          targets = [ "localhost:9100" ];
-        }];
+        static_configs = [
+          {
+            targets = ["localhost:9100"];
+          }
+        ];
       }
     ];
   };
@@ -37,5 +42,5 @@
   };
 
   # Open firewall ports for access
-  networking.firewall.allowedTCPPorts = [ 9090 3000 ];
+  networking.firewall.allowedTCPPorts = [9090 3000];
 }

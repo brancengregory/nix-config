@@ -1,4 +1,8 @@
-{pkgs, inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [
     ../../modules/os/common.nix # Universal settings
     ../../modules/os/nixos.nix # Common NixOS settings
@@ -23,11 +27,15 @@
       cores = 4;
       graphics = true;
       forwardPorts = [
-        { from = "host"; host.port = 2222; guest.port = 22; }
+        {
+          from = "host";
+          host.port = 2222;
+          guest.port = 22;
+        }
       ];
     };
     # Override Nvidia driver in VM to use standard QEMU graphics
-    services.xserver.videoDrivers = pkgs.lib.mkForce [ "modesetting" ];
+    services.xserver.videoDrivers = pkgs.lib.mkForce ["modesetting"];
     hardware.nvidia.modesetting.enable = pkgs.lib.mkForce false;
     hardware.nvidia.open = pkgs.lib.mkForce false;
 
@@ -38,7 +46,7 @@
     };
   };
 
-  home-manager.extraSpecialArgs = { inherit inputs; };
+  home-manager.extraSpecialArgs = {inherit inputs;};
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.backupFileExtension = "backup";
@@ -53,7 +61,7 @@
   services.snapper.configs = {
     root = {
       SUBVOLUME = "/";
-      ALLOW_USERS = [ "brancengregory" ];
+      ALLOW_USERS = ["brancengregory"];
       TIMELINE_CREATE = true;
       TIMELINE_CLEANUP = true;
     };

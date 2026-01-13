@@ -128,6 +128,7 @@
       "microsoft-teams"
       "signal"
       "twitch"
+      "zoom"
 
       # Text editors and IDEs
       "zed"

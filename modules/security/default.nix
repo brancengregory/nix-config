@@ -59,13 +59,13 @@
         hostname = "github.com";
         user = "git";
         identitiesOnly = true;
-        extraOptions = { PreferredAuthentications = "publickey"; };
+        extraOptions = {PreferredAuthentications = "publickey";};
       };
       "gitlab.com" = {
         hostname = "gitlab.com";
         user = "git";
         identitiesOnly = true;
-        extraOptions = { PreferredAuthentications = "publickey"; };
+        extraOptions = {PreferredAuthentications = "publickey";};
       };
       "*.local" = {
         user = "brancengregory";

@@ -82,99 +82,99 @@
 
     # Custom functions and additional configuration
     initContent = ''
-         # Path
-         path=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin' $path)
+      # Path
+      path=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin' $path)
 
-         # Autocompletion
-         autoload -Uz compinit && compinit
+      # Autocompletion
+      autoload -Uz compinit && compinit
 
-         # Custom function for reading files
-         c() {
-           if [[ "$1" == *.md ]]; then
-             glow "$1"
-           else
-             bat "$1"
-           fi
-         }
+      # Custom function for reading files
+      c() {
+        if [[ "$1" == *.md ]]; then
+          glow "$1"
+        else
+          bat "$1"
+        fi
+      }
 
-         # Yazi wrapper function
-         function f() {
-         	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-         	yazi "$@" --cwd-file="$tmp"
-         	IFS= read -r -d "" cwd < "$tmp"
-         	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
-         	rm -f -- "$tmp"
-         }
+      # Yazi wrapper function
+      function f() {
+      	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+      	yazi "$@" --cwd-file="$tmp"
+      	IFS= read -r -d "" cwd < "$tmp"
+      	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+      	rm -f -- "$tmp"
+      }
 
-         # History settings (additional options not covered by home-manager)
-         setopt append_history           # allow multiple sessions to append to one history
-         setopt bang_hist                # treat ! special during command expansion
-         setopt hist_expire_dups_first   # expire duplicates first when trimming history
-         setopt hist_find_no_dups        # When searching history, don't repeat
-         setopt hist_reduce_blanks       # Remove extra blanks from each command added to history
-         setopt hist_verify              # Don't execute immediately upon history expansion
-         setopt inc_append_history       # Write to history file immediately, not when shell quits
-         # share_history is handled by home-manager option above
+      # History settings (additional options not covered by home-manager)
+      setopt append_history           # allow multiple sessions to append to one history
+      setopt bang_hist                # treat ! special during command expansion
+      setopt hist_expire_dups_first   # expire duplicates first when trimming history
+      setopt hist_find_no_dups        # When searching history, don't repeat
+      setopt hist_reduce_blanks       # Remove extra blanks from each command added to history
+      setopt hist_verify              # Don't execute immediately upon history expansion
+      setopt inc_append_history       # Write to history file immediately, not when shell quits
+      # share_history is handled by home-manager option above
 
-         # Add history search keys
-         bindkey '^[[A' history-substring-search-up
-         bindkey '^[[B' history-substring-search-down
+      # Add history search keys
+      bindkey '^[[A' history-substring-search-up
+      bindkey '^[[B' history-substring-search-down
 
 
-         # Unified GPG/SSH environment setup
-         export SSH_ASKPASS_REQUIRE=never
+      # Unified GPG/SSH environment setup
+      export SSH_ASKPASS_REQUIRE=never
 
-         # Optimized GPG_TTY handling
-         if [ -t 1 ]; then
-           export GPG_TTY=$(tty)
-           # Only update GPG agent if it's running (lazy initialization)
-           if pgrep -x gpg-agent >/dev/null 2>&1; then
-             gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-           fi
-         fi
+      # Optimized GPG_TTY handling
+      if [ -t 1 ]; then
+        export GPG_TTY=$(tty)
+        # Only update GPG agent if it's running (lazy initialization)
+        if pgrep -x gpg-agent >/dev/null 2>&1; then
+          gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+        fi
+      fi
 
-         # Platform-specific configuration
-         ${
-           if pkgs.stdenv.isLinux
-           then ''
-             # Linux: Use GPG agent for SSH authentication
-                  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+      # Platform-specific configuration
+      ${
+        if pkgs.stdenv.isLinux
+        then ''
+          # Linux: Use GPG agent for SSH authentication
+               export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 
-             # Tmux-specific improvements
-                  if [ -n "$TMUX" ]; then
-                    stty sane
-                  fi
+          # Tmux-specific improvements
+               if [ -n "$TMUX" ]; then
+                 stty sane
+               fi
 
-                  export PROJ_DATA=/usr/share/proj
-           ''
-           else ''
-             # macOS: Use GPG agent for SSH authentication
-                  export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-                  # Ensure GPG agent is running (lazy start)
-                  gpgconf --launch gpg-agent 2>/dev/null || true
-           ''
-         }
+               export PROJ_DATA=/usr/share/proj
+        ''
+        else ''
+          # macOS: Use GPG agent for SSH authentication
+               export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+               # Ensure GPG agent is running (lazy start)
+               gpgconf --launch gpg-agent 2>/dev/null || true
+        ''
+      }
 
-         # Tmux integration with performance optimization
-         if [ -n "$TMUX" ]; then
-           # Simplified refresh function for manual use
-           refresh_gpg() {
-             export GPG_TTY=$(tty)
-             if pgrep -x gpg-agent >/dev/null 2>&1; then
-               gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-               echo "GPG agent refreshed for current tmux pane"
-             else
-               echo "GPG agent not running"
-             fi
-           }
+      # Tmux integration with performance optimization
+      if [ -n "$TMUX" ]; then
+        # Simplified refresh function for manual use
+        refresh_gpg() {
+          export GPG_TTY=$(tty)
+          if pgrep -x gpg-agent >/dev/null 2>&1; then
+            gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+            echo "GPG agent refreshed for current tmux pane"
+          else
+            echo "GPG agent not running"
+          fi
+        }
 
-           # Ensure terminal is properly configured in tmux
-           [ -t 1 ] && stty sane 2>/dev/null || true
-         fi
+        # Ensure terminal is properly configured in tmux
+        [ -t 1 ] && stty sane 2>/dev/null || true
+      fi
 
-         # Conda initialization (if available)
-         [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
-         export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+      # Conda initialization (if available)
+      [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
+      export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
     '';
 
     # Additional PATH entries
