@@ -77,6 +77,7 @@
       sesh
       sshs
       tealdeer
+      google-cloud-sdk
     ]
     ++ (
       if pkgs.stdenv.isLinux

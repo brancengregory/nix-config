@@ -169,10 +169,6 @@
          # Conda initialization (if available)
          [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
          export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
-
-         # Google Cloud SDK
-         if [ -f '/home/brancengregory/code/google/google-cloud-sdk/path.zsh.inc' ]; then . '/home/brancengregory/code/google/google-cloud-sdk/path.zsh.inc'; fi
-         if [ -f '/home/brancengregory/code/google/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/brancengregory/code/google/google-cloud-sdk/completion.zsh.inc'; fi
     '';
 
     # Additional PATH entries
