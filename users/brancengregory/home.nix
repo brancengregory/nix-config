@@ -44,7 +44,7 @@
       # lazysql maybe
       nh
       nmap
-      inputs.plasma-manager.packages.${pkgs.system}.rc2nix
+      inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
       # ollama maybe
       # opencode maybe
       openssh

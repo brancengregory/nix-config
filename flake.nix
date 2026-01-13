@@ -49,10 +49,6 @@
           {
             nixpkgs.overlays = [
               (final: prev: {
-                radian = prev.python3Packages.radian.overridePythonAttrs (old: {
-                  pyproject = true;
-                  build-system = [final.python3Packages.setuptools];
-                });
                 rPackages =
                   prev.rPackages.override {
                     overrides = {
