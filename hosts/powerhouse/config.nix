@@ -28,6 +28,7 @@
   home-manager.extraSpecialArgs = { inherit inputs; };
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
+  home-manager.backupFileExtension = "backup";
   home-manager.users.brancengregory = {
     imports = [
       inputs.plasma-manager.homeModules.plasma-manager
