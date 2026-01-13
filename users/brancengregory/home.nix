@@ -89,6 +89,7 @@
         positron-bin
         rustup
         snapper-gui
+        keymapp
       ]
       else if pkgs.stdenv.isDarwin
       then [
