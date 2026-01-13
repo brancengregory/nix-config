@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, inputs, ...}: {
   imports = [
     ../../modules/fonts/default.nix
     ../../modules/desktop/plasma-home.nix
@@ -44,6 +44,7 @@
       # lazysql maybe
       nh
       nmap
+      inputs.plasma-manager.packages.${pkgs.system}.rc2nix
       # ollama maybe
       # opencode maybe
       procs
