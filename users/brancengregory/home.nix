@@ -121,5 +121,5 @@
       else throw "Unsupported OS for this home-manager configuration"
     );
 
-  home.stateVersion = "25.05";
+  home.stateVersion = "25.11";
 }
