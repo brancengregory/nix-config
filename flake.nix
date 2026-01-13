@@ -30,11 +30,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-
-    # Radian Flake
-    radian-flake = {
-      url = "github:swt30/radian-flake";
-    };
   };
 
   outputs = {
@@ -44,7 +39,6 @@
     nix-darwin,
     home-manager,
     plasma-manager,
-    radian-flake,
     ...
   } @ inputs: {
     nixosConfigurations = {
@@ -52,6 +46,16 @@
         system = "x86_64-linux";
         specialArgs = {inherit inputs;}; # Pass inputs to modules
         modules = [
+          {
+            nixpkgs.overlays = [
+              (final: prev: {
+                radian = prev.radian.overridePythonAttrs (old: {
+                  pyproject = true;
+                  build-system = [final.python3Packages.setuptools];
+                });
+              })
+            ];
+          }
           home-manager.nixosModules.home-manager
           ./hosts/powerhouse/config.nix
         ];

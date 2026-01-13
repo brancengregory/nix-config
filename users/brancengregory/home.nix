@@ -71,7 +71,7 @@
           usethis
         ];
       })
-      inputs.radian-flake.packages.${pkgs.system}.default
+      pkgs.radian
       ripgrep
       scc
       sesh
