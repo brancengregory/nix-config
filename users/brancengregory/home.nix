@@ -73,6 +73,8 @@
           stringr
           targets
           usethis
+          readxl
+          janitor
           # Database packages
           DBI
           RPostgres
