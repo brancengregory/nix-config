@@ -12,7 +12,10 @@ lib.mkIf pkgs.stdenv.isLinux {
       theme = "breeze-dark";
       colorScheme = "BreezeDark";
       iconTheme = "breeze-dark";
-      cursorTheme = "Breeze_Snow"; # Breeze Snow is the light cursor often paired with Breeze Dark
+      cursor = {
+        theme = "Breeze_Snow";
+        size = 24;
+      };
     };
 
     input.keyboard = {
@@ -26,8 +29,8 @@ lib.mkIf pkgs.stdenv.isLinux {
 
     powerdevil = {
       AC = {
-        dimDisplayTimeout = 300; # 5 minutes
-        displayIdleTimeout = 2700; # 45 minutes
+        dimDisplay.idleTimeout = 300; # 5 minutes
+        turnOffDisplay.idleTimeout = 2700; # 45 minutes
       };
     };
 
@@ -60,18 +63,14 @@ lib.mkIf pkgs.stdenv.isLinux {
             name = "org.kde.plasma.digitalclock";
             config = {
               Appearance = {
-                showDate = "true";
-                use24hFormat = 0; # 0 = 12h format
+                showDate = true;
+                use24hFormat = "12h"; # Based on common plasma-manager patterns
               };
             };
           }
         ];
       }
     ];
-
-    # High-level kwin settings
-    kwin.effects.blur.enable = false;
-    kwin.effects.translucency.enable = false;
 
     # Keep only things that don't have high-level options yet
     configFile = {
@@ -80,6 +79,8 @@ lib.mkIf pkgs.stdenv.isLinux {
       kactivitymanagerdrc.activities.d9f05ec3-85fe-4fbc-937e-eebdad2df53d = "Default";
       kactivitymanagerdrc.main.currentActivity = "d9f05ec3-85fe-4fbc-937e-eebdad2df53d";
       kded5rc.Module-device_automounter.autoload = false;
+      # Manually disable translucency to ensure opaque menu
+      kwinrc.Plugins.translucencyEnabled = false;
     };
   };
 }
