@@ -41,6 +41,7 @@
       jnv
       just
       libpq # Move elsewhere?
+      lazygit
       # lazysql maybe
       nh
       nmap
