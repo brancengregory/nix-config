@@ -11,6 +11,7 @@
 - [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md)
 - [Security Guidelines](./SECURITY.md)
 - [Homebrew Integration](./HOMEBREW.md)
+- [Unified Theming](./THEMING.md)
 - [Cross-Platform Development](./CROSS_COMPILATION.md)
 - [Restic Backup Configuration](./RESTIC.md)
 
