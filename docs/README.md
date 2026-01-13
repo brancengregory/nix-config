@@ -3,12 +3,11 @@
 A set of configs for my machines:
 
 - powerhouse (desktop) - NixOS
-- capacitor (server) - NixOS
-- turbine (laptop) - macOS with nix-darwin
+- turbine (laptop) - macOS with nix-darwin (Intel)
 
 ## Features
 
-- **Modular Architecture**: 17+ organized modules across 9 categories for maximum reusability
+- **Modular Architecture**: 20+ organized modules across 10 categories for maximum reusability
 - **Cross-platform**: Supports both NixOS and macOS with shared configurations
 - **Home Manager integration**: User-specific configs with modular component imports
 - **Unified GPG/SSH**: Integrated authentication and encryption strategy
@@ -54,14 +53,16 @@ just check-darwin
 ├── hosts/              # Host-specific configurations
 │   ├── powerhouse/     # NixOS desktop
 │   └── turbine/        # macOS laptop
-├── modules/            # Modular components (17+ modules)
-│   ├── desktop/        # Desktop environments (hyprland)
+├── modules/            # Modular components (20+ modules)
+│   ├── desktop/        # Desktop environments (plasma, hyprland)
 │   ├── fonts/          # Font configurations
-│   ├── hardware/       # Hardware-specific modules (nvidia)
+│   ├── hardware/       # Hardware-specific modules (nvidia, bluetooth)
+│   ├── media/          # Media modules (audio)
 │   ├── network/        # Network configurations (wireguard)
 │   ├── os/             # Operating system modules (common, darwin, nixos)
 │   ├── programs/       # Application configurations (git)
 │   ├── security/       # Security modules (gpg, ssh, gpg-agent)
+│   ├── services/       # Service modules (backup/restic)
 │   ├── terminal/       # Terminal tools (nvim, starship, tmux, zsh)
 │   └── virtualization/ # Virtualization tools (podman, qemu)
 ├── users/              # User-specific configurations
@@ -88,6 +89,7 @@ The configuration is built using a modular approach where each component serves 
 - `modules/network/` - Network and VPN configurations
 - `modules/desktop/` - Desktop environment configurations
 - `modules/virtualization/` - Container and VM configurations
+- `modules/services/` - Background services and backups
 
 ### Configuration Import Strategy
 
@@ -104,7 +106,7 @@ imports = [
 ```nix
 imports = [
   ../../modules/terminal/zsh.nix
-  ../../modules/security/gpg.nix
+  ../../modules/security/default.nix
   ../../modules/programs/git.nix
   # Add modules as needed
 ];

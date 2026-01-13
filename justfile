@@ -11,6 +11,7 @@ help:
     @echo "  check           - Check flake syntax"
     @echo "  clean           - Clean build results"
     @echo "  format          - Format Nix files"
+    @echo "  test            - Run all validation tests"
     @echo "  docs-init       - Initialize mdBook documentation"
     @echo "  docs-build      - Build documentation site"
     @echo "  docs-serve      - Serve documentation locally"
@@ -43,6 +44,11 @@ clean:
 # Format Nix files
 format:
     nix develop -c alejandra .
+
+# Run all validation tests
+test:
+    just check
+    just check-darwin
 
 # Initialize mdBook documentation
 docs-init:

@@ -31,7 +31,6 @@
       delta
       eza
       fd
-      ghostty
       glow
       gnupg
       htop
@@ -44,7 +43,16 @@
       # lazysql maybe
       nh
       nmap
-      inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
+    ]
+    ++ (
+      if pkgs.stdenv.isLinux
+      then [
+        inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
+        pkgs.ghostty
+      ]
+      else []
+    )
+    ++ [
       # ollama maybe
       # opencode maybe
       openssh

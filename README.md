@@ -3,12 +3,11 @@
 A set of configs for my machines:
 
 - powerhouse (desktop) - NixOS
-- capacitor (server) - NixOS
-- turbine (laptop) - macOS with nix-darwin
+- turbine (laptop) - macOS with nix-darwin (Intel)
 
 ## Features
 
-- **Modular Architecture**: 17+ organized modules across 9 categories for maximum reusability
+- **Modular Architecture**: 20+ organized modules across 10 categories for maximum reusability
 - **Cross-platform**: Supports both NixOS and macOS with shared configurations
 - **Home Manager integration**: User-specific configs with modular component imports
 - **Unified GPG/SSH**: Integrated authentication and encryption strategy
@@ -22,6 +21,7 @@ A set of configs for my machines:
 - [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
 - [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux
 - [GitHub Copilot Agent](docs/COPILOT_AGENT.md) - Development environment for Copilot coding agent
+- [Restic Backup Configuration](docs/RESTIC.md) - Secure, declarative backups with Restic
 
 ## Repository Structure
 
@@ -30,14 +30,16 @@ A set of configs for my machines:
 ├── hosts/              # Host-specific configurations
 │   ├── powerhouse/     # NixOS desktop
 │   └── turbine/        # macOS laptop
-├── modules/            # Modular components (17+ modules)
-│   ├── desktop/        # Desktop environments (hyprland)
+├── modules/            # Modular components (20+ modules)
+│   ├── desktop/        # Desktop environments (plasma, hyprland)
 │   ├── fonts/          # Font configurations
-│   ├── hardware/       # Hardware-specific modules (nvidia)
+│   ├── hardware/       # Hardware-specific modules (nvidia, bluetooth)
+│   ├── media/          # Media modules (audio)
 │   ├── network/        # Network configurations (wireguard)
 │   ├── os/             # Operating system modules (common, darwin, nixos)
 │   ├── programs/       # Application configurations (git)
 │   ├── security/       # Security modules (gpg, ssh, gpg-agent)
+│   ├── services/       # Service modules (backup/restic)
 │   ├── terminal/       # Terminal tools (nvim, starship, tmux, zsh)
 │   └── virtualization/ # Virtualization tools (podman, qemu)
 ├── users/              # User-specific configurations

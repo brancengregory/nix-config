@@ -87,9 +87,10 @@ This ensures:
 
 The strategy is implemented across several configuration files:
 
-- **`users/brancengregory/home.nix`**: Main GPG/SSH configuration
-- **Environment variables**: Cross-platform GPG agent integration
-- **Platform-specific**: Pinentry and socket configuration
+- **`modules/security/default.nix`**: Main unified GPG/SSH/Agent configuration
+- **`users/brancengregory/home.nix`**: User-specific configuration and imports
+- **`modules/terminal/zsh.nix`**: Shell aliases and agent integration
+- **`modules/terminal/tmux.nix`**: Performance-optimized tmux hooks
 
 ## Initial Setup
 

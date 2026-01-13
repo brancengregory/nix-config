@@ -1,17 +1,24 @@
 # Module Architecture
 
-This configuration uses a modular architecture with 17+ modules organized across 9 categories. Each module encapsulates specific functionality and can be imported as needed by host and user configurations.
+This configuration uses a modular architecture with 20+ modules organized across 11 categories. Each module encapsulates specific functionality and can be imported as needed by host and user configurations.
 
 ## Module Categories
 
 ### Desktop Modules (`modules/desktop/`)
+- **plasma.nix** - KDE Plasma desktop environment
+- **plasma-home.nix** - Plasma user-specific settings (via plasma-manager)
 - **hyprland.nix** - Hyprland window manager configuration
+- **sddm.nix** - SDDM display manager configuration
 
 ### Font Modules (`modules/fonts/`)  
 - **default.nix** - System font configurations and font packages
 
 ### Hardware Modules (`modules/hardware/`)
 - **nvidia.nix** - NVIDIA GPU drivers and configuration
+- **bluetooth.nix** - Bluetooth service and configuration
+
+### Media Modules (`modules/media/`)
+- **audio.nix** - PipeWire/Pipewire audio configuration
 
 ### Network Modules (`modules/network/`)
 - **wireguard.nix** - WireGuard VPN configuration
@@ -25,9 +32,11 @@ This configuration uses a modular architecture with 17+ modules organized across
 - **git.nix** - Git configuration and aliases
 
 ### Security Modules (`modules/security/`)
-- **gpg.nix** - GPG configuration and key management
-- **gpg-agent.nix** - GPG agent configuration
-- **ssh.nix** - SSH client and server configuration
+- **default.nix** - Unified GPG, SSH, and GPG Agent configuration
+
+### Service Modules (`modules/services/`)
+- **backup.nix** - Restic backup service configuration
+- **monitoring.nix** - System monitoring services
 
 ### Terminal Modules (`modules/terminal/`)
 - **nvim.nix** - Neovim editor configuration
@@ -58,7 +67,7 @@ Example:
   ];
   
   networking.hostName = "powerhouse";
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 }
 ```
 
@@ -74,9 +83,7 @@ User configurations (`users/*/home.nix`) import user-specific modules:
     ../../modules/terminal/starship.nix
     ../../modules/terminal/tmux.nix
     ../../modules/terminal/nvim.nix
-    ../../modules/security/gpg.nix
-    ../../modules/security/ssh.nix
-    ../../modules/security/gpg-agent.nix
+    ../../modules/security/default.nix
     ../../modules/network/wireguard.nix
     ../../modules/programs/git.nix
   ];
