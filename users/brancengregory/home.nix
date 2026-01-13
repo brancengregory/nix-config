@@ -31,6 +31,7 @@
       age
       alejandra
       bat
+      delta
       eza
       fd
       ghostty
@@ -49,6 +50,7 @@
       # ollama maybe
       # opencode maybe
       procs
+      yazi
       (rWrapper.override {
         packages = with rPackages; [
           cli

@@ -43,8 +43,11 @@
         l = "ls";
         ls = "eza -al --git --icons=always";
         cat = "bat";
+        diff = "delta";
         tre = "eza --tree --level=3 --icons --git-ignore";
         r = "radian";
+        s = "sesh cn .";
+        h = "sesh cn home";
         md = "glow";
         g = "lazygit";
 
@@ -74,10 +77,14 @@
       ignoreDups = true;
       ignoreSpace = true;
       extended = true;
+      share = true;
     };
 
     # Custom functions and additional configuration
     initContent = ''
+         # Path
+         path=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin' $path)
+
          # Autocompletion
          autoload -Uz compinit && compinit
 
@@ -90,6 +97,15 @@
            fi
          }
 
+         # Yazi wrapper function
+         function f() {
+         	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+         	yazi "$@" --cwd-file="$tmp"
+         	IFS= read -r -d "" cwd < "$tmp"
+         	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+         	rm -f -- "$tmp"
+         }
+
          # History settings (additional options not covered by home-manager)
          setopt append_history           # allow multiple sessions to append to one history
          setopt bang_hist                # treat ! special during command expansion
@@ -98,28 +114,28 @@
          setopt hist_reduce_blanks       # Remove extra blanks from each command added to history
          setopt hist_verify              # Don't execute immediately upon history expansion
          setopt inc_append_history       # Write to history file immediately, not when shell quits
-         setopt share_history            # Share history among all sessions
+         # share_history is handled by home-manager option above
+
+         # Add history search keys
+         bindkey '^[[A' history-substring-search-up
+         bindkey '^[[B' history-substring-search-down
 
 
-      # Environment variables for unified GPG/SSH strategy
-         export SSH_ASKPASS_REQUIRE=never
+      #-- GPG and SSH Agent Configuration ==#
 
-      # Dynamic GPG_TTY handling for tmux compatibility
-         update_gpg_tty() {
-           export GPG_TTY=$(tty)
-           if [ -n "$GPG_AGENT_INFO" ] || pgrep -x gpg-agent >/dev/null 2>&1; then
-             gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-           fi
-         }
+      # Set the TTY for new shells and disable graphical prompts
+      export GPG_TTY=$(tty)
+      export SSH_ASKPASS_REQUIRE=never
 
-         # Set initial GPG_TTY and update it
-         update_gpg_tty
+      # This function actively tells the GPG agent which terminal is in use
+      update_gpg_tty() {
+        gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+      }
 
-         # Update GPG_TTY when entering new shells (important for tmux)
-         if [ -n "$TMUX" ]; then
-           # In tmux, update GPG_TTY whenever we start a new shell
-           update_gpg_tty
-         fi
+      # Run the update function before each new command prompt is displayed
+      # This ensures the pinentry prompt always appears in the active pane
+      autoload -U add-zsh-hook
+      add-zsh-hook precmd update_gpg_tty
 
       ${
         if pkgs.stdenv.isLinux
@@ -129,19 +145,7 @@
 
           # Tmux-specific improvements
                if [ -n "$TMUX" ]; then
-                # Ensure SSH agent socket is available in tmux
-                 if [ ! -S "$SSH_AUTH_SOCK" ]; then
-                   export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-                 fi
-
-                 # Make sure sudo and other commands work well in tmux
                  stty sane
-
-          	# Create a function to refresh GPG agent in current tmux pane
-                 refresh_gpg() {
-                   update_gpg_tty
-                   echo "GPG agent refreshed for current tmux pane"
-                 }
                fi
 
                export PROJ_DATA=/usr/share/proj
@@ -158,13 +162,6 @@
                  if [ ! -S "$SSH_AUTH_SOCK" ]; then
                    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
                  fi
-
-                 # Create a function to refresh GPG agent in current tmux pane
-                 refresh_gpg() {
-                   update_gpg_tty
-                   gpgconf --launch gpg-agent
-                   echo "GPG agent refreshed for current tmux pane"
-                 }
                fi
         ''
       }
@@ -172,6 +169,10 @@
          # Conda initialization (if available)
          [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
          export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+
+         # Google Cloud SDK
+         if [ -f '/home/brancengregory/code/google/google-cloud-sdk/path.zsh.inc' ]; then . '/home/brancengregory/code/google/google-cloud-sdk/path.zsh.inc'; fi
+         if [ -f '/home/brancengregory/code/google/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/brancengregory/code/google/google-cloud-sdk/completion.zsh.inc'; fi
     '';
 
     # Additional PATH entries
