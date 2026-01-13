@@ -18,10 +18,7 @@ A set of configs for my machines:
 
 ## Documentation
 
-📖 **[View the complete documentation site](https://brancengregory.github.io/nix-config/)**
-
 - [GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md) - Unified authentication and encryption across all systems
-- [Security Guidelines](docs/SECURITY.md) - Security best practices and audit results
 - [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
 - [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux
 - [GitHub Copilot Agent](docs/COPILOT_AGENT.md) - Development environment for Copilot coding agent

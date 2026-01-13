@@ -7,7 +7,7 @@ This document outlines the streamlined GPG/SSH configuration implemented across 
 The strategy implements a **performance-optimized, secure approach** where:
 
 - **GPG agent serves as the central authentication hub** for both GPG operations and SSH authentication
-- **Cross-platform compatibility** ensures consistent behavior on Linux and macOS
+- **Cross-platform compatibility** ensures consistent behavior on Linux and macOS  
 - **Streamlined configuration** with essential security settings and optimized performance
 - **Unified configuration** managed through home-manager for consistency
 
@@ -69,7 +69,7 @@ programs.tmux = {
   extraConfig = ''
     # Streamlined environment variable passing
     set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
-
+    
     # Efficient GPG_TTY updates - only when creating sessions or attaching clients
     set-hook -g session-created 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
     set-hook -g client-attached 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
@@ -101,7 +101,7 @@ gpg --full-gen-key
 
 # Choose:
 # (1) RSA and RSA (default) or (9) ECC and ECC
-# Key size: 4096 bits (RSA) or Curve 25519 (ECC)
+# Key size: 4096 bits (RSA) or Curve 25519 (ECC)  
 # Valid for: 1-2 years (recommended)
 # Real name: Brancen Gregory
 # Email: brancengregory@gmail.com
@@ -178,7 +178,7 @@ If you encounter pinentry or authentication issues in tmux:
 # Check GPG agent status
 gpg-status
 
-# Restart GPG agent if needed
+# Restart GPG agent if needed  
 gpg-restart
 
 # Manually refresh GPG state in current pane
@@ -297,7 +297,7 @@ ssh-keys     # List SSH keys
 # Solution 1: Refresh GPG state in current pane
 refresh_gpg
 
-# Solution 2: Restart GPG agent completely
+# Solution 2: Restart GPG agent completely  
 gpg-restart
 
 # Solution 3: Check GPG_TTY is set correctly
@@ -361,7 +361,6 @@ gpgconf --check-programs
 5. **Revocation Ready**: Maintain current revocation certificates
 
 ### Trust Model
-
 - **Web of Trust**: Participate in key signing when appropriate
 - **Key Verification**: Always verify key fingerprints out-of-band
 - **Certificate Authorities**: Consider using keyserver certificates for verification
@@ -393,7 +392,7 @@ The configuration supports hardware tokens (YubiKey, etc.):
 ### Regular Tasks
 
 - **Weekly**: Check agent status and key usage
-- **Monthly**: Review SSH connections and Git signatures
+- **Monthly**: Review SSH connections and Git signatures  
 - **Quarterly**: Review key expiration dates
 - **Annually**: Consider key rotation and security review
 

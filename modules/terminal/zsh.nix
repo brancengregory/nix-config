@@ -121,50 +121,56 @@
          bindkey '^[[B' history-substring-search-down
 
 
-      #-- GPG and SSH Agent Configuration ==#
+         # Unified GPG/SSH environment setup
+         export SSH_ASKPASS_REQUIRE=never
 
-      # Set the TTY for new shells and disable graphical prompts
-      export GPG_TTY=$(tty)
-      export SSH_ASKPASS_REQUIRE=never
+         # Optimized GPG_TTY handling
+         if [ -t 1 ]; then
+           export GPG_TTY=$(tty)
+           # Only update GPG agent if it's running (lazy initialization)
+           if pgrep -x gpg-agent >/dev/null 2>&1; then
+             gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+           fi
+         fi
 
-      # This function actively tells the GPG agent which terminal is in use
-      update_gpg_tty() {
-        gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-      }
+         # Platform-specific configuration
+         ${
+           if pkgs.stdenv.isLinux
+           then ''
+             # Linux: Use GPG agent for SSH authentication
+                  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 
-      # Run the update function before each new command prompt is displayed
-      # This ensures the pinentry prompt always appears in the active pane
-      autoload -U add-zsh-hook
-      add-zsh-hook precmd update_gpg_tty
+             # Tmux-specific improvements
+                  if [ -n "$TMUX" ]; then
+                    stty sane
+                  fi
 
-      ${
-        if pkgs.stdenv.isLinux
-        then ''
-          # Linux: Use GPG agent for SSH authentication
-               export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+                  export PROJ_DATA=/usr/share/proj
+           ''
+           else ''
+             # macOS: Use GPG agent for SSH authentication
+                  export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+                  # Ensure GPG agent is running (lazy start)
+                  gpgconf --launch gpg-agent 2>/dev/null || true
+           ''
+         }
 
-          # Tmux-specific improvements
-               if [ -n "$TMUX" ]; then
-                 stty sane
-               fi
+         # Tmux integration with performance optimization
+         if [ -n "$TMUX" ]; then
+           # Simplified refresh function for manual use
+           refresh_gpg() {
+             export GPG_TTY=$(tty)
+             if pgrep -x gpg-agent >/dev/null 2>&1; then
+               gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+               echo "GPG agent refreshed for current tmux pane"
+             else
+               echo "GPG agent not running"
+             fi
+           }
 
-               export PROJ_DATA=/usr/share/proj
-        ''
-        else ''
-          # macOS: Use GPG agent for SSH authentication
-               export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-               # Ensure GPG agent is running
-               gpgconf --launch gpg-agent
-
-               # Tmux-specific improvements for macOS
-               if [ -n "$TMUX" ]; then
-                 # Verify SSH socket is accessible in tmux
-                 if [ ! -S "$SSH_AUTH_SOCK" ]; then
-                   export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-                 fi
-               fi
-        ''
-      }
+           # Ensure terminal is properly configured in tmux
+           [ -t 1 ] && stty sane 2>/dev/null || true
+         fi
 
          # Conda initialization (if available)
          [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
