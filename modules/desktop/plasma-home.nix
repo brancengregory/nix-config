@@ -9,7 +9,9 @@ lib.mkIf pkgs.stdenv.isLinux {
 
     workspace = {
       lookAndFeel = "org.kde.breezedark.desktop";
-      theme = "breeze-dark";
+      # Setting theme to 'default' (Breeze) which is more likely to be opaque
+      # than 'breeze-dark' which often has transparency in its SVG files.
+      theme = "default";
       colorScheme = "BreezeDark";
       iconTheme = "breeze-dark";
       cursor = {
@@ -23,8 +25,12 @@ lib.mkIf pkgs.stdenv.isLinux {
       repeatRate = 50;
     };
 
-    kwin.virtualDesktops = {
-      number = 1;
+    kwin = {
+      virtualDesktops.number = 1;
+      effects = {
+        blur.enable = false;
+        translucency.enable = false;
+      };
     };
 
     powerdevil = {
@@ -64,7 +70,7 @@ lib.mkIf pkgs.stdenv.isLinux {
             config = {
               Appearance = {
                 showDate = true;
-                use24hFormat = "12h"; # Based on common plasma-manager patterns
+                use24hFormat = "12h";
               };
             };
           }
@@ -79,8 +85,12 @@ lib.mkIf pkgs.stdenv.isLinux {
       kactivitymanagerdrc.activities.d9f05ec3-85fe-4fbc-937e-eebdad2df53d = "Default";
       kactivitymanagerdrc.main.currentActivity = "d9f05ec3-85fe-4fbc-937e-eebdad2df53d";
       kded5rc.Module-device_automounter.autoload = false;
-      # Manually disable translucency to ensure opaque menu
-      kwinrc.Plugins.translucencyEnabled = false;
+      # Force plugins off via configFile as well
+      kwinrc.Plugins = {
+        blurEnabled = false;
+        translucencyEnabled = false;
+        backgroundcontrastEnabled = false;
+      };
     };
   };
 }
