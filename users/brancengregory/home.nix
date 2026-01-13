@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   imports = [
     ../../modules/fonts/default.nix
+    ../../modules/desktop/plasma-home.nix
     ../../modules/terminal/zsh.nix
     ../../modules/terminal/starship.nix
     ../../modules/terminal/tmux.nix

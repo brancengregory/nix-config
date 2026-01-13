@@ -36,7 +36,6 @@
 
   networking.firewall = {
     enable = true;
-    package = pkgs.nftables;
     allowedTCPPorts = [
       22
       80

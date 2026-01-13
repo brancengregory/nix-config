@@ -30,6 +30,7 @@
   home-manager.useUserPackages = true;
   home-manager.users.brancengregory = {
     imports = [
+      inputs.plasma-manager.homeManagerModules.plasma-manager
       ../../users/brancengregory/home.nix
     ];
   };

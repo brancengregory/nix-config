@@ -23,6 +23,13 @@
       # Make sure that nixpkgs.url and home-manager.url stay in sync and can work together
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Plasma Manager
+    plasma-manager = {
+      url = "github:pjones/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs = {
@@ -31,6 +38,7 @@
     nixpkgs-unstable,
     nix-darwin,
     home-manager,
+    plasma-manager,
     ...
   } @ inputs: {
     nixosConfigurations = {
