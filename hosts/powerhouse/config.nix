@@ -7,6 +7,7 @@
     ../../modules/os/common.nix # Universal settings
     ../../modules/os/nixos.nix # Common NixOS settings
     ./hardware.nix # Hardware-specific configuration
+    ../../modules/themes/stylix.nix
     ../../modules/hardware/nvidia.nix # NVIDIA GPU
     ../../modules/desktop/sddm.nix
     ../../modules/desktop/plasma.nix
@@ -50,6 +51,9 @@
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.backupFileExtension = "backup";
+  home-manager.sharedModules = [
+    {stylix.enableReleaseChecks = false;}
+  ];
   home-manager.users.brancengregory = {
     imports = [
       inputs.plasma-manager.homeModules.plasma-manager

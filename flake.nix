@@ -31,6 +31,9 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    # Stylix for unified styling
+    stylix.url = "github:danth/stylix";
+
     # Custom Neovim Configuration
     nvim-config = {
       url = "github:brancengregory/nvim";
@@ -45,6 +48,7 @@
     nix-darwin,
     home-manager,
     plasma-manager,
+    stylix,
     nvim-config,
     ...
   } @ inputs: {
@@ -85,6 +89,7 @@
             ];
           }
           home-manager.nixosModules.home-manager
+          inputs.stylix.nixosModules.stylix
           ./hosts/powerhouse/config.nix
         ];
       };
@@ -131,6 +136,7 @@
             ];
           }
           home-manager.darwinModules.home-manager
+          inputs.stylix.homeModules.stylix
           ./hosts/turbine/config.nix
         ];
       };

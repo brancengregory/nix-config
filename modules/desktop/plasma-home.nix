@@ -9,8 +9,6 @@ lib.mkIf pkgs.stdenv.isLinux {
 
     workspace = {
       lookAndFeel = "org.kde.breezedark.desktop";
-      # Setting theme to 'default' (Breeze) which is more likely to be opaque
-      # than 'breeze-dark' which often has transparency in its SVG files.
       theme = "default";
       colorScheme = "BreezeDark";
       iconTheme = "breeze-dark";
