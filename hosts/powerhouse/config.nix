@@ -23,6 +23,12 @@
     services.xserver.videoDrivers = pkgs.lib.mkForce [ "modesetting" ];
     hardware.nvidia.modesetting.enable = pkgs.lib.mkForce false;
     hardware.nvidia.open = pkgs.lib.mkForce false;
+
+    # Force software rendering in VM to avoid kwin framebuffer errors
+    environment.variables = {
+      LIBGL_ALWAYS_SOFTWARE = "1";
+      WLR_RENDERER = "pixman"; # For wlroots-based compositors (backup)
+    };
   };
 
   home-manager.extraSpecialArgs = { inherit inputs; };
