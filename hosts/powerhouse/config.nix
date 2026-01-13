@@ -22,6 +22,9 @@
       memorySize = 8192; # 8GB RAM
       cores = 4;
       graphics = true;
+      forwardPorts = [
+        { from = "host"; host.port = 2222; guest.port = 22; }
+      ];
     };
     # Override Nvidia driver in VM to use standard QEMU graphics
     services.xserver.videoDrivers = pkgs.lib.mkForce [ "modesetting" ];
