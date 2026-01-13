@@ -10,6 +10,7 @@
     ../../modules/hardware/bluetooth.nix
     ../../modules/services/monitoring.nix
     ../../modules/services/backup.nix
+    ../../modules/network/wireguard.nix
   ];
 
   networking.hostName = "powerhouse";

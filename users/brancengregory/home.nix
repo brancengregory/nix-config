@@ -7,7 +7,6 @@
     ../../modules/terminal/tmux.nix
     ../../modules/terminal/nvim.nix
     ../../modules/security/default.nix
-    ../../modules/network/wireguard.nix
     ../../modules/programs/git.nix
   ];
 
