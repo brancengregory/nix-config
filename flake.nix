@@ -34,7 +34,6 @@
     # Radian Flake
     radian-flake = {
       url = "github:swt30/radian-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
