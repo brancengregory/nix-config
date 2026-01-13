@@ -5,7 +5,8 @@
   # Root filesystem configuration - minimal for VM/testing
   fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";
-    fsType = "ext4";
+    fsType = "btrfs";
+    options = [ "compress=zstd" "noatime" ];
   };
 
   # Boot configuration - using GRUB as required by the error message

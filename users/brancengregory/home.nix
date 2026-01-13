@@ -88,6 +88,7 @@
         slack
         positron-bin
         rustup
+        snapper-gui
       ]
       else if pkgs.stdenv.isDarwin
       then [

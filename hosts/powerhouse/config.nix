@@ -42,5 +42,15 @@
     ];
   };
 
+  # Enable Snapper for Btrfs snapshots
+  services.snapper.configs = {
+    root = {
+      SUBVOLUME = "/";
+      ALLOW_USERS = [ "brancengregory" ];
+      TIMELINE_CREATE = true;
+      TIMELINE_CLEANUP = true;
+    };
+  };
+
   system.stateVersion = "25.05";
 }
