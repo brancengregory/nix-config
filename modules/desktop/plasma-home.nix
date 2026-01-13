@@ -13,6 +13,11 @@ lib.mkIf pkgs.stdenv.isLinux {
       colorScheme = "BreezeDark";
     };
 
+    input.keyboard = {
+      repeatDelay = 250;
+      repeatRate = 50;
+    };
+
     shortcuts = {
       ActivityManager.switch-to-activity-d9f05ec3-85fe-4fbc-937e-eebdad2df53d = [];
       "KDE Keyboard Layout Switcher"."Switch to Last-Used Keyboard Layout" = "Meta+Alt+L";
@@ -287,12 +292,26 @@ lib.mkIf pkgs.stdenv.isLinux {
         widgets = [
           "org.kde.plasma.kickoff"
           "org.kde.plasma.pager"
-          "org.kde.plasma.icontasks"
+          {
+            name = "org.kde.plasma.icontasks";
+            config = {
+              General = {
+                launchers = [
+                  "applications:org.kde.systemsettings.desktop"
+                  "applications:org.kde.dolphin.desktop"
+                  "applications:google-chrome.desktop"
+                  "applications:com.mitchellh.ghostty.desktop"
+                ];
+              };
+            };
+          }
           "org.kde.plasma.marginsseparator"
           "org.kde.plasma.systemtray"
           "org.kde.plasma.digitalclock"
         ];
       }
     ];
+
+    configFile.kwinrc.Plugins.translucencyEnabled = false;
   };
 }
