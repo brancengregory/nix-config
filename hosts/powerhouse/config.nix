@@ -7,6 +7,9 @@
     ../../modules/desktop/sddm.nix
     ../../modules/desktop/plasma.nix
     ../../modules/media/audio.nix
+    ../../modules/hardware/bluetooth.nix
+    ../../modules/services/monitoring.nix
+    ../../modules/services/backup.nix
   ];
 
   networking.hostName = "powerhouse";
