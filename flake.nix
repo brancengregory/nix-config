@@ -69,6 +69,8 @@
                           RPostgres
                           dplyr
                           dbplyr
+                          ggplot2
+                          pool
                           magrittr
                           rlang
                           stringr
