@@ -21,7 +21,7 @@
         Address = "10.0.0.1/24";
         IPMasquerade = "both";
       };
-      linkConfig.MTU = 1280;
+      linkConfig.MTU = "1280";
     };
   };
 
