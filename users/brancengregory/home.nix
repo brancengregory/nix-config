@@ -68,7 +68,7 @@
           usethis
         ];
       })
-      # radian
+      radian
       ripgrep
       scc
       sesh
