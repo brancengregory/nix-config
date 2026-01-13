@@ -71,7 +71,7 @@
           usethis
         ];
       })
-      radian
+      pkgs.radian
       ripgrep
       scc
       sesh
