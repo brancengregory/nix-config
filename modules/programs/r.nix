@@ -44,7 +44,10 @@
 in {
   home.packages = with pkgs; [
     my-r
+    # Wrap radian to explicitly set package paths
     (pkgs.writeShellScriptBin "radian" ''
+      export R_LIBS_SITE="${my-r}/library:${my-r}/lib/R/library"
+      export R_BINARY="${my-r}/bin/R"
       exec ${pkgs.radian}/bin/radian --r-binary="${my-r}/bin/R" "$@"
     '')
   ];
