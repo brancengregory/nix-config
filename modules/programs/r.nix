@@ -44,12 +44,15 @@
 in {
   home.packages = with pkgs; [
     my-r
-    radian
+    # Wrap radian to explicitly use our wrapped R
+    (pkgs.writeShellScriptBin "radian" ''
+      export R_BINARY="${my-r}/bin/R"
+      exec ${pkgs.radian}/bin/radian "$@"
+    '')
   ];
 
-  # Force radian to use the wrapped R
+  # R Environment variables
   home.sessionVariables = {
-    R_BINARY = "${my-r}/bin/R";
     R_ENVIRON_USER = config.sops.secrets.renviron.path;
   };
 }
