@@ -14,6 +14,7 @@
     ../../modules/terminal/nvim.nix
     ../../modules/security/default.nix
     ../../modules/programs/git.nix
+    ../../modules/programs/r.nix
     inputs.sops-nix.homeManagerModules.sops
   ] ++ (if isLinux then [
     ../../modules/desktop/plasma-home.nix
@@ -97,44 +98,6 @@
       postgresql
       sqlite
       arrow-cpp
-      (rWrapper.override {
-        packages = with rPackages; [
-          cli
-          devtools
-          dplyr
-          fs
-          ggplot2
-          glue
-          lubridate
-          tibble
-          readr
-          renv
-          rix
-          rlang
-          scales
-          stringr
-          targets
-          usethis
-          readxl
-          janitor
-          tidymodels
-          # Database packages
-          DBI
-          RPostgres
-          RSQLite
-          duckdb
-          arrow
-          # Production and Parallelism
-          crew
-          mirai
-          plumber
-          httr2
-          shiny
-          bslib
-          ojodb
-        ];
-      })
-      pkgs.radian
       ripgrep
       scc
       sesh
