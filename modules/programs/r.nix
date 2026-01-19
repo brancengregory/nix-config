@@ -63,6 +63,7 @@ in {
     (pkgs.writeShellScriptBin "radian" ''
       export R_LIBS_SITE="${my-r-env}/library"
       export R_BINARY="${my-r}/bin/R"
+      export R_ENVIRON_USER="${config.sops.secrets.renviron.path}"
       exec ${pkgs.radian}/bin/radian "$@"
     '')
   ];
