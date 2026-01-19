@@ -13,6 +13,7 @@
   # The path to the user's age key (optional for system, mainly for home-manager but good to have)
   sops.age.keyFile = "/home/brancengregory/.config/sops/age/keys.txt";
 
-  # Example secret (referenced in configuration)
-  # sops.secrets."example_key" = {};
+  # Restic Backup Secrets
+  sops.secrets."restic/password" = {};
+  sops.secrets."restic/env" = {};
 }

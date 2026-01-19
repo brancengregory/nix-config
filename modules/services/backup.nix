@@ -17,8 +17,8 @@
       repository = "gs:powerhouse-backup:/";
 
       # Credentials (evaluation requires these to be set)
-      passwordFile = "/etc/nixos/secrets/restic-password";
-      environmentFile = "/etc/nixos/secrets/restic-env";
+      passwordFile = config.sops.secrets."restic/password".path;
+      environmentFile = config.sops.secrets."restic/env".path;
 
       paths = ["/home/brancengregory"];
 
