@@ -44,11 +44,9 @@
 in {
   home.packages = with pkgs; [
     my-r
-    # Wrap radian to explicitly use our wrapped R
-    (pkgs.writeShellScriptBin "radian" ''
-      export R_BINARY="${my-r}/bin/R"
-      exec ${pkgs.radian}/bin/radian "$@"
-    '')
+    (pkgs.radian.override {
+      r = my-r;
+    })
   ];
 
   # R Environment variables
