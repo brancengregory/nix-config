@@ -45,7 +45,7 @@ in {
   home.packages = with pkgs; [
     my-r
     (pkgs.radian.override {
-      r = my-r;
+      R = my-r;
     })
   ];
 
