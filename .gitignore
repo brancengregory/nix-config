@@ -3,3 +3,7 @@ result
 
 # mdBook output
 docs/book/
+secrets/vm_host_key
+secrets/vm_host_key.pub
+secrets/turbine_host_key
+secrets/turbine_host_key.pub

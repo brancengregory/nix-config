@@ -39,6 +39,12 @@
       url = "github:brancengregory/nvim";
       flake = false;
     };
+
+    # Secret Management
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -50,6 +56,7 @@
     plasma-manager,
     stylix,
     nvim-config,
+    sops-nix,
     ...
   } @ inputs: {
     nixosConfigurations = {

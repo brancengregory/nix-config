@@ -82,6 +82,11 @@
 
     # Custom functions and additional configuration
     initContent = ''
+      # Source secrets if they exist
+      if [ -f "$HOME/.config/zsh/secrets.zsh" ]; then
+        source "$HOME/.config/zsh/secrets.zsh"
+      fi
+
       # Path
       path=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin' $path)
 

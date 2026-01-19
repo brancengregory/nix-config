@@ -1,6 +1,7 @@
 {
   pkgs,
   inputs,
+  config,
   ...
 }: {
   imports = [
@@ -12,7 +13,32 @@
     ../../modules/terminal/nvim.nix
     ../../modules/security/default.nix
     ../../modules/programs/git.nix
+    inputs.sops-nix.homeManagerModules.sops
   ];
+
+  sops = {
+    defaultSopsFile = ../../secrets/secrets.yaml;
+    defaultSopsFormat = "yaml";
+    age.keyFile = "/home/brancengregory/.config/sops/age/keys.txt";
+    
+    secrets = {
+      # Database credentials
+      pgpass = {
+        path = "${config.home.homeDirectory}/.pgpass";
+        mode = "0600";
+      };
+
+      # R environment variables
+      renviron = {
+        path = "${config.home.homeDirectory}/.Renviron";
+      };
+
+      # Shell secrets (sourced by zsh)
+      zsh_env = {
+        path = "${config.xdg.configHome}/zsh/secrets.zsh";
+      };
+    };
+  };
 
   programs.home-manager.enable = true;
 
@@ -47,6 +73,8 @@
       # lazysql maybe
       nh
       nmap
+      sops
+      ssh-to-age
     ]
     ++ (
       if pkgs.stdenv.isLinux

@@ -16,6 +16,7 @@
     ../../modules/services/monitoring.nix
     ../../modules/services/backup.nix
     ../../modules/network/wireguard.nix
+    ../../modules/security/sops.nix
   ];
 
   networking.hostName = "powerhouse";
