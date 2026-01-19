@@ -17,6 +17,8 @@
     ../../modules/services/backup.nix
     ../../modules/network/wireguard.nix
     ../../modules/security/sops.nix
+    ../../modules/virtualization/podman.nix
+    ../../modules/virtualization/qemu.nix
   ];
 
   networking.hostName = "powerhouse";
@@ -45,6 +47,21 @@
     environment.variables = {
       LIBGL_ALWAYS_SOFTWARE = "1";
       WLR_RENDERER = "pixman"; # For wlroots-based compositors (backup)
+    };
+
+    # Inject the persistent VM key so sops can decrypt secrets
+    # Security Note: This puts the private key in the Nix store (world-readable on host)
+    environment.etc."ssh/ssh_host_ed25519_key" = {
+      source = "/home/brancengregory/code/brancengregory/nix-config/secrets/vm_host_key";
+      mode = "0600";
+    };
+
+    # Share host sops keys with VM via QEMU 9p
+    virtualisation.sharedDirectories = {
+      sops_keys = {
+        source = "/home/brancengregory/.config/sops";
+        target = "/home/brancengregory/.config/sops";
+      };
     };
   };
 
