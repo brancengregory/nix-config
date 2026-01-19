@@ -21,6 +21,7 @@
     ../../modules/security/sops.nix
     ../../modules/virtualization/podman.nix
     ../../modules/virtualization/qemu.nix
+    ./disks/main.nix
   ];
 
   networking.hostName = "powerhouse";
@@ -71,12 +72,21 @@
       mode = "0600";
     };
 
-    # Share host sops keys with VM via QEMU 9p
-    virtualisation.sharedDirectories = {
-      sops_keys = {
-        source = "/home/brancengregory/.config/sops";
-        target = "/home/brancengregory/.config/sops";
-      };
+    # Provision sops key securely into the VM
+    environment.etc."sops/age/keys.txt" = {
+      source = "/home/brancengregory/.config/sops/age/keys.txt";
+      mode = "0400";
+      user = "brancengregory";
+      group = "users";
+    };
+
+    system.activationScripts.sopsKeyHack = {
+      text = ''
+        mkdir -p /home/brancengregory/.config/sops/age
+        ln -sf /etc/sops/age/keys.txt /home/brancengregory/.config/sops/age/keys.txt
+        chown -R brancengregory:users /home/brancengregory/.config/sops
+      '';
+      deps = [];
     };
   };
 

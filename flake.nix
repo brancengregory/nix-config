@@ -45,6 +45,12 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Disk Partitioning
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -57,6 +63,7 @@
     stylix,
     nvim-config,
     sops-nix,
+    disko,
     ...
   } @ inputs: {
     nixosConfigurations = {
@@ -75,6 +82,7 @@
           }
           home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
+          inputs.disko.nixosModules.disko
           ./hosts/powerhouse/config.nix
         ];
       };
