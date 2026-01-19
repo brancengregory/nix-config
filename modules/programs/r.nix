@@ -44,9 +44,9 @@
 in {
   home.packages = with pkgs; [
     my-r
-    (pkgs.radian.override {
-      R = my-r;
-    })
+    (pkgs.writeShellScriptBin "radian" ''
+      exec ${pkgs.radian}/bin/radian --r-binary="${my-r}/bin/R" "$@"
+    '')
   ];
 
   # R Environment variables
