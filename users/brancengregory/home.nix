@@ -33,9 +33,7 @@
       };
 
       # R environment variables
-      renviron = {
-        path = "${config.home.homeDirectory}/.Renviron";
-      };
+      renviron = {};
 
       # Shell secrets (sourced by zsh)
       zsh_env = {
