@@ -62,7 +62,11 @@
     nixosConfigurations = {
       powerhouse = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs;}; # Pass inputs to modules
+        specialArgs = {
+          inherit inputs;
+          isLinux = true;
+          isDarwin = false;
+        }; # Pass inputs to modules
         modules = [
           {
             nixpkgs.overlays = [
@@ -82,7 +86,11 @@
       turbine = nix-darwin.lib.darwinSystem {
         system = "x86_64-darwin"; # Intel CPU
 
-        specialArgs = {inherit inputs;};
+        specialArgs = {
+          inherit inputs;
+          isLinux = false;
+          isDarwin = true;
+        };
 
         modules = [
           {
@@ -91,7 +99,7 @@
             ];
           }
           home-manager.darwinModules.home-manager
-          inputs.stylix.homeModules.stylix
+          inputs.stylix.darwinModules.stylix
           ./hosts/turbine/config.nix
         ];
       };

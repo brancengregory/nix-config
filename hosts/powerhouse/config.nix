@@ -1,6 +1,8 @@
 {
   pkgs,
   inputs,
+  isLinux,
+  isDarwin,
   ...
 }: {
   imports = [
@@ -23,6 +25,19 @@
 
   networking.hostName = "powerhouse";
   nixpkgs.config.allowUnfree = true;
+
+  stylix.cursor = {
+    package = pkgs.kdePackages.breeze;
+    name = "Breeze_Snow";
+    size = 24;
+  };
+
+  # Selectively enable targets that are safe and desired
+  stylix.targets = {
+    console.enable = true;
+    gnome.enable = false;
+    gtk.enable = true;
+  };
 
   # Optimize VM Performance
   virtualisation.vmVariant = {
@@ -65,7 +80,9 @@
     };
   };
 
-  home-manager.extraSpecialArgs = {inherit inputs;};
+  home-manager.extraSpecialArgs = {
+    inherit inputs isLinux isDarwin;
+  };
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.backupFileExtension = "backup";

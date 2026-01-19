@@ -1,6 +1,8 @@
 {
   pkgs,
   inputs,
+  isLinux,
+  isDarwin,
   ...
 }: {
   imports = [
@@ -9,7 +11,9 @@
     ../../modules/themes/stylix.nix
   ];
 
-  home-manager.extraSpecialArgs = {inherit inputs;};
+  home-manager.extraSpecialArgs = {
+    inherit inputs isLinux isDarwin;
+  };
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.sharedModules = [

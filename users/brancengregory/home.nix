@@ -2,11 +2,12 @@
   pkgs,
   inputs,
   config,
+  isLinux,
+  isDarwin,
   ...
 }: {
   imports = [
     ../../modules/fonts/default.nix
-    ../../modules/desktop/plasma-home.nix
     ../../modules/terminal/zsh.nix
     ../../modules/terminal/starship.nix
     ../../modules/terminal/tmux.nix
@@ -14,7 +15,9 @@
     ../../modules/security/default.nix
     ../../modules/programs/git.nix
     inputs.sops-nix.homeManagerModules.sops
-  ];
+  ] ++ (if isLinux then [
+    ../../modules/desktop/plasma-home.nix
+  ] else []);
 
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
@@ -162,7 +165,7 @@
       else throw "Unsupported OS for this home-manager configuration"
     );
 
-  xdg.mimeApps = {
+  xdg.mimeApps = if isLinux then {
     enable = true;
     defaultApplications = {
       "text/html" = "google-chrome.desktop";
@@ -171,7 +174,7 @@
       "x-scheme-handler/about" = "google-chrome.desktop";
       "x-scheme-handler/unknown" = "google-chrome.desktop";
     };
-  };
+  } else {};
 
   home.stateVersion = "25.11";
 

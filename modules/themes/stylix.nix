@@ -1,6 +1,7 @@
 {
   pkgs,
   inputs,
+  lib,
   ...
 }: {
   stylix = {
@@ -18,12 +19,6 @@
 
     # Using Tokyo Night
     base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyo-night-dark.yaml";
-
-    cursor = {
-      package = pkgs.kdePackages.breeze;
-      name = "Breeze_Snow";
-      size = 24;
-    };
 
     fonts = {
       monospace = {
@@ -56,12 +51,5 @@
     };
 
     polarity = "dark";
-
-    # Selectively enable targets that are safe and desired
-    targets = {
-      console.enable = true;
-      gnome.enable = false;
-      gtk.enable = true;
-    };
   };
 }
