@@ -27,6 +27,10 @@
   networking.hostName = "powerhouse";
   nixpkgs.config.allowUnfree = true;
 
+  # Bootloader - Use systemd-boot for UEFI
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   stylix.cursor = {
     package = pkgs.kdePackages.breeze;
     name = "Breeze_Snow";
