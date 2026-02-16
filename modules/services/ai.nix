@@ -50,11 +50,11 @@ in {
       openFirewall = true;
     };
 
-    # Open WebUI
+    # Open WebUI - Port 8080 (changed from 3000 to avoid conflict with Grafana)
     virtualisation.oci-containers.containers.open-webui = mkIf cfg.open-webui.enable {
       image = "ghcr.io/open-webui/open-webui:main";
       autoStart = true;
-      ports = ["3000:8080"];
+      ports = ["8080:8080"];
       volumes = [
         "/var/lib/open-webui:/app/backend/data"
       ];
@@ -82,7 +82,7 @@ in {
     # Firewall ports
     networking.firewall.allowedTCPPorts = [
       11434 # Ollama API
-      3000 # Open WebUI
+      8080 # Open WebUI (changed from 3000 to avoid conflict with Grafana)
     ];
   };
 }

@@ -20,6 +20,8 @@
     ../../modules/services/git.nix # Forgejo
     ../../modules/services/storage.nix # Minio, NFS, mergerfs, SnapRAID
     ../../modules/network/wireguard.nix # WireGuard hub
+    ../../modules/network/netbird.nix # Netbird self-hosted server
+    ../../modules/network/caddy.nix # Caddy reverse proxy
     ../../modules/security/sops.nix
     ../../modules/security/gpg.nix
     ../../modules/security/ssh.nix
@@ -126,10 +128,83 @@
     };
   };
 
+  # Netbird Self-Hosted Configuration
+  services.netbird-server = {
+    enable = true;
+    domain = "netbird.brancen.world";
+    managementPort = 33073;
+    dashboardPort = 18765;
+    signalPort = 10000;
+    turnPort = 3478;
+    
+    client = {
+      enable = true;
+      managementUrl = "https://netbird.brancen.world:33073";
+    };
+    
+    secrets = {
+      jwtSecretFile = config.sops.secrets."netbird/jwt-secret".path;
+      adminPasswordHashFile = config.sops.secrets."netbird/admin-password-hash".path;
+      postgresPasswordFile = config.sops.secrets."netbird/postgres-password".path;
+      turnPasswordFile = config.sops.secrets."netbird/turn-password".path;
+    };
+  };
+
+  # Caddy Reverse Proxy with Wildcard SSL (uses DNS-01 challenge via Porkbun)
+  services.caddy-proxy = {
+    enable = true;
+    domain = "brancen.world";
+    porkbunCredentialsFile = config.sops.secrets."porkbun/credentials".path;
+    
+    services = {
+      netbird = {
+        subdomain = "netbird";
+        port = 18765;
+      };
+      jellyfin = {
+        subdomain = "jellyfin";
+        port = 8096;
+      };
+      git = {
+        subdomain = "git";
+        port = 3080;
+      };
+      chat = {
+        subdomain = "chat";
+        port = 8080; # Open WebUI
+      };
+      grafana = {
+        subdomain = "grafana";
+        port = 3000;
+      };
+      prometheus = {
+        subdomain = "prometheus";
+        port = 9090;
+      };
+      downloads = {
+        subdomain = "downloads";
+        port = 8080; # qBittorrent
+      };
+      ollama = {
+        subdomain = "ollama";
+        port = 11434;
+      };
+    };
+  };
+
   # SOPS Secret Declarations
   sops.secrets = {
     # WireGuard secrets
     "wireguard/capacitor/private_key" = {};
+
+    # Netbird secrets
+    "netbird/jwt-secret" = {};
+    "netbird/admin-password-hash" = {};
+    "netbird/postgres-password" = {};
+    "netbird/turn-password" = {};
+    
+    # Porkbun API credentials
+    "porkbun/credentials" = {};
 
     # GPG keys - Uncomment after generating keys
     # "gpg/capacitor/secret_keys" = {};
@@ -157,6 +232,7 @@
     smartmontools
     nvme-cli
     mergerfs-tools
+    netbird
   ];
 
   # Garbage collection - more aggressive for server
