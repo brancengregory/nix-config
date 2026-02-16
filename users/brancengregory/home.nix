@@ -2,8 +2,10 @@
   pkgs,
   inputs,
   config,
+  lib,
   isLinux,
   isDarwin,
+  isDesktop,
   ...
 }: {
   imports =
@@ -19,13 +21,9 @@
       ../../modules/home/programs/r.nix
       inputs.sops-nix.homeManagerModules.sops
     ]
-    ++ (
-      if isLinux
-      then [
-        ../../modules/home/desktop/plasma.nix
-      ]
-      else []
-    );
+    ++ (lib.optionals (isLinux && isDesktop) [
+      ../../modules/home/desktop/plasma.nix
+    ]);
 
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
@@ -59,9 +57,7 @@
     then "/Users/brancengregory"
     else throw "Unsupported OS for this home-manager configuration";
 
-  # Prefer nixpkgs packages over Homebrew when possible
-  # GUI applications should be managed via Homebrew casks in darwin.nix
-  # CLI tools should generally be managed here via nixpkgs
+  # Base packages for all hosts
   home.packages = with pkgs;
     [
       age
@@ -77,25 +73,14 @@
       jaq
       jnv
       just
-      libpq # Move elsewhere?
+      opencode
+      ollama
+      libpq
       lazygit
-      # lazysql maybe
       nh
       nmap
       sops
       ssh-to-age
-    ]
-    ++ (
-      if pkgs.stdenv.isLinux
-      then [
-        inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
-        pkgs.ghostty
-      ]
-      else []
-    )
-    ++ [
-      # ollama maybe
-      # opencode maybe
       openssh
       procs
       yazi
@@ -110,31 +95,32 @@
       tealdeer
       google-cloud-sdk
     ]
-    ++ (
-      if pkgs.stdenv.isLinux
-      then [
-        # Linux specific packages
-        pinentry-curses
-        sudo
-        slack
-        discord
-        zoom-us
-        positron-bin
-        rustup
-        snapper-gui
-        keymapp
-      ]
-      else if pkgs.stdenv.isDarwin
-      then [
-        # Mac specific packages
-        pinentry-curses
-        # mas-cli maybe
-      ]
-      else throw "Unsupported OS for this home-manager configuration"
-    );
+    # Linux-specific packages
+    ++ (lib.optionals isLinux [
+      pinentry-curses
+      sudo
+      rsync
+      restic
+    ])
+    # Desktop-specific packages (Linux only)
+    ++ (lib.optionals (isLinux && isDesktop) [
+      inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
+      ghostty
+      slack
+      discord
+      zoom-us
+      positron-bin
+      rustup
+      snapper-gui
+      keymapp
+    ])
+    # macOS-specific packages
+    ++ (lib.optionals isDarwin [
+      pinentry-curses
+    ]);
 
   xdg.mimeApps =
-    if isLinux
+    if (isLinux && isDesktop)
     then {
       enable = true;
       defaultApplications = {
@@ -152,6 +138,6 @@
   # Selectively enable Stylix targets for Home Manager
   stylix.targets = {
     starship.enable = true;
-    ghostty.enable = true;
+    ghostty.enable = isDesktop;
   };
 }

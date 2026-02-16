@@ -14,10 +14,11 @@
     ./disks.nix # Disk configuration (preserves existing LUKS vaults)
     ../../modules/themes/stylix.nix
     ../../modules/services/monitoring.nix
-    ../../modules/services/media-stack.nix # Jellyfin, *arr apps
+    ../../modules/services/media.nix # Jellyfin, *arr apps
     ../../modules/services/download.nix # qBittorrent, SABnzbd
     ../../modules/services/ollama.nix # Ollama LLM server
     ../../modules/services/openwebui.nix # Open WebUI
+    ../../modules/services/opencode.nix # OpenCode server
     ../../modules/services/git.nix # Forgejo
     ../../modules/services/storage.nix # Minio, NFS, mergerfs, SnapRAID
     ../../modules/network/wireguard.nix # WireGuard hub
@@ -49,32 +50,31 @@
     };
   };
 
-  # Firewall - open necessary ports
+  # Firewall - VPN-only access
+  # Only WireGuard (51820/UDP) is exposed to WAN
+  # All other services accessed via VPN (WireGuard 10.0.0.0/8 or NetBird 100.64.0.0/10)
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [
-      22 # Forgejo SSH
-      77 # System SSH
-      80 # HTTP
-      443 # HTTPS
-      3000 # Grafana
-      3080 # Forgejo HTTP
-      53 # DNS
-      2049 # NFS
-      111 # RPC (NFS)
-      9090 # Prometheus
-      9000 # Minio
-      9001 # Minio console
-      8000 # Ollama API
-      8080 # Open WebUI
-    ];
+    # Only WireGuard port exposed to WAN
     allowedUDPPorts = [
-      53 # DNS
-      5353 # mDNS
       51820 # WireGuard
-      111 # RPC (NFS)
-      2049 # NFS
     ];
+    # All TCP services are VPN-only (handled by extraCommands)
+    allowedTCPPorts = [];
+    # Allow VPN subnets to access all ports
+    extraCommands = ''
+      # Allow from WireGuard subnet (10.0.0.0/8)
+      iptables -A INPUT -s 10.0.0.0/8 -j ACCEPT
+      
+      # Allow from NetBird subnet (100.64.0.0/10)
+      iptables -A INPUT -s 100.64.0.0/10 -j ACCEPT
+      
+      # Allow from localhost
+      iptables -A INPUT -s 127.0.0.1 -j ACCEPT
+      
+      # Allow established connections
+      iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+    '';
   };
 
   # WireGuard Hub Configuration
@@ -151,6 +151,14 @@
     };
   };
 
+  # OpenCode server
+  services.opencode-server = {
+    enable = true;
+    port = 8081;
+    workingDir = "/home/brancengregory/code";
+    user = "brancengregory";
+  };
+
   # Caddy Reverse Proxy with Wildcard SSL (uses DNS-01 challenge via Porkbun)
   services.caddy-proxy = {
     enable = true;
@@ -189,6 +197,10 @@
       ollama = {
         subdomain = "ollama";
         port = 11434;
+      };
+      opencode = {
+        subdomain = "opencode";
+        port = 8081;
       };
     };
   };
@@ -248,6 +260,7 @@
 
   home-manager.extraSpecialArgs = {
     inherit inputs isLinux isDarwin;
+    isDesktop = false;
   };
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
@@ -257,7 +270,7 @@
   ];
   home-manager.users.brancengregory = {
     imports = [
-      ../../users/brancengregory/home-server.nix
+      ../../users/brancengregory/home.nix
     ];
   };
 

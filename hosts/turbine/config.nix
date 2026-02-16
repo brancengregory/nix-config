@@ -13,6 +13,7 @@
 
   home-manager.extraSpecialArgs = {
     inherit inputs isLinux isDarwin;
+    isDesktop = true;
   };
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;

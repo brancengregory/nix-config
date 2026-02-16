@@ -48,9 +48,6 @@ in {
       "d /var/lib/open-webui 0755 root root -"
     ];
 
-    # Firewall ports
-    networking.firewall.allowedTCPPorts = [
-      cfg.port # Open WebUI
-    ];
+    # Firewall managed by host (VPN-only)
   };
 }

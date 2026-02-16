@@ -1,4 +1,4 @@
-# modules/services/media-stack.nix
+# modules/services/media.nix
 # Media server stack: Jellyfin, Sonarr, Radarr, Lidarr, Readarr, Prowlarr
 {
   config,
@@ -7,9 +7,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.media-stack;
+  cfg = config.services.media;
 in {
-  options.services.media-stack = {
+  options.services.media = {
     enable = mkEnableOption "Media server stack (Jellyfin, Sonarr, Radarr, Lidarr, Readarr, Prowlarr)";
 
     jellyfin = {
@@ -93,37 +93,37 @@ in {
     # Jellyfin
     services.jellyfin = mkIf cfg.jellyfin.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Sonarr (TV)
     services.sonarr = mkIf cfg.sonarr.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Radarr (Movies)
     services.radarr = mkIf cfg.radarr.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Lidarr (Music)
     services.lidarr = mkIf cfg.lidarr.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Readarr (Books)
     services.readarr = mkIf cfg.readarr.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Prowlarr (Indexer manager)
     services.prowlarr = mkIf cfg.prowlarr.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Jellyseerr (request management for Jellyfin)
@@ -168,17 +168,5 @@ in {
 
     # Ensure jellyfin user can access media
     users.users.jellyfin.extraGroups = ["users"];
-
-    # Firewall ports
-    networking.firewall.allowedTCPPorts = [
-      8096 # Jellyfin
-      8989 # Sonarr
-      7878 # Radarr
-      8686 # Lidarr
-      8787 # Readarr
-      9696 # Prowlarr
-      5055 # Jellyseerr
-      3579 # Ombi
-    ];
   };
 }

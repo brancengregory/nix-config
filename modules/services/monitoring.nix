@@ -41,6 +41,5 @@
     };
   };
 
-  # Open firewall ports for access
-  networking.firewall.allowedTCPPorts = [9090 3000];
+  # Firewall managed by host (VPN-only)
 }

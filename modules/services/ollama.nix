@@ -32,7 +32,7 @@ in {
       listenAddress = "0.0.0.0:11434";
       acceleration = cfg.acceleration;
       home = cfg.modelsDir;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Create directories
@@ -45,10 +45,5 @@ in {
       home = cfg.modelsDir;
       createHome = true;
     };
-
-    # Firewall ports
-    networking.firewall.allowedTCPPorts = [
-      11434 # Ollama API
-    ];
   };
 }

@@ -23,6 +23,12 @@ in {
       description = "Path to file containing Porkbun API credentials (PORKBUN_API_KEY and PORKBUN_SECRET_KEY)";
     };
 
+    vpnOnly = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Restrict Caddy to VPN interfaces only (WireGuard + NetBird + localhost)";
+    };
+
     services = mkOption {
       type = types.attrsOf (types.submodule {
         options = {
@@ -63,6 +69,10 @@ in {
       # Global options
       globalConfig = ''
         auto_https disable_redirects
+        ${optionalString cfg.vpnOnly ''
+          # Bind to VPN interfaces only
+          default_bind 10.0.0.1 127.0.0.1 ::1
+        ''}
       '';
 
       # Virtual hosts configuration
@@ -71,6 +81,14 @@ in {
         mkVhost = name: svc: {
           hostName = "${svc.subdomain}.${cfg.domain}";
           extraConfig = ''
+            ${optionalString cfg.vpnOnly ''
+              # Restrict to VPN networks only (WireGuard + NetBird + localhost)
+              @not_vpn {
+                not remote_ip 10.0.0.0/8 100.64.0.0/10 127.0.0.1 ::1
+              }
+              respond @not_vpn "Access denied - VPN required" 403
+            ''}
+            
             tls {
               dns porkbun {
                 api_key {env.PORKBUN_API_KEY}
@@ -91,7 +109,28 @@ in {
       EnvironmentFile = cfg.porkbunCredentialsFile;
     };
 
-    # Open firewall for HTTP/HTTPS
-    networking.firewall.allowedTCPPorts = [80 443];
+    # Firewall: VPN-only access
+    networking.firewall = {
+      # Only allow 80/443 from localhost and VPN subnets
+      extraCommands = optionalString cfg.vpnOnly ''
+        # Allow from localhost
+        iptables -A INPUT -p tcp --dport 80 -s 127.0.0.1 -j ACCEPT
+        iptables -A INPUT -p tcp --dport 443 -s 127.0.0.1 -j ACCEPT
+        iptables -A INPUT -p tcp --dport 80 -s ::1 -j ACCEPT
+        iptables -A INPUT -p tcp --dport 443 -s ::1 -j ACCEPT
+        
+        # Allow from WireGuard subnet (10.0.0.0/8)
+        iptables -A INPUT -p tcp --dport 80 -s 10.0.0.0/8 -j ACCEPT
+        iptables -A INPUT -p tcp --dport 443 -s 10.0.0.0/8 -j ACCEPT
+        
+        # Allow from NetBird subnet (100.64.0.0/10)
+        iptables -A INPUT -p tcp --dport 80 -s 100.64.0.0/10 -j ACCEPT
+        iptables -A INPUT -p tcp --dport 443 -s 100.64.0.0/10 -j ACCEPT
+        
+        # Drop all other 80/443 traffic
+        iptables -A INPUT -p tcp --dport 80 -j DROP
+        iptables -A INPUT -p tcp --dport 443 -j DROP
+      '';
+    };
   };
 }

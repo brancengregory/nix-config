@@ -100,7 +100,7 @@ in {
     # SABnzbd (NZB downloader)
     services.sabnzbd = mkIf cfg.sabnzbd.enable {
       enable = true;
-      openFirewall = true;
+      # Firewall managed by host (VPN-only)
     };
 
     # Create directories
@@ -113,20 +113,5 @@ in {
       "d ${cfg.downloadDir}/watch 0775 root root -"
       "d ${cfg.downloadDir}/nzb 0775 root root -"
     ];
-
-    # Firewall ports
-    networking.firewall = {
-      allowedTCPPorts = [
-        8080 # qBittorrent (brancengregory)
-        8081 # qBittorrent (qbt)
-        6881 # qBittorrent BT
-        6882 # qBittorrent BT (qbt)
-        8090 # SABnzbd
-      ];
-      allowedUDPPorts = [
-        6881 # qBittorrent DHT
-        6882 # qBittorrent DHT (qbt)
-      ];
-    };
   };
 }

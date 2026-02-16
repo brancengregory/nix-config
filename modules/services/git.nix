@@ -70,13 +70,8 @@ in {
       "d ${cfg.dataDir} 0755 1000 1000 -"
     ];
 
-    # Firewall ports
-    networking.firewall.allowedTCPPorts = [
-      cfg.forgejo.httpPort
-      cfg.forgejo.sshPort
-    ];
-
     # Note: Using port 22 for Forgejo SSH means system SSH must use a different port
     # Current setup has system SSH on port 77, which is preserved
+    # Firewall managed by host (VPN-only)
   };
 }
