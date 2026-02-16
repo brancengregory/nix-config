@@ -1,12 +1,17 @@
+# Disk configuration for powerhouse
+# NixOS is installed on nvme1n1 (dedicated drive)
+# nvme0n1 contains Windows with shared ESP
+
 {
   disko.devices = {
     disk = {
       main = {
         type = "disk";
-        device = "/dev/nvme0n1";
+        device = "/dev/nvme1n1";
         content = {
           type = "gpt";
           partitions = {
+            # Backup EFI partition for NixOS
             ESP = {
               size = "512M";
               type = "EF00";
@@ -22,10 +27,9 @@
               content = {
                 type = "luks";
                 name = "crypted";
-                # Disable settings.keyFile if you want to type a password interactively at boot
+                # Password unlock at boot (no keyfile)
                 settings = {
                   allowDiscards = true;
-                  # keyFile = "/tmp/secret.key";
                 };
                 content = {
                   type = "btrfs";
@@ -43,10 +47,18 @@
                       mountpoint = "/nix";
                       mountOptions = ["compress=zstd" "noatime"];
                     };
+                    "@var_log" = {
+                      mountpoint = "/var/log";
+                      mountOptions = ["compress=zstd" "noatime"];
+                    };
+                    "@snapshots" = {
+                      mountpoint = "/.snapshots";
+                      mountOptions = ["compress=zstd" "noatime"];
+                    };
                     "@swap" = {
                       mountpoint = "/.swapvol";
                       swap = {
-                        swapfile.size = "32G";
+                        swapfile.size = "16G";
                       };
                     };
                   };

@@ -1,14 +1,48 @@
+# SOPS Configuration
+# Defines who can decrypt the secrets in this repository
+# 
+# Key Types:
+#   - user_*: Personal age keys for admins (can edit secrets)
+#   - host_*: Per-host age keys (can only decrypt their own secrets)
+#
+# To add a new key:
+#   1. Generate: age-keygen -o key.txt
+#   2. Extract public key (shown in output or: cat key.txt | grep "public key")
+#   3. Add to this file
+#   4. Re-encrypt: sops updatekeys secrets/secrets.yaml
+
 keys:
+  # Admin/User Keys
+  # These keys can decrypt ALL secrets
   - &user_core age1lehvxg7l88c565huaqnk32shnn39k90ujmm58hew4rvugfwmhv2q22qle9
+  
+  # Host Keys
+  # Each host has its own key to decrypt its specific secrets
+  # Keys are stored in secrets.yaml under age: tree
   - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
   - &host_turbine age1kh6w6v9zu6ahrddlsl47rypr7wtlht94hj6h2p9sqnavpujsvaqs2ghtve
+  - &host_capacitor PLACEHOLDER_CAPACITOR_KEY
+  - &host_battery PLACEHOLDER_BATTERY_KEY
+  
+  # Development/Testing Keys
   - &host_vm age1dr3ecjsnv5azmeq63764md7ag04kuyyzc8w8yx60u4v5dfndxpasyrnp4t
 
 creation_rules:
+  # Default rule for all secrets
+  # All user keys and all host keys can decrypt
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:
         - *user_core
         - *host_powerhouse
         - *host_turbine
+        - *host_capacitor
+        - *host_battery
         - *host_vm
+
+  # Optional: Restricted secrets (e.g., only specific hosts)
+  # - path_regex: secrets/powerhouse/.*$
+  #   key_groups:
+  #     - age:
+  #       - *user_core
+  #       - *host_powerhouse

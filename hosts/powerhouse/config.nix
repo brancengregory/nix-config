@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   inputs,
   isLinux,
@@ -17,8 +18,10 @@
     ../../modules/hardware/bluetooth.nix
     ../../modules/services/monitoring.nix
     ../../modules/services/backup.nix
-    ../../modules/network/wireguard.nix
+    ../../modules/network/wireguard.nix # WireGuard hub-and-spoke VPN
     ../../modules/security/sops.nix
+    ../../modules/security/gpg.nix # Declarative GPG key import
+    ../../modules/security/ssh.nix # Declarative SSH host keys
     ../../modules/virtualization/podman.nix
     ../../modules/virtualization/qemu.nix
     ./disks/main.nix
@@ -27,9 +30,30 @@
   networking.hostName = "powerhouse";
   nixpkgs.config.allowUnfree = true;
 
-  # Bootloader - Use systemd-boot for UEFI
-  boot.loader.systemd-boot.enable = true;
+  # Bootloader - systemd-boot for UEFI with Windows dual-boot support
+  boot.loader.systemd-boot = {
+    enable = true;
+    # Automatically detect Windows and other OSes
+    extraEntries = {
+      "windows.conf" = ''
+        title Windows
+        efi /EFI/Microsoft/Boot/bootmgfw.efi
+      '';
+    };
+    # Allow editing boot entries during boot
+    editor = true;
+  };
   boot.loader.efi.canTouchEfiVariables = true;
+  
+  # Mount Windows ESP for unified boot entries
+  # This makes Windows bootloader accessible from systemd-boot menu
+  fileSystems."/boot/efi-windows" = {
+    device = "/dev/disk/by-partuuid/PARTUUID-OF-NVME0N1-ESP";
+    fsType = "vfat";
+    options = ["noauto" "x-systemd.automount"];
+    # Note: Replace PARTUUID-OF-NVME0N1-ESP with actual partuuid after Windows install
+    # Get it with: lsblk -o NAME,PARTUUID
+  };
 
   stylix.cursor = {
     package = pkgs.kdePackages.breeze;
@@ -110,6 +134,70 @@
     ];
   };
 
+  # Declarative WireGuard Configuration (Spoke - connects to Capacitor hub)
+  networking.wireguard-mesh = {
+    enable = true;
+    nodeName = "powerhouse";
+    hubNodeName = "capacitor";
+    nodes = {
+      capacitor = {
+        ip = "10.0.0.1";
+        publicKey = "REPLACE_WITH_CAPACITOR_WG_PUBKEY";
+        isServer = true;
+        endpoint = "capacitor.yourdomain.com:51820";
+      };
+      powerhouse = {
+        ip = "10.0.0.2";
+        publicKey = "REPLACE_WITH_POWERHOUSE_WG_PUBKEY";
+      };
+      turbine = {
+        ip = "10.0.0.3";
+        publicKey = "REPLACE_WITH_TURBINE_WG_PUBKEY";
+      };
+      battery = {
+        ip = "10.0.0.4";
+        publicKey = "REPLACE_WITH_BATTERY_WG_PUBKEY";
+      };
+    };
+    privateKeyFile = config.sops.secrets."wireguard/powerhouse/private_key".path;
+    presharedKeyFile = config.sops.secrets."wireguard/powerhouse/preshared_key".path;
+  };
+
+  # Declarative GPG Key Import
+  security.gpg = {
+    enable = true;
+    user = "brancengregory";
+    secretKeysFile = config.sops.secrets."gpg/powerhouse/secret_keys".path;
+    publicKeysFile = config.sops.secrets."gpg/powerhouse/public_keys".path;
+    trustLevel = 5;
+    enableSSH = true;
+  };
+
+  # Declarative SSH Host Keys
+  services.openssh.hostKeysDeclarative = {
+    enable = true;
+    ed25519 = {
+      privateKeyFile = config.sops.secrets."ssh/powerhouse/host_key".path;
+      publicKeyFile = config.sops.secrets."ssh/powerhouse/host_key_pub".path;
+    };
+  };
+
+  # SOPS Secret Declarations
+  # These will be populated by generate-all-secrets.sh
+  sops.secrets = {
+    # WireGuard secrets
+    "wireguard/powerhouse/private_key" = {};
+    "wireguard/powerhouse/preshared_key" = {};
+    
+    # GPG keys
+    "gpg/powerhouse/secret_keys" = {};
+    "gpg/powerhouse/public_keys" = {};
+    
+    # SSH host keys
+    "ssh/powerhouse/host_key" = {};
+    "ssh/powerhouse/host_key_pub" = {};
+  };
+
   # Enable Snapper for Btrfs snapshots
   services.snapper.configs = {
     root = {
@@ -117,6 +205,22 @@
       ALLOW_USERS = ["brancengregory"];
       TIMELINE_CREATE = true;
       TIMELINE_CLEANUP = true;
+      TIMELINE_LIMIT_HOURLY = 10;
+      TIMELINE_LIMIT_DAILY = 7;
+      TIMELINE_LIMIT_WEEKLY = 4;
+      TIMELINE_LIMIT_MONTHLY = 12;
+      TIMELINE_LIMIT_YEARLY = 2;
+    };
+    home = {
+      SUBVOLUME = "/home";
+      ALLOW_USERS = ["brancengregory"];
+      TIMELINE_CREATE = true;
+      TIMELINE_CLEANUP = true;
+      TIMELINE_LIMIT_HOURLY = 5;
+      TIMELINE_LIMIT_DAILY = 7;
+      TIMELINE_LIMIT_WEEKLY = 4;
+      TIMELINE_LIMIT_MONTHLY = 6;
+      TIMELINE_LIMIT_YEARLY = 1;
     };
   };
 

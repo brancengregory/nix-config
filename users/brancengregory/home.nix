@@ -8,20 +8,21 @@
 }: {
   imports =
     [
-      ../../modules/fonts/default.nix
-      ../../modules/terminal/zsh.nix
-      ../../modules/terminal/starship.nix
-      ../../modules/terminal/tmux.nix
-      ../../modules/terminal/nvim.nix
-      ../../modules/security/default.nix
-      ../../modules/programs/git.nix
-      ../../modules/programs/r.nix
+      ../../modules/home/fonts.nix
+      ../../modules/home/gpg.nix
+      ../../modules/home/ssh.nix
+      ../../modules/home/terminal/zsh.nix
+      ../../modules/home/terminal/starship.nix
+      ../../modules/home/terminal/tmux.nix
+      ../../modules/home/terminal/nvim.nix
+      ../../modules/home/programs/git.nix
+      ../../modules/home/programs/r.nix
       inputs.sops-nix.homeManagerModules.sops
     ]
     ++ (
       if isLinux
       then [
-        ../../modules/desktop/plasma-home.nix
+        ../../modules/home/desktop/plasma.nix
       ]
       else []
     );

@@ -137,22 +137,75 @@
     # Development shells for cross-platform work
     devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
       buildInputs = with nixpkgs.legacyPackages.x86_64-linux; [
+        # Nix ecosystem
         nixos-rebuild
         nix-output-monitor
         alejandra # Nix formatter
         mise # Universal task runner
         mdbook # Documentation generator
+        
+        # Secret management tools
+        sops # Secrets management
+        age # Modern encryption
+        ssh-to-age # Convert SSH keys to age
+        gnupg # GPG for key management
+        pinentry-curses # GPG passphrase entry
+        
+        # WireGuard tools
+        wireguard-tools
+        
+        # Cryptographic tools
+        openssl # General crypto operations
+        jq # JSON processing for scripts
+        
+        # System tools
+        git # Version control
+        usbutils # lsusb for hardware detection
+        pciutils # lspci for hardware detection
+        
+        # Deployment helpers
+        just # Task runner (alternative to mise)
+        fzf # Fuzzy finder for interactive scripts
       ];
+      
       shellHook = ''
         echo "🚀 Cross-platform Nix development environment"
-        echo "💡 Available commands:"
+        echo ""
+        echo "🔐 Secret Generation & Management:"
+        echo "  - ./scripts/generate-all-secrets.sh    # Generate all infrastructure secrets"
+        echo "  - ./scripts/generate-host-secrets.sh   # Generate secrets for single host"
+        echo "  - sops secrets/secrets.yaml            # Edit encrypted secrets"
+        echo ""
+        echo "💻 System Building & Deployment:"
         echo "  - mise build-darwin (cross-compile darwin config)"
         echo "  - mise check-darwin (validate darwin config)"
         echo "  - mise build-linux (build NixOS VM)"
+        echo "  - nixos-install --flake .#powerhouse   # Install NixOS"
+        echo ""
+        echo "🛠️  Development Tools:"
         echo "  - mise format (format Nix files)"
         echo "  - mise docs-serve (serve documentation locally)"
         echo "  - mise docs-build (build documentation)"
         echo "  - mise help (show all commands)"
+        echo ""
+        echo "📚 Documentation:"
+        echo "  - docs/MIGRATION.md       # Arch → NixOS migration guide"
+        echo "  - docs/SECRET_MANAGEMENT.md # Secret workflow documentation"
+        echo "  - docs/GPG-SSH-STRATEGY.md # Authentication strategy"
+        echo ""
+        
+        # Set up environment for secret generation
+        export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
+        
+        # Ensure scripts are executable
+        chmod +x ./scripts/*.sh 2>/dev/null || true
+        
+        # Check for age key
+        if [ ! -f "$SOPS_AGE_KEY_FILE" ]; then
+          echo "⚠️  Warning: No age key found at $SOPS_AGE_KEY_FILE"
+          echo "   Run: mkdir -p ~/.config/sops/age && age-keygen -o ~/.config/sops/age/keys.txt"
+          echo ""
+        fi
       '';
     };
 

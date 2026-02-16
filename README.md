@@ -17,6 +17,8 @@ A set of configs for my machines:
 
 ## Documentation
 
+- [Migration Guide](docs/MIGRATION.md) - Complete Arch Linux to NixOS migration guide with Windows dual-boot
+- [Secret Management](docs/SECRET_MANAGEMENT.md) - Ultra-secure, declarative secret management with sops and age
 - [GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md) - Unified authentication and encryption across all systems
 - [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
 - [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux
