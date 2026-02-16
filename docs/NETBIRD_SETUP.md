@@ -18,7 +18,7 @@ We've implemented:
 3. `secrets/netbird-secrets-template.yaml` - Template for required secrets
 
 ### Modified Files
-1. `modules/services/ai.nix` - Changed Open WebUI port 3000 → 8080
+1. `modules/services/openwebui.nix` - Changed Open WebUI port 3000 → 8080
 2. `hosts/capacitor/config.nix` - Added Netbird and Caddy configurations
 
 ## Prerequisites

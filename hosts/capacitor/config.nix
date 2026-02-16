@@ -16,7 +16,8 @@
     ../../modules/services/monitoring.nix
     ../../modules/services/media-stack.nix # Jellyfin, *arr apps
     ../../modules/services/download.nix # qBittorrent, SABnzbd
-    ../../modules/services/ai.nix # Ollama, Open WebUI
+    ../../modules/services/ollama.nix # Ollama LLM server
+    ../../modules/services/openwebui.nix # Open WebUI
     ../../modules/services/git.nix # Forgejo
     ../../modules/services/storage.nix # Minio, NFS, mergerfs, SnapRAID
     ../../modules/network/wireguard.nix # WireGuard hub
