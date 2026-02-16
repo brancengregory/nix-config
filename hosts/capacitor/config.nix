@@ -17,7 +17,7 @@
     ../../modules/services/media.nix # Jellyfin, *arr apps
     ../../modules/services/download.nix # qBittorrent, SABnzbd
     ../../modules/services/ollama.nix # Ollama LLM server
-    ../../modules/services/openwebui.nix # Open WebUI
+
     ../../modules/services/opencode.nix # OpenCode server
     ../../modules/services/git.nix # Forgejo
     ../../modules/services/storage.nix # Minio, NFS, mergerfs, SnapRAID

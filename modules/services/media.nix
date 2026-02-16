@@ -135,7 +135,12 @@ in {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
-    users.users.prowlarr.extraGroups = ["media"];
+    users.users.prowlarr = {
+      isSystemUser = true;
+      group = "prowlarr";
+      extraGroups = ["media"];
+    };
+    users.groups.prowlarr = {};
 
     # Jellyseerr (request management for Jellyfin)
     # Using container since no NixOS module exists

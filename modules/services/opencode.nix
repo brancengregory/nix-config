@@ -64,7 +64,7 @@ in {
 
       environment = {
         HOME = "/home/${cfg.user}";
-        PATH = lib.makeBinPath [pkgs.git pkgs.openssh];
+        PATH = lib.mkForce (lib.makeBinPath [pkgs.git pkgs.openssh pkgs.coreutils pkgs.findutils pkgs.gnugrep pkgs.gnused pkgs.systemd]);
       };
     };
 
