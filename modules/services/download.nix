@@ -104,7 +104,7 @@ in {
     };
     # Add sabnzbd user to media group for shared access
     users.users.sabnzbd.extraGroups = ["media"];
-    
+
     # Add brancengregory user to media group (for qBittorrent container access)
     users.users.brancengregory.extraGroups = ["media"];
 

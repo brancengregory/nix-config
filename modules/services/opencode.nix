@@ -33,7 +33,7 @@ in {
 
   config = mkIf cfg.enable {
     # Ensure opencode is available system-wide
-    environment.systemPackages = [ pkgs.opencode ];
+    environment.systemPackages = [pkgs.opencode];
 
     # Create working directory
     systemd.tmpfiles.rules = [
@@ -43,8 +43,8 @@ in {
     # OpenCode server systemd service
     systemd.services.opencode-server = {
       description = "OpenCode server - remote coding agent backend";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["network.target"];
+      wantedBy = ["multi-user.target"];
 
       serviceConfig = {
         Type = "simple";
@@ -59,12 +59,12 @@ in {
         NoNewPrivileges = true;
         ProtectSystem = "strict";
         ProtectHome = "read-only";
-        ReadWritePaths = [ cfg.workingDir "/home/${cfg.user}/.local/share/opencode" "/home/${cfg.user}/.config/opencode" ];
+        ReadWritePaths = [cfg.workingDir "/home/${cfg.user}/.local/share/opencode" "/home/${cfg.user}/.config/opencode"];
       };
 
       environment = {
         HOME = "/home/${cfg.user}";
-        PATH = lib.makeBinPath [ pkgs.git pkgs.openssh ];
+        PATH = lib.makeBinPath [pkgs.git pkgs.openssh];
       };
     };
 

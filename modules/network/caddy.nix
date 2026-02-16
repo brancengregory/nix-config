@@ -88,20 +88,21 @@ in {
               }
               respond @not_vpn "Access denied - VPN required" 403
             ''}
-            
+
             tls {
               dns porkbun {
                 api_key {env.PORKBUN_API_KEY}
                 api_secret_key {env.PORKBUN_SECRET_KEY}
               }
             }
-            
+
             reverse_proxy localhost:${toString svc.port}
-            
+
             ${svc.extraConfig}
           '';
         };
-      in mapAttrs mkVhost cfg.services;
+      in
+        mapAttrs mkVhost cfg.services;
     };
 
     # Create environment file for Caddy with Porkbun credentials
@@ -118,15 +119,15 @@ in {
         iptables -A INPUT -p tcp --dport 443 -s 127.0.0.1 -j ACCEPT
         iptables -A INPUT -p tcp --dport 80 -s ::1 -j ACCEPT
         iptables -A INPUT -p tcp --dport 443 -s ::1 -j ACCEPT
-        
+
         # Allow from WireGuard subnet (10.0.0.0/8)
         iptables -A INPUT -p tcp --dport 80 -s 10.0.0.0/8 -j ACCEPT
         iptables -A INPUT -p tcp --dport 443 -s 10.0.0.0/8 -j ACCEPT
-        
+
         # Allow from NetBird subnet (100.64.0.0/10)
         iptables -A INPUT -p tcp --dport 80 -s 100.64.0.0/10 -j ACCEPT
         iptables -A INPUT -p tcp --dport 443 -s 100.64.0.0/10 -j ACCEPT
-        
+
         # Drop all other 80/443 traffic
         iptables -A INPUT -p tcp --dport 80 -j DROP
         iptables -A INPUT -p tcp --dport 443 -j DROP

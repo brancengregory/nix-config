@@ -65,13 +65,13 @@
     extraCommands = ''
       # Allow from WireGuard subnet (10.0.0.0/8)
       iptables -A INPUT -s 10.0.0.0/8 -j ACCEPT
-      
+
       # Allow from NetBird subnet (100.64.0.0/10)
       iptables -A INPUT -s 100.64.0.0/10 -j ACCEPT
-      
+
       # Allow from localhost
       iptables -A INPUT -s 127.0.0.1 -j ACCEPT
-      
+
       # Allow established connections
       iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
     '';
@@ -137,12 +137,12 @@
     dashboardPort = 18765;
     signalPort = 10000;
     turnPort = 3478;
-    
+
     client = {
       enable = true;
       managementUrl = "https://netbird.brancen.world:33073";
     };
-    
+
     secrets = {
       jwtSecretFile = config.sops.secrets."netbird/jwt-secret".path;
       adminPasswordHashFile = config.sops.secrets."netbird/admin-password-hash".path;
@@ -164,7 +164,7 @@
     enable = true;
     domain = "brancen.world";
     porkbunCredentialsFile = config.sops.secrets."porkbun/credentials".path;
-    
+
     services = {
       netbird = {
         subdomain = "netbird";
@@ -215,7 +215,7 @@
     "netbird/admin-password-hash" = {};
     "netbird/postgres-password" = {};
     "netbird/turn-password" = {};
-    
+
     # Porkbun API credentials
     "porkbun/credentials" = {};
 

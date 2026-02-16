@@ -173,19 +173,23 @@ in {
         "${pkgs.writeTextFile {
           name = "management.json";
           text = builtins.toJSON {
-            Stuns = [{
-              Proto = "udp";
-              URI = "stun:netbird.brancen.world:${toString cfg.turnPort}";
-              Username = "";
-              Password = "";
-            }];
-            TURNConfig = {
-              Turns = [{
+            Stuns = [
+              {
                 Proto = "udp";
-                URI = "turn:netbird.brancen.world:${toString cfg.turnPort}";
-                Username = "netbird";
-                Password = "$TURN_PASSWORD";
-              }];
+                URI = "stun:netbird.brancen.world:${toString cfg.turnPort}";
+                Username = "";
+                Password = "";
+              }
+            ];
+            TURNConfig = {
+              Turns = [
+                {
+                  Proto = "udp";
+                  URI = "turn:netbird.brancen.world:${toString cfg.turnPort}";
+                  Username = "netbird";
+                  Password = "$TURN_PASSWORD";
+                }
+              ];
               CredentialsTTL = "12h";
               Secret = {};
               TimeBasedCredentials = false;
@@ -291,7 +295,7 @@ in {
         ExecStart = pkgs.writeShellScript "netbird-setup" ''
           # Wait for management to be ready
           sleep 10
-          
+
           # Check if already connected
           if ! ${pkgs.netbird}/bin/netbird status | grep -q "Connected"; then
             echo "Connecting to Netbird management server..."
@@ -304,17 +308,17 @@ in {
     # Firewall rules
     networking.firewall = {
       allowedTCPPorts = [
-        cfg.managementPort    # 33073 - Management API
-        cfg.dashboardPort     # 18765 - Dashboard (internal)
-        cfg.signalPort        # 10000 - Signal
-        cfg.turnPort          # 3478 - TURN
-        5349                  # TURNS
+        cfg.managementPort # 33073 - Management API
+        cfg.dashboardPort # 18765 - Dashboard (internal)
+        cfg.signalPort # 10000 - Signal
+        cfg.turnPort # 3478 - TURN
+        5349 # TURNS
       ];
       allowedUDPPorts = [
-        cfg.signalPort        # 10000 - Signal
-        cfg.turnPort          # 3478 - TURN/STUN
-        5349                  # TURNS
-        10000                 # Relay
+        cfg.signalPort # 10000 - Signal
+        cfg.turnPort # 3478 - TURN/STUN
+        5349 # TURNS
+        10000 # Relay
       ];
     };
 
