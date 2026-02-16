@@ -8,7 +8,7 @@ The Copilot agent environment automatically provides:
 
 - **Nix with flakes support** - Reliable installation using DeterminateSystems/nix-installer-action
 - **Development shell** - Access to all tools via `nix develop`
-- **Command runner** - `just` for convenient development commands
+- **Command runner** - `mise` for convenient development commands
 - **Code formatting** - `alejandra` Nix formatter
 - **Cross-compilation** - Build and validate configs across platforms
 - **Testing framework** - Automated validation and testing
@@ -23,16 +23,18 @@ nix develop             # Enter development shell with all tools
 nix build .#<package>   # Build specific packages or configurations
 ```
 
-### Just Command Shortcuts
+### Mise Task Shortcuts
 ```bash
-just help               # Show all available development commands
-just check              # Check flake syntax (alias for nix flake check)
-just check-darwin       # Validate nix-darwin config (fast validation)
-just build-darwin       # Cross-compile full nix-darwin config from Linux
-just build-linux        # Build NixOS VM for testing
-just format             # Format Nix files using alejandra
-just test               # Run cross-compilation tests
-just clean              # Clean build results and artifacts
+mise help               # Show all available development commands
+mise check              # Check flake syntax (alias for nix flake check)
+mise check-darwin       # Validate nix-darwin config (fast validation)
+mise build-turbine      # Cross-compile full nix-darwin config from Linux
+mise build-powerhouse   # Build powerhouse NixOS configuration
+mise build-capacitor    # Build capacitor NixOS configuration
+mise format             # Format Nix files using alejandra
+mise test               # Run validation tests
+mise clean              # Clean build results and artifacts
+mise dev                # Enter development shell
 ```
 
 ## Environment Setup
@@ -45,7 +47,7 @@ The environment uses GitHub Copilot's official setup workflow approach:
    - Proper flakes configuration and validation
 
 2. **Development Shell** - The agent enters the Nix development shell defined in `flake.nix`
-3. **Tool Access** - All development tools become available (just, alejandra, etc.)
+3. **Tool Access** - All development tools become available (mise, alejandra, etc.)
 
 ### Benefits of GitHub Copilot Setup Approach
 
@@ -64,7 +66,7 @@ The environment uses GitHub Copilot's official setup workflow approach:
 
 ### Supporting Files
 - `flake.nix` - Nix flake with development shell definition
-- `justfile` - Development command shortcuts
+- `mise.toml` - Development task configuration
 
 The setup provides:
 - **Automatic Nix installation** - Uses DeterminateSystems actions for reliable setup
@@ -98,9 +100,9 @@ gh workflow run copilot-setup-steps.yml
 - The copilot-setup-steps.yml workflow handles this automatically
 - Manual fix: `echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf`
 
-**"just: command not found"**
-- Enter dev shell first: `nix develop`
-- Or run commands via: `nix develop -c just <command>`
+**"mise: command not found"**
+- Install mise: `curl https://mise.run | sh`
+- Or enter dev shell: `nix develop`
 
 **Flake evaluation errors**
 - Check syntax: `nix flake check --no-build`
@@ -113,7 +115,7 @@ gh workflow run copilot-setup-steps.yml
 - Magic Nix Cache provides automatic caching for faster builds
 
 **Build failures**
-- Clean previous builds: `just clean`
+- Clean previous builds: `mise clean`
 - Check available packages: `nix flake show`
 
 ## Development Workflow
@@ -122,9 +124,9 @@ The typical development workflow with the Copilot agent:
 
 1. **Validate configuration**: `nix flake check`
 2. **Make changes** to Nix files
-3. **Format code**: `just format`
-4. **Test changes**: `just test` or specific validation commands
-5. **Build configurations**: `just build-darwin` or `just build-linux`
+3. **Format code**: `mise format`
+4. **Test changes**: `mise test` or specific validation commands
+5. **Build configurations**: `mise build-turbine` or `mise build-powerhouse`
 
 ## Cross-Platform Support
 
@@ -132,14 +134,14 @@ The environment supports cross-platform development:
 
 - **Linux**: Full support for NixOS configurations and cross-compilation to macOS
 - **macOS**: Native nix-darwin support with Linux VM building capabilities
-- **Validation**: Quick config validation without full builds using `just check-darwin`
+- **Validation**: Quick config validation without full builds using `mise check-darwin`
 
 ## Integration with Repository
 
 The Copilot agent environment is fully integrated with this repository's structure:
 
 - **Flake-based**: Uses the `devShells` defined in `flake.nix`
-- **Just integration**: All `justfile` commands are available
+- **Mise integration**: All `mise.toml` tasks are available
 - **Cross-compilation**: Supports the existing cross-platform workflow
 - **Testing**: Integrates with existing test scripts
 

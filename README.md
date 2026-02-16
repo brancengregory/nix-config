@@ -2,8 +2,10 @@
 
 A set of configs for my machines:
 
-- powerhouse (desktop) - NixOS
-- turbine (laptop) - macOS with nix-darwin (Intel)
+- **powerhouse** (desktop) - NixOS
+- **capacitor** (server) - NixOS  
+- **turbine** (laptop) - macOS with nix-darwin (Intel)
+- **battery** (future) - NixOS
 
 ## Features
 
@@ -14,22 +16,27 @@ A set of configs for my machines:
 - **Homebrew support** (macOS): GUI applications and Mac-specific software
 - **Minimal approach**: Prefer nixpkgs over Homebrew when possible
 - **Cross-compilation**: Build and validate nix-darwin configs from Linux
+- **ISO Installers**: Custom NixOS installer ISOs with pre-configured flakes
 
 ## Documentation
 
-- [Migration Guide](docs/MIGRATION.md) - Complete Arch Linux to NixOS migration guide with Windows dual-boot
-- [Secret Management](docs/SECRET_MANAGEMENT.md) - Ultra-secure, declarative secret management with sops and age
-- [GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md) - Unified authentication and encryption across all systems
-- [Homebrew Integration](docs/HOMEBREW.md) - Managing GUI apps and Mac-specific software
-- [Cross-Platform Development](docs/CROSS_COMPILATION.md) - Building nix-darwin configs from Linux
-- [GitHub Copilot Agent](docs/COPILOT_AGENT.md) - Development environment for Copilot coding agent
-- [Restic Backup Configuration](docs/RESTIC.md) - Secure, declarative backups with Restic
+- **[Complete Documentation](docs/)** - Full documentation site with detailed guides
+- **[Migration Guide](docs/MIGRATION.md)** - Complete Arch Linux to NixOS migration guide with Windows dual-boot
+- **[Secret Management](docs/SECRET_MANAGEMENT.md)** - Ultra-secure, declarative secret management with sops and age
+- **[GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md)** - Unified authentication and encryption across all systems
+- **[Homebrew Integration](docs/HOMEBREW.md)** - Managing GUI apps and Mac-specific software
+- **[Cross-Platform Development](docs/CROSS_COMPILATION.md)** - Building nix-darwin configs from Linux
+- **[GitHub Copilot Agent](docs/COPILOT_AGENT.md)** - Development environment for Copilot coding agent
+- **[Restic Backup Configuration](docs/RESTIC.md)** - Secure, declarative backups with Restic
+- **[Module Architecture](docs/MODULES.md)** - Understanding the modular system
+- **[Current Setup Status](SETUP_STATUS.md)** - Current configuration status and checklist
 
 ## Repository Structure
 
 ```
 ├── docs/               # Documentation
 ├── hosts/              # Host-specific configurations
+│   ├── capacitor/      # NixOS homelab server
 │   ├── powerhouse/     # NixOS desktop
 │   └── turbine/        # macOS laptop
 ├── modules/            # Modular components (20+ modules)
@@ -46,17 +53,51 @@ A set of configs for my machines:
 │   └── virtualization/ # Virtualization tools (podman, qemu)
 ├── users/              # User-specific configurations
 ├── flake.nix           # Main flake configuration
-└── justfile            # Development commands
+├── mise.toml           # Development commands and tasks
+└── SETUP_STATUS.md     # Current configuration status
 ```
 
-### Working with Modules
+### Module Architecture
 
-The modular architecture allows for flexible configuration:
+The configuration is built using a modular approach where each component serves a specific purpose:
 
-- **Host configurations** (`hosts/*/config.nix`) import OS-specific modules
-- **User configurations** (`users/*/home.nix`) import user-specific modules  
-- **Shared modules** provide consistent configurations across all systems
-- **Cross-platform compatibility** through OS-specific module imports
+#### OS Modules (`modules/os/`)
+- `common.nix` - Universal settings for all systems
+- `nixos.nix` - NixOS-specific system configurations
+- `darwin.nix` - macOS-specific system configurations
+
+#### User-specific Modules
+- `modules/terminal/` - Shell, terminal emulators, and CLI tools
+- `modules/security/` - GPG, SSH, and authentication
+- `modules/programs/` - Application-specific configurations
+
+#### System Modules
+- `modules/hardware/` - Hardware-specific configurations
+- `modules/network/` - Network and VPN configurations
+- `modules/desktop/` - Desktop environment configurations
+- `modules/virtualization/` - Container and VM configurations
+- `modules/services/` - Background services and backups
+
+### Configuration Import Strategy
+
+**Host Configurations** (`hosts/*/config.nix`):
+```nix
+imports = [
+  ../../modules/os/common.nix    # Universal settings
+  ../../modules/os/nixos.nix     # or darwin.nix for macOS
+  ./hardware.nix                 # Host-specific hardware
+];
+```
+
+**User Configurations** (`users/*/home.nix`):
+```nix
+imports = [
+  ../../modules/terminal/zsh.nix
+  ../../modules/security/default.nix
+  ../../modules/programs/git.nix
+  # Add modules as needed
+];
+```
 
 ## Quick Start
 
@@ -70,22 +111,31 @@ The modular architecture allows for flexible configuration:
 
 ```bash
 # Enter development shell
-nix develop
+mise dev
+# or: nix develop
 
 # View available commands
-just help
+mise help
 ```
 
 ### Building Configurations
 
 ```bash
-# Build NixOS VM
-just build-linux
+# Build NixOS configurations
+mise build-powerhouse
+mise build-capacitor
 
 # Cross-compile nix-darwin config from Linux
-just build-darwin
+mise build-turbine
 
 # Validate nix-darwin config (faster)
-just check-darwin
+mise check-darwin
+
+# Build all configurations
+mise build-all
+
+# Build ISO installers
+mise build-powerhouse-iso
+mise build-capacitor-iso
 ```
 

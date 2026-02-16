@@ -1,21 +1,36 @@
 # Summary
 
-[Introduction](./README.md)
+[Introduction](../README.md)
 
 # Architecture
 
-- [Module Architecture](./MODULES.md)
+- [Module System](./MODULES.md)
+- [Secret Management](./SECRET_MANAGEMENT.md)
 
-# Configuration Guides
+# Platform Configuration
+
+- [Cross-Platform Development](./CROSS_COMPILATION.md)
+- [Homebrew Integration (macOS)](./HOMEBREW.md)
+
+# Security & Authentication
 
 - [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md)
 - [Security Guidelines](./SECURITY.md)
-- [Homebrew Integration](./HOMEBREW.md)
-- [Unified Theming](./THEMING.md)
-- [Cross-Platform Development](./CROSS_COMPILATION.md)
-- [Restic Backup Configuration](./RESTIC.md)
 
-# Development Environment
+# Appearance & Backups
+
+- [Unified Theming](./THEMING.md)
+- [Restic Backup](./RESTIC.md)
+
+# Migration
+
+- [Arch to NixOS Migration](./MIGRATION.md)
+
+# Development
 
 - [GitHub Copilot Agent](./COPILOT_AGENT.md)
 - [Contributing](./CONTRIBUTING.md)
+
+---
+
+[Setup Status](../SETUP_STATUS.md)

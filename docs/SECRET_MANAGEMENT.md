@@ -1,6 +1,82 @@
 # Secret Management Guide
 
-This document describes the ultra-secure, fully declarative secret management system for the NixOS infrastructure.
+This document describes the ultra-secure, fully declarative secret management system for the NixOS infrastructure using **sops-nix**.
+
+## Quick Start Guide
+
+This section provides a quickstart for adding sops-nix to your Nix configuration. For comprehensive secret generation and management, see the sections below.
+
+### Why sops-nix?
+
+- **Atomic & Declarative:** Secrets are deployed alongside configuration
+- **GitOps Friendly:** Encrypted secrets stored directly in Git (YAML/JSON)
+- **Native Integration:** NixOS and Home Manager modules
+- **Flexible Keys:** Works with Age and SSH keys
+
+### Prerequisites
+
+Tools are available via `nix develop` or:
+```bash
+nix-shell -p sops age ssh-to-age
+```
+
+### Basic Setup
+
+**1. Add Flake Input:**
+```nix
+inputs.sops-nix = {
+  url = "github:Mic92/sops-nix";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+```
+
+**2. Configure `.sops.yaml`:**
+```yaml
+keys:
+  - &user_brancen age1... # Your age public key
+  - &host_powerhouse age1... # Convert from SSH: ssh-to-age
+
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json)$
+    key_groups:
+      - age:
+        - *user_brancen
+        - *host_powerhouse
+```
+
+**3. Create Secrets:**
+```bash
+mkdir secrets
+sops secrets/general.yaml
+# Add secrets in the editor, save and close
+```
+
+**4. Configure System:**
+```nix
+sops.defaultSopsFile = ../../secrets/general.yaml;
+sops.secrets."my_secret" = {};
+```
+
+**5. Configure Home Manager (Optional):**
+```nix
+sops.secrets.api_key = {
+  path = "${config.home.homeDirectory}/.api_key";
+  mode = "0600";
+};
+```
+
+### Workflow
+
+1. **Edit:** `sops secrets/general.yaml`
+2. **Commit:** `git add secrets/ && git commit`
+3. **Apply:** `nixos-rebuild switch` or `home-manager switch`
+4. **Rotate:** `sops updatekeys secrets/general.yaml`
+
+---
+
+## Infrastructure Secret Management
+
+For comprehensive infrastructure secrets (GPG keys, WireGuard, SSH host keys, etc.), see below.
 
 ## Architecture Overview
 
@@ -511,6 +587,12 @@ The old `energize.sh` script generated secrets manually on each host. The new sy
    - Check GPG keys: `gpg --list-keys`
    - Check WireGuard: `wg show`
    - Check SSH: `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`
+
+## See Also
+
+- [Security Guidelines](./SECURITY.md) - General security best practices
+- [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md) - Key management strategy
+- [Migration Guide](./MIGRATION.md) - System migration procedures
 
 ## References
 

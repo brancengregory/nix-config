@@ -12,7 +12,7 @@ Build nix-darwin configurations on Linux without requiring a macOS system:
 nix build .#turbine-darwin
 
 # Or use the convenience command
-just build-darwin
+mise build-turbine
 
 # The result will be in ./result/
 ```
@@ -25,7 +25,7 @@ Validate nix-darwin configurations without performing a full build:
 nix build .#turbine-check
 
 # Or use the convenience command
-just check-darwin
+mise check-darwin
 
 # This is faster than a full build and useful for CI/testing
 ```
@@ -39,9 +39,9 @@ Use the provided development shell for cross-platform work:
 # Enter the development environment
 nix develop
 # Or
-just dev
+mise dev
 
-# This provides tools like nixos-rebuild, nix-output-monitor, alejandra, and just
+# This provides tools like nixos-rebuild, nix-output-monitor, alejandra, and mise
 ```
 
 ## Linux Builder Setup
@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v27
       - name: Validate darwin config
-        run: just check-darwin
+        run: mise check-darwin
       
   build-darwin-native:
     runs-on: macos-latest  
@@ -84,7 +84,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v27
       - name: Build darwin config natively
-        run: just build-darwin
+        run: mise build-turbine
 ```
 
 3. **Local cross-compilation** (current setup):
@@ -93,15 +93,15 @@ For development and testing, you can use the cross-compilation support directly:
 
 ```bash
 # Quick validation (recommended for most cases)
-just check-darwin
+mise check-darwin
 
 # Full cross-compilation (may be slower without remote builder)
-just build-darwin
+mise build-turbine
 ```
 
 ### Performance Tips
 
-- **Use `just check-darwin`** for quick validation during development
+- **Use `mise check-darwin`** for quick validation during development
 - **Set up remote builders** for production deployments
 - **Use binary caches** to avoid rebuilding common packages:
 
@@ -140,21 +140,21 @@ In continuous integration, you can validate both NixOS and nix-darwin configurat
 ```yaml
 # Example GitHub Actions workflow
 - name: Validate NixOS configuration
-  run: just build-linux
+  run: mise build-powerhouse
 
 - name: Validate nix-darwin configuration  
-  run: just check-darwin
+  run: mise check-darwin
 
 - name: Cross-compile darwin configuration
-  run: just build-darwin
+  run: mise build-turbine
 ```
 
 ### Development Workflow
 When developing on Linux but targeting macOS:
 
 1. **Edit configurations** in your preferred Linux environment
-2. **Validate syntax** with `just check-darwin`
-3. **Cross-compile** with `just build-darwin` to catch platform-specific issues
+2. **Validate syntax** with `mise check-darwin`
+3. **Cross-compile** with `mise build-turbine` to catch platform-specific issues
 4. **Deploy** the configuration on actual macOS hardware when ready
 
 ## Requirements

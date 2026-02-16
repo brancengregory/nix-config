@@ -58,8 +58,14 @@ For security-related questions or to report vulnerabilities:
 - Open an issue with the "security" label
 - Follow responsible disclosure practices
 
+## See Also
+
+- [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md) - Detailed authentication and encryption configuration
+- [Secret Management](./SECRET_MANAGEMENT.md) - Secure credential management with sops-nix
+- [Contributing](./CONTRIBUTING.md) - Development workflow and security guidelines
+
 ## References
 
-- [GPG/SSH Strategy](GPG-SSH-STRATEGY.md) - Detailed security configuration
+- [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md) - Detailed security configuration
 - [NixOS Security](https://nixos.org/manual/nixos/stable/index.html#ch-security) - Official security documentation
 - [Home Manager Security](https://nix-community.github.io/home-manager/) - User-level security considerations

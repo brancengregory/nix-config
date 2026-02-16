@@ -145,10 +145,10 @@ imports = [
 nix flake check
 
 # Test darwin config
-just check-darwin
+mise check-darwin
 
 # Test NixOS config  
-just build-linux
+mise build-powerhouse
 ```
 
 ## Module Dependencies

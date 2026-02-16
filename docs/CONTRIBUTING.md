@@ -9,7 +9,8 @@ This page outlines how to contribute to the Nix configuration and documentation.
 3. Enter the development environment:
 
 ```bash
-nix develop
+mise dev
+# or: nix develop
 ```
 
 ## Making Changes
@@ -19,12 +20,12 @@ nix develop
 1. Make your changes to the appropriate files in `hosts/`, `modules/`, or `users/`
 2. Test your changes:
    ```bash
-   just check-darwin  # for nix-darwin configs
-   just build-linux   # for NixOS configs
+   mise check-darwin  # for nix-darwin configs
+   mise build-powerhouse  # for NixOS configs
    ```
 3. Format your code:
    ```bash
-   just format
+   mise format
    ```
 
 ### Documentation Changes
@@ -32,11 +33,11 @@ nix develop
 1. Edit the markdown files in the `docs/` directory
 2. Build and preview the documentation:
    ```bash
-   just docs-build
-   just docs-serve
+   mise docs-build
+   mise docs-serve
    ```
 3. The documentation site will be automatically deployed when changes are merged to main
 
 ## Available Commands
 
-Run `just help` to see all available development commands.
+Run `mise help` to see all available development commands.

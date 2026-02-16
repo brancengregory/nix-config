@@ -66,7 +66,7 @@ To change the entire system's look, you only need to modify `modules/themes/styl
 
 1. Update `base16Scheme` to point to a gruvbox YAML file.
 2. Update the `image` URL and hash to a matching wallpaper.
-3. Run `just build-linux` (or rebuild your system) to apply changes everywhere.
+3. Run `mise build-powerhouse` or `mise build-capacitor` (or run `nixos-rebuild switch` on the target system) to apply changes.
 
 ## Troubleshooting
 
