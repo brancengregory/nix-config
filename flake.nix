@@ -87,7 +87,26 @@
         ];
       };
 
-      # Additional NixOS systems here
+      # Capacitor - Homelab server (Intel 12th gen, 64GB RAM, storage server)
+      capacitor = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {
+          inherit inputs;
+          isLinux = true;
+          isDarwin = false;
+        };
+        modules = [
+          {
+            nixpkgs.overlays = [
+              (import ./overlays/ojodb.nix)
+            ];
+          }
+          home-manager.nixosModules.home-manager
+          inputs.stylix.nixosModules.stylix
+          inputs.disko.nixosModules.disko
+          ./hosts/capacitor/config.nix
+        ];
+      };
     };
 
     darwinConfigurations = {
@@ -115,9 +134,141 @@
       # Additional Mac systems here
     };
 
+    # ISO Installer configurations
+    nixosConfigurations.capacitor-iso = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit inputs;
+        isLinux = true;
+        isDarwin = false;
+      };
+      modules = [
+        {
+          nixpkgs.overlays = [
+            (import ./overlays/ojodb.nix)
+          ];
+        }
+        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+        inputs.sops-nix.nixosModules.sops
+        inputs.disko.nixosModules.disko
+        ./hosts/capacitor/hardware.nix
+        ./hosts/capacitor/disks.nix
+        {
+          # ISO-specific settings
+          isoImage.squashfsCompression = "zstd -Xcompression-level 3";
+
+          # Basic system settings
+          networking.hostName = "capacitor-installer";
+          time.timeZone = "America/Chicago";
+          i18n.defaultLocale = "en_US.UTF-8";
+
+          # Add tools needed for installation
+          environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
+            git
+            vim
+            curl
+            wget
+            gptfdisk
+            cryptsetup
+            btrfs-progs
+            mergerfs
+            snapraid
+            disko
+          ];
+
+          # Enable SSH in the installer
+          services.openssh = {
+            enable = true;
+            ports = [77];
+            settings.PermitRootLogin = "yes";
+          };
+
+          # Set a temporary root password for the installer
+          # Note: Base ISO already sets initialHashedPassword = ""
+          users.users.root.initialPassword = "nixos";
+
+          # Boot loader for ISO
+          boot.loader.systemd-boot.enable = true;
+          boot.loader.efi.canTouchEfiVariables = true;
+
+          # Install tools
+          programs.git.enable = true;
+        }
+      ];
+    };
+
+    # ISO Installer configurations - Powerhouse
+    nixosConfigurations.powerhouse-iso = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {
+        inherit inputs;
+        isLinux = true;
+        isDarwin = false;
+      };
+      modules = [
+        {
+          nixpkgs.overlays = [
+            (import ./overlays/ojodb.nix)
+          ];
+        }
+        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+        inputs.sops-nix.nixosModules.sops
+        inputs.disko.nixosModules.disko
+        ./hosts/powerhouse/hardware.nix
+        ./hosts/powerhouse/disks/main.nix
+        {
+          # ISO-specific settings
+          isoImage.squashfsCompression = "zstd -Xcompression-level 3";
+
+          # Basic system settings
+          networking.hostName = "powerhouse-installer";
+          time.timeZone = "America/Chicago";
+          i18n.defaultLocale = "en_US.UTF-8";
+
+          # Add tools needed for installation
+          environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
+            git
+            vim
+            curl
+            wget
+            gptfdisk
+            cryptsetup
+            btrfs-progs
+            disko
+          ];
+
+          # Enable SSH in the installer
+          services.openssh = {
+            enable = true;
+            ports = [22];
+            settings.PermitRootLogin = "yes";
+          };
+
+          # Set a temporary root password for the installer
+          # Note: Base ISO already sets initialHashedPassword = ""
+          users.users.root.initialPassword = "nixos";
+
+          # Boot loader for ISO
+          boot.loader.systemd-boot.enable = true;
+          boot.loader.efi.canTouchEfiVariables = true;
+
+          # Install tools
+          programs.git.enable = true;
+        }
+      ];
+    };
+
     # Create a VM for testing and cross-compilation targets
     packages.x86_64-linux = {
       powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
+
+      # Capacitor system configuration
+      capacitor = self.nixosConfigurations.capacitor.config.system.build.toplevel;
+      powerhouse = self.nixosConfigurations.powerhouse.config.system.build.toplevel;
+
+      # ISO Installers
+      capacitor-iso = self.nixosConfigurations.capacitor-iso.config.system.build.isoImage;
+      powerhouse-iso = self.nixosConfigurations.powerhouse-iso.config.system.build.isoImage;
 
       # Cross-compilation: Build darwin configs from Linux
       turbine-darwin = self.darwinConfigurations.turbine.system;
@@ -129,7 +280,7 @@
     # Enable cross-compilation for darwin packages on Linux
     packages.x86_64-darwin = {
       turbine-darwin = self.darwinConfigurations.turbine.system;
-      
+
       # Cross-compile: Build NixOS VM from Darwin
       powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
     };
@@ -143,69 +294,93 @@
         alejandra # Nix formatter
         mise # Universal task runner
         mdbook # Documentation generator
-        
+
         # Secret management tools
         sops # Secrets management
         age # Modern encryption
         ssh-to-age # Convert SSH keys to age
         gnupg # GPG for key management
         pinentry-curses # GPG passphrase entry
-        
+
         # WireGuard tools
         wireguard-tools
-        
+
         # Cryptographic tools
         openssl # General crypto operations
         jq # JSON processing for scripts
-        
+
         # System tools
         git # Version control
         usbutils # lsusb for hardware detection
         pciutils # lspci for hardware detection
-        
+
         # Deployment helpers
         just # Task runner (alternative to mise)
         fzf # Fuzzy finder for interactive scripts
       ];
-      
+
       shellHook = ''
         echo "🚀 Cross-platform Nix development environment"
         echo ""
-        echo "🔐 Secret Generation & Management:"
-        echo "  - ./scripts/generate-all-secrets.sh    # Generate all infrastructure secrets"
-        echo "  - ./scripts/generate-host-secrets.sh   # Generate secrets for single host"
-        echo "  - sops secrets/secrets.yaml            # Edit encrypted secrets"
+        echo "🏠 Available Hosts:"
+        echo "  - powerhouse  (NixOS desktop with dual-boot)"
+        echo "  - capacitor   (NixOS homelab server)"
+        echo "  - turbine     (macOS workstation)"
         echo ""
-        echo "💻 System Building & Deployment:"
-        echo "  - mise build-darwin (cross-compile darwin config)"
-        echo "  - mise check-darwin (validate darwin config)"
-        echo "  - mise build-linux (build NixOS VM)"
-        echo "  - nixos-install --flake .#powerhouse   # Install NixOS"
+        echo "🔨 Build Commands:"
+        echo "  - mise build-powerhouse              # Build powerhouse NixOS config"
+        echo "  - mise build-powerhouse-iso          # Build powerhouse ISO installer"
+        echo "  - mise build-capacitor               # Build capacitor NixOS config"
+        echo "  - mise build-capacitor-iso           # Build capacitor ISO installer"
+        echo "  - mise build-turbine                 # Build turbine macOS config"
+        echo "  - mise build-all                     # Build all configurations"
+        echo ""
+        echo "✅ Validation Commands:"
+        echo "  - mise check                         # Check flake syntax"
+        echo "  - mise check-darwin                  # Validate macOS config"
+        echo "  - mise dry-run-powerhouse            # Dry-run powerhouse config"
+        echo "  - mise dry-run-capacitor             # Dry-run capacitor config"
+        echo "  - mise test                          # Run all validation tests"
+        echo ""
+        echo "🔐 Secret Management:"
+        echo "  - mise secrets-edit                  # Edit encrypted secrets"
+        echo "  - mise secrets-update-keys           # Update SOPS keys for all hosts"
+        echo "  - mise secrets-generate              # Generate all infrastructure secrets"
+        echo "  - sops secrets/secrets.yaml          # Direct edit with sops"
+        echo ""
+        echo "💻 Deployment:"
+        echo "  - nixos-install --flake .#powerhouse   # Install NixOS powerhouse"
+        echo "  - nixos-install --flake .#capacitor    # Install NixOS capacitor"
         echo ""
         echo "🛠️  Development Tools:"
-        echo "  - mise format (format Nix files)"
-        echo "  - mise docs-serve (serve documentation locally)"
-        echo "  - mise docs-build (build documentation)"
-        echo "  - mise help (show all commands)"
+        echo "  - mise format                        # Format Nix files"
+        echo "  - mise dev                           # Enter development shell"
+        echo "  - mise clean                         # Clean build results"
+        echo "  - mise ssh-capacitor                 # SSH into capacitor"
+        echo "  - mise ssh-turbine                   # SSH into turbine"
         echo ""
         echo "📚 Documentation:"
-        echo "  - docs/MIGRATION.md       # Arch → NixOS migration guide"
-        echo "  - docs/SECRET_MANAGEMENT.md # Secret workflow documentation"
-        echo "  - docs/GPG-SSH-STRATEGY.md # Authentication strategy"
+        echo "  - mise docs-serve                    # Serve docs locally"
+        echo "  - mise docs-build                    # Build documentation"
+        echo "  - docs/MIGRATION.md                  # Arch → NixOS migration guide"
+        echo "  - hosts/capacitor/README.md          # Capacitor server docs"
         echo ""
-        
+
         # Set up environment for secret generation
         export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
-        
+
         # Ensure scripts are executable
         chmod +x ./scripts/*.sh 2>/dev/null || true
-        
+
         # Check for age key
         if [ ! -f "$SOPS_AGE_KEY_FILE" ]; then
           echo "⚠️  Warning: No age key found at $SOPS_AGE_KEY_FILE"
           echo "   Run: mkdir -p ~/.config/sops/age && age-keygen -o ~/.config/sops/age/keys.txt"
           echo ""
         fi
+
+        echo "💡 Run 'mise help' or 'mise tasks' to see all available commands"
+        echo ""
       '';
     };
 

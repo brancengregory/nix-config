@@ -1,12 +1,13 @@
 # modules/home/ssh.nix
 # Home-manager SSH client configuration
 # User-level SSH client settings and host configurations
-
-{ config, pkgs, lib, ... }:
-
-with lib;
-
 {
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; {
   # Install SSH client
   home.packages = with pkgs; [
     openssh

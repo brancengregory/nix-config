@@ -7,3 +7,9 @@ secrets/vm_host_key
 secrets/vm_host_key.pub
 secrets/turbine_host_key
 secrets/turbine_host_key.pub
+secrets/capacitor_host_key
+secrets/capacitor_host_key.pub
+secrets/powerhouse_host_key
+secrets/powerhouse_host_key.pub
+secrets/battery_host_key
+secrets/battery_host_key.pub

@@ -21,8 +21,8 @@ keys:
   # Keys are stored in secrets.yaml under age: tree
   - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
   - &host_turbine age1kh6w6v9zu6ahrddlsl47rypr7wtlht94hj6h2p9sqnavpujsvaqs2ghtve
-  - &host_capacitor PLACEHOLDER_CAPACITOR_KEY
-  - &host_battery PLACEHOLDER_BATTERY_KEY
+  - &host_capacitor age1ca3nyr5m5musmwafqcel0t89ugupvwmmkamrlnpsnp6dpc8d6y2q09mv8k
+  - &host_battery age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3
   
   # Development/Testing Keys
   - &host_vm age1dr3ecjsnv5azmeq63764md7ag04kuyyzc8w8yx60u4v5dfndxpasyrnp4t

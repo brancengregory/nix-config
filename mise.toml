@@ -4,30 +4,101 @@
 
 [tasks]
 # Help / List tasks
-help = { run = "mise tasks", description = "Show available mise tasks" }
+[tasks.help]
+description = "Show available mise tasks"
+run = "mise tasks"
 
-# Build commands
-check-darwin = { run = "nix build .#turbine-check", description = "Validate nix-darwin config (fast)" }
-build-darwin = { run = "nix build .#turbine-darwin", description = "Cross-compile full nix-darwin config" }
-build-linux = { run = "nix build .#powerhouse-vm", description = "Build NixOS VM" }
+# Build commands - Individual Hosts
+[tasks.build-powerhouse]
+description = "Build powerhouse NixOS configuration"
+run = "nix build .#powerhouse"
+
+[tasks.build-capacitor]
+description = "Build capacitor NixOS configuration"
+run = "nix build .#capacitor"
+
+[tasks.build-turbine]
+description = "Cross-compile full nix-darwin config for turbine"
+run = "nix build .#turbine-darwin"
+
+# Build commands - ISO Installers
+[tasks.build-powerhouse-iso]
+description = "Build powerhouse ISO installer"
+run = "nix build .#powerhouse-iso"
+
+[tasks.build-capacitor-iso]
+description = "Build capacitor ISO installer"
+run = "nix build .#capacitor-iso"
+
+# Build commands - VMs (for testing)
+[tasks.build-powerhouse-vm]
+description = "Build powerhouse NixOS VM for testing"
+run = "nix build .#powerhouse-vm"
+
+# Validation / Dry-run
+[tasks.check]
+description = "Check flake syntax and validate"
+run = "nix flake check"
+
+[tasks.check-darwin]
+description = "Validate nix-darwin config (fast)"
+run = "nix build .#turbine-check"
+
+[tasks.dry-run-powerhouse]
+description = "Dry-run powerhouse config (no build)"
+run = "nixos-rebuild dry-build --flake .#powerhouse"
+
+[tasks.dry-run-capacitor]
+description = "Dry-run capacitor config (no build)"
+run = "nixos-rebuild dry-build --flake .#capacitor"
 
 # Development
-dev = { run = "nix develop", description = "Enter development shell" }
-check = { run = "nix flake check", description = "Check flake syntax" }
+[tasks.dev]
+description = "Enter development shell"
+run = "nix develop"
 
-# Maintenance
-clean = { run = "rm -rf result*", description = "Clean build results" }
+[tasks.shell]
+description = "Enter development shell (alias)"
+run = "nix develop"
 
-# Formatting
-[tasks.format]
-description = "Format Nix files"
-run = "nix develop -c alejandra ."
+# Build all (comprehensive)
+[tasks.build-all]
+description = "Build all configurations (comprehensive)"
+depends = ["build-powerhouse", "build-capacitor", "build-turbine"]
+run = "echo 'All configurations built successfully!'"
 
 # Testing - runs checks in parallel
 [tasks.test]
 description = "Run all validation tests"
 depends = ["check", "check-darwin"]
 run = "echo 'All tests passed'"
+
+# Maintenance
+[tasks.clean]
+description = "Clean build results"
+run = "rm -rf result*"
+
+# Formatting
+[tasks.format]
+description = "Format Nix files"
+run = "nix develop -c alejandra ."
+
+[tasks.fmt]
+description = "Format Nix files (alias)"
+run = "nix develop -c alejandra ."
+
+# Secrets Management
+[tasks.secrets-edit]
+description = "Edit encrypted secrets"
+run = "nix develop -c sops secrets/secrets.yaml"
+
+[tasks.secrets-update-keys]
+description = "Update SOPS keys for all recipients"
+run = "nix develop -c sops updatekeys secrets/secrets.yaml"
+
+[tasks.secrets-generate]
+description = "Generate all infrastructure secrets"
+run = "./scripts/generate-all-secrets.sh"
 
 # Documentation
 [tasks.docs-init]
@@ -45,3 +116,41 @@ run = "nix develop -c mdbook serve --open"
 [tasks.docs-clean]
 description = "Clean documentation build"
 run = "rm -rf docs/book"
+
+# Host-specific helpers
+[tasks.ssh-capacitor]
+description = "SSH into capacitor"
+run = "ssh -p 77 capacitor"
+
+[tasks.ssh-turbine]
+description = "SSH into turbine"
+run = "ssh turbine"
+
+# Git helpers
+[tasks.git-status]
+description = "Show git status with Nix additions"
+run = "git status && echo '---' && echo 'Nix build results:' && ls -la result* 2>/dev/null || echo 'No build results'"
+
+# System info
+[tasks.system-info]
+description = "Show current system configuration"
+run = '''
+echo "=== Nix Config Repository ==="
+echo "Flake outputs:"
+nix flake metadata 2>/dev/null | head -20 || echo "Run 'nix flake metadata' for details"
+echo ""
+echo "=== Available Hosts ==="
+echo "- powerhouse (NixOS desktop)"
+echo "- capacitor (NixOS server)"
+echo "- turbine (macOS)"
+echo ""
+echo "=== ISO Installers ==="
+echo "- mise build-powerhouse-iso"
+echo "- mise build-capacitor-iso"
+echo ""
+echo "=== Build Commands ==="
+echo "- mise build-powerhouse"
+echo "- mise build-capacitor"
+echo "- mise build-turbine"
+echo "- mise build-all"
+'''

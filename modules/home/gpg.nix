@@ -1,12 +1,13 @@
 # modules/home/gpg.nix
 # Home-manager GPG client configuration
 # User-level GPG settings, agent, and SSH support
-
-{ config, pkgs, lib, ... }:
-
-with lib;
-
 {
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; {
   # GPG client settings
   programs.gpg = {
     enable = true;

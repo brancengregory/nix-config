@@ -44,7 +44,7 @@
     editor = true;
   };
   boot.loader.efi.canTouchEfiVariables = true;
-  
+
   # Mount Windows ESP for unified boot entries
   # This makes Windows bootloader accessible from systemd-boot menu
   fileSystems."/boot/efi-windows" = {
@@ -142,21 +142,21 @@
     nodes = {
       capacitor = {
         ip = "10.0.0.1";
-        publicKey = "REPLACE_WITH_CAPACITOR_WG_PUBKEY";
+        publicKey = "psAKnDTfrEStGzrqCA3O9pvcz+AQc+gR0JpBOSh6tiE=";
         isServer = true;
         endpoint = "capacitor.yourdomain.com:51820";
       };
       powerhouse = {
         ip = "10.0.0.2";
-        publicKey = "REPLACE_WITH_POWERHOUSE_WG_PUBKEY";
+        publicKey = "xsNOf2S+gjNralEsOAJbkHcslpHQ8fBsjD/OxWWLV2g=";
       };
       turbine = {
         ip = "10.0.0.3";
-        publicKey = "REPLACE_WITH_TURBINE_WG_PUBKEY";
+        publicKey = "QsnC5kPNXU/9WITRJEqW6RXMG1FpnwuYVixwCtLPeBU=";
       };
       battery = {
         ip = "10.0.0.4";
-        publicKey = "REPLACE_WITH_BATTERY_WG_PUBKEY";
+        publicKey = "avw08hoEMczOTsmsGIC89iMtw4s9/tbhRsSXUf+Ruxg=";
       };
     };
     privateKeyFile = config.sops.secrets."wireguard/powerhouse/private_key".path;
@@ -188,11 +188,11 @@
     # WireGuard secrets
     "wireguard/powerhouse/private_key" = {};
     "wireguard/powerhouse/preshared_key" = {};
-    
+
     # GPG keys
     "gpg/powerhouse/secret_keys" = {};
     "gpg/powerhouse/public_keys" = {};
-    
+
     # SSH host keys
     "ssh/powerhouse/host_key" = {};
     "ssh/powerhouse/host_key_pub" = {};
