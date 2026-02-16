@@ -129,6 +129,9 @@
     # Enable cross-compilation for darwin packages on Linux
     packages.x86_64-darwin = {
       turbine-darwin = self.darwinConfigurations.turbine.system;
+      
+      # Cross-compile: Build NixOS VM from Darwin
+      powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
     };
 
     # Development shells for cross-platform work
@@ -137,19 +140,38 @@
         nixos-rebuild
         nix-output-monitor
         alejandra # Nix formatter
-        just # Command runner
+        mise # Universal task runner
         mdbook # Documentation generator
       ];
       shellHook = ''
         echo "🚀 Cross-platform Nix development environment"
         echo "💡 Available commands:"
-        echo "  - just build-darwin (cross-compile darwin config)"
-        echo "  - just check-darwin (validate darwin config)"
-        echo "  - just build-linux (build NixOS VM)"
-        echo "  - just format (format Nix files)"
-        echo "  - just docs-serve (serve documentation locally)"
-        echo "  - just docs-build (build documentation)"
-        echo "  - just help (show all commands)"
+        echo "  - mise build-darwin (cross-compile darwin config)"
+        echo "  - mise check-darwin (validate darwin config)"
+        echo "  - mise build-linux (build NixOS VM)"
+        echo "  - mise format (format Nix files)"
+        echo "  - mise docs-serve (serve documentation locally)"
+        echo "  - mise docs-build (build documentation)"
+        echo "  - mise help (show all commands)"
+      '';
+    };
+
+    devShells.x86_64-darwin.default = nixpkgs.legacyPackages.x86_64-darwin.mkShell {
+      buildInputs = with nixpkgs.legacyPackages.x86_64-darwin; [
+        nix-output-monitor
+        alejandra # Nix formatter
+        mise # Universal task runner
+        mdbook # Documentation generator
+      ];
+      shellHook = ''
+        echo "🚀 Cross-platform Nix development environment"
+        echo "💡 Available commands:"
+        echo "  - mise build-darwin (build darwin config)"
+        echo "  - mise check-darwin (validate darwin config)"
+        echo "  - mise format (format Nix files)"
+        echo "  - mise docs-serve (serve documentation locally)"
+        echo "  - mise docs-build (build documentation)"
+        echo "  - mise help (show all commands)"
       '';
     };
 

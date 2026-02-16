@@ -6,25 +6,31 @@
   isDarwin,
   ...
 }: {
-  imports = [
-    ../../modules/fonts/default.nix
-    ../../modules/terminal/zsh.nix
-    ../../modules/terminal/starship.nix
-    ../../modules/terminal/tmux.nix
-    ../../modules/terminal/nvim.nix
-    ../../modules/security/default.nix
-    ../../modules/programs/git.nix
-    ../../modules/programs/r.nix
-    inputs.sops-nix.homeManagerModules.sops
-  ] ++ (if isLinux then [
-    ../../modules/desktop/plasma-home.nix
-  ] else []);
+  imports =
+    [
+      ../../modules/fonts/default.nix
+      ../../modules/terminal/zsh.nix
+      ../../modules/terminal/starship.nix
+      ../../modules/terminal/tmux.nix
+      ../../modules/terminal/nvim.nix
+      ../../modules/security/default.nix
+      ../../modules/programs/git.nix
+      ../../modules/programs/r.nix
+      inputs.sops-nix.homeManagerModules.sops
+    ]
+    ++ (
+      if isLinux
+      then [
+        ../../modules/desktop/plasma-home.nix
+      ]
+      else []
+    );
 
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
     age.keyFile = "/home/brancengregory/.config/sops/age/keys.txt";
-    
+
     secrets = {
       # Database credentials
       pgpass = {
@@ -126,16 +132,19 @@
       else throw "Unsupported OS for this home-manager configuration"
     );
 
-  xdg.mimeApps = if isLinux then {
-    enable = true;
-    defaultApplications = {
-      "text/html" = "google-chrome.desktop";
-      "x-scheme-handler/http" = "google-chrome.desktop";
-      "x-scheme-handler/https" = "google-chrome.desktop";
-      "x-scheme-handler/about" = "google-chrome.desktop";
-      "x-scheme-handler/unknown" = "google-chrome.desktop";
-    };
-  } else {};
+  xdg.mimeApps =
+    if isLinux
+    then {
+      enable = true;
+      defaultApplications = {
+        "text/html" = "google-chrome.desktop";
+        "x-scheme-handler/http" = "google-chrome.desktop";
+        "x-scheme-handler/https" = "google-chrome.desktop";
+        "x-scheme-handler/about" = "google-chrome.desktop";
+        "x-scheme-handler/unknown" = "google-chrome.desktop";
+      };
+    }
+    else {};
 
   home.stateVersion = "25.11";
 

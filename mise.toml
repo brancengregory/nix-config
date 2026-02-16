@@ -1,0 +1,47 @@
+# Mise task configuration for nix-config
+# Run tasks with: mise <task-name>
+# Example: mise build-linux, mise check, mise format
+
+[tasks]
+# Help / List tasks
+help = { run = "mise tasks", description = "Show available mise tasks" }
+
+# Build commands
+check-darwin = { run = "nix build .#turbine-check", description = "Validate nix-darwin config (fast)" }
+build-darwin = { run = "nix build .#turbine-darwin", description = "Cross-compile full nix-darwin config" }
+build-linux = { run = "nix build .#powerhouse-vm", description = "Build NixOS VM" }
+
+# Development
+dev = { run = "nix develop", description = "Enter development shell" }
+check = { run = "nix flake check", description = "Check flake syntax" }
+
+# Maintenance
+clean = { run = "rm -rf result*", description = "Clean build results" }
+
+# Formatting
+[tasks.format]
+description = "Format Nix files"
+run = "nix develop -c alejandra ."
+
+# Testing - runs checks in parallel
+[tasks.test]
+description = "Run all validation tests"
+depends = ["check", "check-darwin"]
+run = "echo 'All tests passed'"
+
+# Documentation
+[tasks.docs-init]
+description = "Initialize mdBook documentation"
+run = "nix develop -c mdbook init --theme docs"
+
+[tasks.docs-build]
+description = "Build documentation site"
+run = "nix develop -c mdbook build"
+
+[tasks.docs-serve]
+description = "Serve documentation locally"
+run = "nix develop -c mdbook serve --open"
+
+[tasks.docs-clean]
+description = "Clean documentation build"
+run = "rm -rf docs/book"

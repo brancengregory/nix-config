@@ -6,7 +6,7 @@
 }: {
   stylix = {
     enable = true;
-    # Disable autoEnable to prevent it from touching KDE/Plasma 
+    # Disable autoEnable to prevent it from touching KDE/Plasma
     # which we've seen causes black screens in Plasma 6.
     autoEnable = false;
     enableReleaseChecks = false;

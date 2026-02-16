@@ -1,4 +1,8 @@
-{pkgs, config, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   # Define the list of R packages we want
   my-r-packages = with pkgs.rPackages; [
     # Core
@@ -46,18 +50,17 @@
   my-r-env = pkgs.buildEnv {
     name = "r-custom-env";
     paths = my-r-packages;
-    pathsToLink = [ "/library" ];
+    pathsToLink = ["/library"];
   };
-  
+
   # We still want the wrapped R for normal usage
   my-r = pkgs.rWrapper.override {
     packages = my-r-packages;
   };
-
 in {
   home.packages = with pkgs; [
     my-r
-    
+
     # Custom radian wrapper that explicitly sets R_LIBS_SITE
     # This bypasses any wrapper logic failure by forcing the library path
     (pkgs.writeShellScriptBin "radian" ''
@@ -72,6 +75,6 @@ in {
   home.sessionVariables = {
     R_ENVIRON_USER = config.sops.secrets.renviron.path;
     # Optional: also set it globally for Rstudio or other tools
-    # R_LIBS_SITE = "${my-r-env}/library"; 
+    # R_LIBS_SITE = "${my-r-env}/library";
   };
 }

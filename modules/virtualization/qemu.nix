@@ -7,11 +7,11 @@
       swtpm.enable = true;
     };
   };
-  
+
   programs.virt-manager.enable = true;
 
-  users.users.brancengregory.extraGroups = [ "libvirtd" ];
-  
+  users.users.brancengregory.extraGroups = ["libvirtd"];
+
   environment.systemPackages = with pkgs; [
     spice
     spice-gtk

@@ -25,23 +25,23 @@
                 # Disable settings.keyFile if you want to type a password interactively at boot
                 settings = {
                   allowDiscards = true;
-                  # keyFile = "/tmp/secret.key"; 
+                  # keyFile = "/tmp/secret.key";
                 };
                 content = {
                   type = "btrfs";
-                  extraArgs = [ "-f" ]; # Force overwrite
+                  extraArgs = ["-f"]; # Force overwrite
                   subvolumes = {
                     "@" = {
                       mountpoint = "/";
-                      mountOptions = [ "compress=zstd" "noatime" ];
+                      mountOptions = ["compress=zstd" "noatime"];
                     };
                     "@home" = {
                       mountpoint = "/home";
-                      mountOptions = [ "compress=zstd" "noatime" ];
+                      mountOptions = ["compress=zstd" "noatime"];
                     };
                     "@nix" = {
                       mountpoint = "/nix";
-                      mountOptions = [ "compress=zstd" "noatime" ];
+                      mountOptions = ["compress=zstd" "noatime"];
                     };
                     "@swap" = {
                       mountpoint = "/.swapvol";
