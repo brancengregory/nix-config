@@ -102,16 +102,23 @@ in {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    # Add sabnzbd user to media group for shared access
+    users.users.sabnzbd.extraGroups = ["media"];
+    
+    # Add brancengregory user to media group (for qBittorrent container access)
+    users.users.brancengregory.extraGroups = ["media"];
 
-    # Create directories
+    # Create directories with setgid bit (2775) for shared group access
+    # Downloads directory owned by root:media, with setgid so new files inherit media group
     systemd.tmpfiles.rules = [
       "d /var/lib/qbittorrent 0755 root root -"
       "d /var/lib/qbittorrent/brancengregory 0755 1000 1000 -"
       "d /var/lib/qbittorrent/qbt 0755 1000 1000 -"
-      "d ${cfg.downloadDir}/complete 0775 root root -"
-      "d ${cfg.downloadDir}/incomplete 0775 root root -"
-      "d ${cfg.downloadDir}/watch 0775 root root -"
-      "d ${cfg.downloadDir}/nzb 0775 root root -"
+      "d ${cfg.downloadDir} 2775 root media -"
+      "d ${cfg.downloadDir}/complete 2775 root media -"
+      "d ${cfg.downloadDir}/incomplete 2775 root media -"
+      "d ${cfg.downloadDir}/watch 2775 root media -"
+      "d ${cfg.downloadDir}/nzb 2775 root media -"
     ];
   };
 }

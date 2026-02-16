@@ -90,41 +90,52 @@ in {
   };
 
   config = mkIf cfg.enable {
+    # Create media group for shared access
+    users.groups.media = {
+      gid = 900;
+    };
+
     # Jellyfin
     services.jellyfin = mkIf cfg.jellyfin.enable {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    users.users.jellyfin.extraGroups = ["media"];
 
     # Sonarr (TV)
     services.sonarr = mkIf cfg.sonarr.enable {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    users.users.sonarr.extraGroups = ["media"];
 
     # Radarr (Movies)
     services.radarr = mkIf cfg.radarr.enable {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    users.users.radarr.extraGroups = ["media"];
 
     # Lidarr (Music)
     services.lidarr = mkIf cfg.lidarr.enable {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    users.users.lidarr.extraGroups = ["media"];
 
     # Readarr (Books)
     services.readarr = mkIf cfg.readarr.enable {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    users.users.readarr.extraGroups = ["media"];
 
     # Prowlarr (Indexer manager)
     services.prowlarr = mkIf cfg.prowlarr.enable {
       enable = true;
       # Firewall managed by host (VPN-only)
     };
+    users.users.prowlarr.extraGroups = ["media"];
 
     # Jellyseerr (request management for Jellyfin)
     # Using container since no NixOS module exists
@@ -156,17 +167,16 @@ in {
       };
     };
 
-    # Create media directories
+    # Create media directories with setgid bit (2775) for shared group access
+    # Directories owned by root:media, with setgid so new files inherit media group
     systemd.tmpfiles.rules = [
-      "d ${cfg.mediaDir}/movies 0775 jellyfin jellyfin -"
-      "d ${cfg.mediaDir}/tv 0775 jellyfin jellyfin -"
-      "d ${cfg.mediaDir}/music 0775 jellyfin jellyfin -"
-      "d ${cfg.mediaDir}/books 0775 jellyfin jellyfin -"
+      "d ${cfg.mediaDir} 2775 root media -"
+      "d ${cfg.mediaDir}/movies 2775 root media -"
+      "d ${cfg.mediaDir}/tv 2775 root media -"
+      "d ${cfg.mediaDir}/music 2775 root media -"
+      "d ${cfg.mediaDir}/books 2775 root media -"
       "d /var/lib/jellyseerr 0755 root root -"
       "d /var/lib/ombi 0755 root root -"
     ];
-
-    # Ensure jellyfin user can access media
-    users.users.jellyfin.extraGroups = ["users"];
   };
 }

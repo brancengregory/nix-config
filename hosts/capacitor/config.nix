@@ -228,12 +228,40 @@
     "ssh/capacitor/host_key_pub" = {};
   };
 
-  # NFS Server exports
+  # Media group for shared access between arr apps and downloaders
+  users.groups.media = {
+    gid = 900;
+  };
+
+  # Ensure brancengregory is in media group for qBittorrent container access
+  users.users.brancengregory.extraGroups = ["media"];
+
+  # Enable media stack and download stack
+  services.media = {
+    enable = true;
+    mediaDir = "/mnt/storage/standard/media";
+  };
+
+  services.download-stack = {
+    enable = true;
+    downloadDir = "/mnt/storage/ephemeral/downloads";
+  };
+
+  # Ensure storage directories exist with proper permissions
+  systemd.tmpfiles.rules = [
+    # Create base storage directories
+    "d /mnt/storage 0755 root root -"
+    "d /mnt/storage/standard 0755 root root -"
+    "d /mnt/storage/ephemeral 0755 root root -"
+    # Media and download directories will be created by their respective modules
+  ];
+
+  # NFS Server exports - restrict to VPN subnet
   services.nfs.server = {
     enable = true;
     exports = ''
-      /mnt/storage/critical 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)
-      /mnt/storage/standard 192.168.1.0/24(rw,sync,no_subtree_check,no_root_squash)
+      /mnt/storage/critical 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
+      /mnt/storage/standard 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
     '';
   };
 
