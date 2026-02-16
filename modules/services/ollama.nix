@@ -13,9 +13,9 @@ in {
     enable = mkEnableOption "Ollama LLM server";
 
     acceleration = mkOption {
-      type = types.enum ["none" "rocm" "cuda"];
-      default = "none";
-      description = "GPU acceleration for Ollama";
+      type = types.nullOr (types.enum [false "rocm" "cuda" "vulkan"]);
+      default = null;
+      description = "GPU acceleration for Ollama (null/false for CPU-only)";
     };
 
     modelsDir = mkOption {
@@ -29,7 +29,8 @@ in {
     # Ollama
     services.ollama = {
       enable = true;
-      listenAddress = "0.0.0.0:11434";
+      host = "0.0.0.0";
+      port = 11434;
       acceleration = cfg.acceleration;
       home = cfg.modelsDir;
       # Firewall managed by host (VPN-only)
@@ -42,8 +43,11 @@ in {
 
     # Ensure Ollama can access models directory
     users.users.ollama = {
+      isSystemUser = true;
+      group = "ollama";
       home = cfg.modelsDir;
       createHome = true;
     };
+    users.groups.ollama = {};
   };
 }

@@ -7,10 +7,10 @@
   ...
 }:
 with lib; let
-  cfg = config.services.storage-server;
+  cfg = config.services.storage;
 in {
-  options.services.storage-server = {
-    enable = mkEnableOption "Storage server stack (mergerfs, SnapRAID, NFS, Minio)";
+  options.services.storage = {
+    enable = mkEnableOption "Storage stack (mergerfs, SnapRAID, NFS, Minio)";
 
     mergerfs = {
       enable = mkOption {
@@ -56,6 +56,12 @@ in {
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.mergerfs.enable -> (config.fileSystems."/mnt/vault1" or {} != {});
+        message = "Storage service requires /mnt/vault1 to be mounted. Please configure LUKS unlock and mount points for vault drives.";
+      }
+    ];
     # Install required packages
     environment.systemPackages = with pkgs; [
       mergerfs

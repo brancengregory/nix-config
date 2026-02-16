@@ -40,6 +40,45 @@
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # LUKS Vault Drives - Unlock at boot with password
+  # These preserve existing encrypted drives from Arch Linux setup
+  boot.initrd.luks.devices = {
+    # Vault 1 (sda) - 19TB
+    crypt_vault1 = {
+      device = "/dev/disk/by-uuid/de63d2dc-d155-4020-9897-f8328bdf9ede";
+      allowDiscards = true;
+    };
+    # Vault 2 (sdb) - 11TB
+    crypt_vault2 = {
+      device = "/dev/disk/by-uuid/a8f9df1c-f7f2-49ad-985c-6f5b7117ebac";
+      allowDiscards = true;
+    };
+    # Vault 3 (sdc) - 11TB (parity)
+    crypt_vault3 = {
+      device = "/dev/disk/by-uuid/7e9cf71f-8db6-466a-b6de-757c7bc9baef";
+      allowDiscards = true;
+    };
+  };
+
+  # Mount vault drives (preserved btrfs subvolumes)
+  fileSystems = {
+    "/mnt/vault1" = {
+      device = "/dev/mapper/crypt_vault1";
+      fsType = "btrfs";
+      options = ["compress=zstd" "noatime" "nofail"];
+    };
+    "/mnt/vault2" = {
+      device = "/dev/mapper/crypt_vault2";
+      fsType = "btrfs";
+      options = ["compress=zstd" "noatime" "nofail"];
+    };
+    "/mnt/vault3" = {
+      device = "/dev/mapper/crypt_vault3";
+      fsType = "btrfs";
+      options = ["compress=zstd" "noatime" "nofail"];
+    };
+  };
+
   # SSH on port 77 (preserving current setup)
   services.openssh = {
     enable = true;
@@ -226,6 +265,9 @@
     # SSH host keys
     "ssh/capacitor/host_key" = {};
     "ssh/capacitor/host_key_pub" = {};
+
+    # Minio root credentials
+    "minio/root_credentials" = {};
   };
 
   # Media group for shared access between arr apps and downloaders
@@ -256,13 +298,41 @@
     # Media and download directories will be created by their respective modules
   ];
 
-  # NFS Server exports - restrict to VPN subnet
-  services.nfs.server = {
+  # Enable storage stack with mergerfs, SnapRAID, NFS, and Minio
+  services.storage = {
     enable = true;
-    exports = ''
-      /mnt/storage/critical 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
-      /mnt/storage/standard 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
-    '';
+    mergerfs.enable = true;
+    snapraid.enable = true;
+    nfs = {
+      enable = true;
+      exports = ''
+        /mnt/storage/critical 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
+        /mnt/storage/standard 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
+      '';
+    };
+    minio = {
+      enable = true;
+      dataDir = "/mnt/storage/standard/minio";
+    };
+  };
+
+  # Ollama LLM server - models stored on NVMe for fast access
+  services.ollama-server = {
+    enable = true;
+    acceleration = null; # CPU-only (no GPU on this server)
+    modelsDir = "/var/lib/ollama"; # NVMe storage for fast model loading
+  };
+
+  # Forgejo Git server - repos on NVMe for fast git operations
+  services.git-server = {
+    enable = true;
+    forgejo = {
+      enable = true;
+      domain = "git.brancen.world";
+      httpPort = 3080;
+      sshPort = 22;
+    };
+    dataDir = "/var/lib/forgejo"; # NVMe storage for fast git operations
   };
 
   # System packages for server management
