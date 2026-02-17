@@ -1,19 +1,37 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  isLinux,
+  isDarwin,
+  ...
+}: {
   programs.tmux = {
     enable = true;
     mouse = true;
     clock24 = true;
-
+    escapeTime = 10;
+    
     # Key bindings
     keyMode = "vi";
     prefix = "C-a";
-
+    
     # Terminal and environment settings
-    terminal = "screen-256color";
+    terminal = "tmux-256color";
+    
+    # Plugins managed by home-manager (replaces tpm)
+    plugins = with pkgs.tmuxPlugins; [
+      sensible
+    ];
 
     extraConfig = ''
       # Enable true color support
-      set-option -sa terminal-overrides ",xterm*:Tc"
+      set-option -sa terminal-overrides ",xterm-256color:Tc"
+      
+      # No confirmation needed to kill session
+      bind-key x kill-pane
+      
+      # Switch to another session when one is killed
+      set-option -g detach-on-destroy off
 
       # GPG/SSH integration - streamlined environment passing
       set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
@@ -44,6 +62,7 @@
       # Pane borders
       set-option -g pane-border-style "fg=#7C7D83"
       set-option -g pane-active-border-style "fg=#E2E4E5"
+      set-option -g pane-border-format " #{pane_index} "
     '';
   };
 }

@@ -1,4 +1,9 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  isLinux,
+  isDarwin,
+  ...
+}: {
   home.packages = with pkgs; [
     fzf
     zoxide
@@ -23,11 +28,24 @@
   programs.zsh = {
     enable = true;
 
-    # Enable native home-manager zsh plugins
+    # Enable native home-manager zsh plugins (replaces sheldon)
     autosuggestion.enable = true;
     enableCompletion = true;
     syntaxHighlighting.enable = true;
     historySubstringSearch.enable = true;
+    
+    # Additional plugins managed natively
+    plugins = [
+      {
+        name = "zsh-fzf-history-search";
+        src = pkgs.fetchFromGitHub {
+          owner = "joshskidmore";
+          repo = "zsh-fzf-history-search";
+          rev = "d1a287b9b529a3e9c561d463547997c401a73da4";
+          sha256 = "sha256-4Dp4/+AMZnXqdc+gbv3B1pK75o7WbDyNhR9eBz5p9sI=";
+        };
+      }
+    ];
 
     # Shell aliases
     shellAliases =
@@ -87,26 +105,32 @@
         source "$HOME/.config/zsh/secrets.zsh"
       fi
 
-      # Path
-      path=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin' $path)
+      # Platform-specific paths
+      ${if isLinux then ''
+        path+=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin')
+      '' else ''
+        path+=('/Users/brancengregory/.cargo/bin' '/Users/brancengregory/go/bin')
+      ''}
 
       # Autocompletion
       autoload -Uz compinit && compinit
 
-               # Custom function for reading files
-               c() {
-                 if [[ "$1" == *.md ]]; then
-                   glow "$1"
-                 else
-                   bat "$1"
-                 fi
-               }
+      # Custom function for reading files
+      c() {
+        if [[ "$1" == *.md ]]; then
+          glow "$1"
+        else
+          bat "$1"
+        fi
+      }
 
-                        # Handle corrupt history file
-                        if ! fc -l 1 >/dev/null 2>&1 && [ -f ~/.zshistory ] && [ -s ~/.zshistory ]; then
-                          mv ~/.zshistory ~/.zshistory.bad.$(date +%s)
-                          touch ~/.zshistory
-                        fi      # Yazi wrapper function
+      # Handle corrupt history file
+      if ! fc -l 1 >/dev/null 2>&1 && [ -f ~/.zshistory ] && [ -s ~/.zshistory ]; then
+        mv ~/.zshistory ~/.zshistory.bad.$(date +%s)
+        touch ~/.zshistory
+      fi
+
+      # Yazi wrapper function
       function f() {
       	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
       	yazi "$@" --cwd-file="$tmp"
@@ -143,26 +167,22 @@
       fi
 
       # Platform-specific configuration
-      ${
-        if pkgs.stdenv.isLinux
-        then ''
-          # Linux: Use GPG agent for SSH authentication
-               export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+      ${if isLinux then ''
+        # Linux: Use GPG agent for SSH authentication
+        export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 
-          # Tmux-specific improvements
-               if [ -n "$TMUX" ]; then
-                 stty sane
-               fi
+        # Tmux-specific improvements
+        if [ -n "$TMUX" ]; then
+          stty sane
+        fi
 
-               export PROJ_DATA=/usr/share/proj
-        ''
-        else ''
-          # macOS: Use GPG agent for SSH authentication
-               export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-               # Ensure GPG agent is running (lazy start)
-               gpgconf --launch gpg-agent 2>/dev/null || true
-        ''
-      }
+        export PROJ_DATA=/usr/share/proj
+      '' else ''
+        # macOS: Use GPG agent for SSH authentication
+        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+        # Ensure GPG agent is running (lazy start)
+        gpgconf --launch gpg-agent 2>/dev/null || true
+      ''}
 
       # Tmux integration with performance optimization
       if [ -n "$TMUX" ]; then
@@ -184,6 +204,12 @@
       # Conda initialization (if available)
       [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
       export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+      
+      # Platform-specific Homebrew settings
+      ${if isDarwin then ''
+        export HOMEBREW_NO_INSTALL_CLEANUP=1
+      '' else ""
+      }
     '';
 
     # Additional PATH entries

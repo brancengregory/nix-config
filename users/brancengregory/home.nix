@@ -16,9 +16,11 @@
       ../../modules/home/terminal/zsh.nix
       ../../modules/home/terminal/starship.nix
       ../../modules/home/terminal/tmux.nix
-      ../../modules/home/terminal/nvim.nix
+      ../../modules/home/programs/nixvim.nix
       ../../modules/home/programs/git.nix
       ../../modules/home/programs/r.nix
+      ../../modules/home/programs/ghostty.nix
+      ../../modules/home/programs/sesh.nix
       inputs.sops-nix.homeManagerModules.sops
     ]
     ++ (lib.optionals (isLinux && isDesktop) [
@@ -28,7 +30,10 @@
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
-    age.keyFile = "/home/brancengregory/.config/sops/age/keys.txt";
+    age.keyFile = 
+      if isLinux 
+      then "/home/brancengregory/.config/sops/age/keys.txt"
+      else "/Users/brancengregory/.config/sops/age/keys.txt";
 
     secrets = {
       # Database credentials
@@ -110,6 +115,7 @@
       discord
       zoom-us
       positron-bin
+      rstudio
       rustup
       snapper-gui
       keymapp
@@ -117,6 +123,8 @@
     # macOS-specific packages
     ++ (lib.optionals isDarwin [
       pinentry-curses
+      positron-bin
+      rstudio
     ]);
 
   xdg.mimeApps =

@@ -99,28 +99,15 @@
       "mas" # Mac App Store CLI
     ];
 
-    # GUI applications (casks) - this is Homebrew's strength
+    # GUI applications (casks) - FINAL PRUNED LIST
+    # R, RStudio, Positron managed by nixpkgs (rWrapper)
     casks = [
       # Development tools
       "visual-studio-code"
-      "arduino-ide"
-      "android-platform-tools"
-      "github"
-      "podman-desktop"
-      "postman"
       "dbeaver-community"
-      "db-browser-for-sqlite"
-      "ngrok"
-      "xquartz"
-
-      # Browsers
-      "firefox"
-      "firefox@developer-edition"
-      "google-chrome"
-      "brave-browser"
-      "tor-browser"
-
-      # Communication
+      "podman-desktop"
+      
+      # Communication (all requested)
       "slack"
       "discord"
       "telegram"
@@ -129,65 +116,27 @@
       "signal"
       "twitch"
       "zoom"
-
-      # Text editors and IDEs
-      "zed"
-      "ghostty"
-      "kitty"
-      "iterm2"
-
-      # Productivity and utilities
-      "notion"
-      "obsidian"
-      "toggl-track"
+      
+      # Productivity/Media
       "zotero"
       "activitywatch"
-      "tunnelblick"
-      "balenaetcher"
-
-      # Media and entertainment
       "vlc"
       "obs"
-      "webtorrent"
+      
+      # Gaming
       "steam"
       "minecraft"
       "epic-games"
-      "openemu"
-
-      # Science and research
-      "qgis"
-      "positron"
-      "r"
-      "rstudio"
-      "miniconda"
-      "julia"
-      "google-earth-pro"
-      "kiwix" # Offline wikipedia
-
-      # Creative tools
-      "blender"
-      "bitwig-studio"
-      "godot"
-      "tic80"
-
-      # System tools and utilities
+      
+      # System
       "syncthing"
-      "virtualbox"
-      "parsec"
       "libreoffice"
-      "pgadmin4"
-      "mactex"
-      "google-cloud-sdk"
-
+      
+      # Browsers (Chrome only as requested)
+      "google-chrome"
+      
       # Fonts
       "font-fira-code-nerd-font"
-      "font-roboto-mono"
-      "font-lato"
-      "font-fanwood-text"
-      "font-league-spartan"
-
-      # Java runtime environments
-      "temurin@8"
     ];
 
     # Mac App Store apps (requires mas CLI)

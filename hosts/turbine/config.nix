@@ -11,6 +11,9 @@
     ../../modules/themes/stylix.nix
   ];
 
+  # Hostname for turbine
+  networking.hostName = "turbine";
+
   home-manager.extraSpecialArgs = {
     inherit inputs isLinux isDarwin;
     isDesktop = true;

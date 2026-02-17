@@ -3,45 +3,44 @@
   config,
   ...
 }: let
-  # Define the list of R packages we want
+  # Define core R packages for global installation
+  # Project-specific packages should use renv
+  # Simplified list - add more as needed
   my-r-packages = with pkgs.rPackages; [
-    # Core
-    cli
-    devtools
+    # Tidyverse core
+    tidyverse
     dplyr
-    fs
     ggplot2
-    glue
-    lubridate
-    tibble
+    tidyr
     readr
-    renv
-    rix
-    rlang
-    scales
+    purrr
     stringr
-    targets
+    lubridate
+    
+    # Development
+    devtools
+    renv
     usethis
-    readxl
-    janitor
-    tidymodels
-
+    testthat
+    roxygen2
+    
     # Database
     DBI
     RPostgres
-    RSQLite
-    duckdb
-    arrow
-
-    # Production & Parallelism
-    crew
-    mirai
-    plumber
+    
+    # Documentation
+    knitr
+    rmarkdown
+    
+    # Web/API
     httr2
-    shiny
-    bslib
-
-    # Custom Overlay
+    jsonlite
+    
+    # Utilities
+    rlang
+    glue
+    
+    # OJO Internal
     ojodb
   ];
 
@@ -77,4 +76,13 @@ in {
     # Optional: also set it globally for Rstudio or other tools
     # R_LIBS_SITE = "${my-r-env}/library";
   };
+  
+  # .Rprofile configuration from chezmoi
+  home.file.".Rprofile".text = ''
+    options(
+      renv.config.pak.enabled = TRUE
+    )
+    
+    rlang::global_entrace()
+  '';
 }

@@ -51,6 +51,12 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Nixvim - Nix-native Neovim configuration
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -64,6 +70,7 @@
     nvim-config,
     sops-nix,
     disko,
+    nixvim,
     ...
   } @ inputs: {
     nixosConfigurations = {
