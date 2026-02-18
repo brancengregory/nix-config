@@ -11,10 +11,9 @@
     ../../modules/os/common.nix # Universal settings
     ../../modules/os/nixos.nix # Common NixOS settings
     ./hardware.nix # Hardware-specific configuration
-    ../../modules/themes/stylix.nix
+    ../../modules/themes # Bundle: stylix and other themes
     ../../modules/hardware/nvidia.nix # NVIDIA GPU
-    ../../modules/desktop/sddm.nix
-    ../../modules/desktop/plasma.nix
+    ../../modules/desktop # Bundle: plasma, sddm, etc.
     ../../modules/media/audio.nix
     ../../modules/hardware/bluetooth.nix
     ../../modules/services/monitoring.nix
@@ -29,6 +28,23 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
+
+  # Desktop Environment
+  desktop.plasma.enable = true;
+  desktop.sddm.enable = true;
+
+  # Theming
+  themes.stylix.enable = true;
+  stylix.cursor = {
+    package = pkgs.kdePackages.breeze;
+    name = "Breeze_Snow";
+    size = 24;
+  };
+  stylix.targets = {
+    console.enable = true;
+    gnome.enable = false;
+    gtk.enable = true;
+  };
 
   # Bootloader - systemd-boot for UEFI with Windows dual-boot support
   boot.loader.systemd-boot = {
@@ -53,19 +69,6 @@
     options = ["noauto" "x-systemd.automount"];
     # Note: Replace PARTUUID-OF-NVME0N1-ESP with actual partuuid after Windows install
     # Get it with: lsblk -o NAME,PARTUUID
-  };
-
-  stylix.cursor = {
-    package = pkgs.kdePackages.breeze;
-    name = "Breeze_Snow";
-    size = 24;
-  };
-
-  # Selectively enable targets that are safe and desired
-  stylix.targets = {
-    console.enable = true;
-    gnome.enable = false;
-    gtk.enable = true;
   };
 
   # Optimize VM Performance

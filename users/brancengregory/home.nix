@@ -145,12 +145,6 @@
 
   home.stateVersion = "25.11";
 
-  # Selectively enable Stylix targets for Home Manager
-  stylix.targets = {
-    starship.enable = true;
-    ghostty.enable = isDesktop;
-  };
-
   # OpenCode AI coding agent with declarative config
   programs.opencode-config.enable = true;
 }

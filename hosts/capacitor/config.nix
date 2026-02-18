@@ -13,7 +13,6 @@
     ../../modules/os/nixos.nix # Common NixOS settings
     ./hardware.nix # Hardware-specific configuration
     ./disks.nix # Disk configuration (preserves existing LUKS vaults)
-    ../../modules/themes/stylix.nix
     ../../modules/services/monitoring.nix
     ../../modules/services/media.nix # Jellyfin, *arr apps
     ../../modules/services/download.nix # qBittorrent, SABnzbd

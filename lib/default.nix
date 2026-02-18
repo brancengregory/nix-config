@@ -1,6 +1,12 @@
 { inputs, ... }:
 let
   inherit (inputs.nixpkgs) lib;
+  
+  # Helper to get the appropriate stylix module for a system type
+  getStylixModule = system:
+    if lib.strings.hasSuffix "darwin" system
+    then inputs.stylix.darwinModules.stylix
+    else inputs.stylix.nixosModules.stylix;
 in
 {
   mkHost = {
@@ -11,7 +17,7 @@ in
     homeManagerModule,    # The platform-specific HM module
     sopsModule,           # The platform-specific sops-nix module
     isDesktop ? false,    # Whether this is a desktop (GUI) system
-    extraModules ? [],    # Specific features (stylix, disko)
+    extraModules ? [],    # Specific features (disko)
     extraOverlays ? [],   # Host-specific overlays
     extraHomeModules ? [] # Extra modules to import in home-manager
   }:
@@ -19,6 +25,7 @@ in
     # Automagic Platform Detection
     isDarwin = lib.strings.hasSuffix "darwin" system;
     isLinux = lib.strings.hasSuffix "linux" system;
+    stylixModule = getStylixModule system;
   in
   builder {
     inherit system;
@@ -41,6 +48,7 @@ in
       # Universal Modules (Sops + Home Manager)
       sopsModule
       homeManagerModule
+      stylixModule  # Always import stylix for home-manager compatibility
 
       # Standard Home Manager Config
       {
@@ -48,9 +56,6 @@ in
         home-manager.useUserPackages = true;
         home-manager.backupFileExtension = "backup";
         home-manager.extraSpecialArgs = { inherit inputs isDarwin isLinux isDesktop; };
-        home-manager.sharedModules = [
-          { stylix.enableReleaseChecks = false; }
-        ];
 
         # Enforced Convention with extra modules
         home-manager.users.${user} = {

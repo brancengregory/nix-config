@@ -92,7 +92,6 @@
         sopsModule = sops-nix.nixosModules.sops;
         isDesktop = true;
         extraModules = [
-          inputs.stylix.nixosModules.stylix
           inputs.disko.nixosModules.disko
         ];
         extraHomeModules = [
@@ -109,7 +108,6 @@
         sopsModule = sops-nix.nixosModules.sops;
         isDesktop = false;
         extraModules = [
-          inputs.stylix.nixosModules.stylix
           inputs.disko.nixosModules.disko
         ];
       };
@@ -247,9 +245,7 @@
         homeManagerModule = home-manager.darwinModules.home-manager;
         sopsModule = sops-nix.darwinModules.sops;
         isDesktop = true;
-        extraModules = [
-          inputs.stylix.darwinModules.stylix
-        ];
+        extraModules = [];
       };
     };
 
