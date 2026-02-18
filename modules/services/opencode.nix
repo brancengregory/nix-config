@@ -17,13 +17,6 @@ with lib; let
     then inputs.opencode-flake.packages.${pkgs.system}.default
     else null;
 in {
-  assertions = [
-    {
-      assertion = !(cfg.enable && opencodePackage == null);
-      message = "OpenCode server is only supported on NixOS Linux. On macOS, install via Homebrew.";
-    }
-  ];
-
   options.services.opencode-server = {
     enable = mkEnableOption "OpenCode server (remote coding agent backend)";
 
@@ -47,6 +40,13 @@ in {
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !(cfg.enable && opencodePackage == null);
+        message = "OpenCode server is only supported on NixOS Linux. On macOS, install via Homebrew.";
+      }
+    ];
+
     # Ensure opencode is available system-wide
     environment.systemPackages = [opencodePackage];
 
