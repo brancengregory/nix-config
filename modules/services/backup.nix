@@ -1,48 +1,83 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
-  # Restic Backup Configuration
-  #
-  # Note: This requires two files to be present on the system:
-  # 1. /etc/nixos/secrets/restic-password (The backup repository password)
-  # 2. /etc/nixos/secrets/restic-env (GCS credentials: GOOGLE_PROJECT_ID, GOOGLE_APPLICATION_CREDENTIALS)
+{ config, pkgs, lib, ... }:
+with lib;
+let
+  cfg = config.services.backup;
+in {
+  options.services.backup = {
+    enable = mkEnableOption "Restic backup service";
 
-  services.restic.backups = {
-    daily-home = {
-      initialize = true;
+    repository = mkOption {
+      type = types.str;
+      description = "Restic repository URL (e.g., gs:bucket-name:path)";
+      example = "gs:my-backup-bucket:/backups";
+    };
 
-      # GCS Repository
-      repository = "gs:powerhouse-backup:/";
+    backupName = mkOption {
+      type = types.str;
+      default = "daily-home";
+      description = "Name for this backup configuration";
+    };
 
-      # Credentials (evaluation requires these to be set)
-      passwordFile = config.sops.secrets."restic/password".path;
-      environmentFile = config.sops.secrets."restic/env".path;
+    paths = mkOption {
+      type = types.listOf types.path;
+      default = [];
+      description = "Paths to backup (must be explicitly defined)";
+    };
 
-      paths = ["/home/brancengregory"];
-
-      exclude = [
-        "/home/brancengregory/.cache"
-        "/home/brancengregory/Downloads"
-        "/home/brancengregory/.local/share/Trash"
+    exclude = mkOption {
+      type = types.listOf types.str;
+      default = [
+        ".cache"
+        "Downloads"
+        ".local/share/Trash"
         ".git"
         "node_modules"
       ];
+      description = "Patterns to exclude from backup";
+    };
 
-      timerConfig = {
+    passwordFile = mkOption {
+      type = types.str;
+      description = "Path to restic repository password file";
+    };
+
+    environmentFile = mkOption {
+      type = types.str;
+      description = "Path to environment file with cloud credentials";
+    };
+
+    timerConfig = mkOption {
+      type = types.attrs;
+      default = {
         OnCalendar = "daily";
         Persistent = true;
       };
+      description = "Systemd timer configuration";
+    };
 
-      pruneOpts = [
+    pruneOpts = mkOption {
+      type = types.listOf types.str;
+      default = [
         "--keep-daily 7"
         "--keep-weekly 4"
         "--keep-monthly 6"
       ];
+      description = "Restic prune options for retention policy";
+    };
+
+    extraConfig = mkOption {
+      type = types.attrs;
+      default = {};
+      description = "Extra configuration to pass to the restic backup service";
     };
   };
 
-  # Ensure restic is installed for manual operations
-  environment.systemPackages = [pkgs.restic];
+  config = mkIf cfg.enable {
+    services.restic.backups.${cfg.backupName} = {
+      inherit (cfg) repository paths exclude timerConfig pruneOpts passwordFile environmentFile;
+      initialize = true;
+    } // cfg.extraConfig;
+
+    environment.systemPackages = [ pkgs.restic ];
+  };
 }

@@ -225,5 +225,14 @@
     };
   };
 
+  # Enable Restic backup with host-specific configuration
+  services.backup = {
+    enable = true;
+    repository = "gs:powerhouse-backup:/";
+    paths = ["/home/brancengregory"];
+    passwordFile = config.sops.secrets."restic/password".path;
+    environmentFile = config.sops.secrets."restic/env".path;
+  };
+
   system.stateVersion = "25.11";
 }
