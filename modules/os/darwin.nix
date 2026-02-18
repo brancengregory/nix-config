@@ -97,6 +97,7 @@
     brews = [
       # Add CLI tools that aren't available or don't work well in nixpkgs
       "mas" # Mac App Store CLI
+      "anomalyco/tap/opencode" # OpenCode AI coding agent (flake doesn't support x86_64-darwin)
     ];
 
     # GUI applications (casks) - FINAL PRUNED LIST

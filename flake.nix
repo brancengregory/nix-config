@@ -57,6 +57,12 @@
       url = "github:nix-community/nixvim/nixos-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # OpenCode - AI coding agent
+    opencode-flake = {
+      url = "github:aodhanhayter/opencode-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -71,6 +77,7 @@
     sops-nix,
     disko,
     nixvim,
+    opencode-flake,
     ...
   } @ inputs: {
     nixosConfigurations = {

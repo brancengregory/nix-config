@@ -1,14 +1,29 @@
 # modules/services/opencode.nix
 # OpenCode server - remote coding agent backend
+# Note: This is NixOS-only. On macOS, use Homebrew instead:
+#   homebrew.brews = [ "anomalyco/tap/opencode" ];
 {
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 with lib; let
   cfg = config.services.opencode-server;
+  # Only define package on Linux (NixOS)
+  opencodePackage =
+    if pkgs.system == "x86_64-linux" || pkgs.system == "aarch64-linux"
+    then inputs.opencode-flake.packages.${pkgs.system}.default
+    else null;
 in {
+  assertions = [
+    {
+      assertion = !(cfg.enable && opencodePackage == null);
+      message = "OpenCode server is only supported on NixOS Linux. On macOS, install via Homebrew.";
+    }
+  ];
+
   options.services.opencode-server = {
     enable = mkEnableOption "OpenCode server (remote coding agent backend)";
 
@@ -33,7 +48,7 @@ in {
 
   config = mkIf cfg.enable {
     # Ensure opencode is available system-wide
-    environment.systemPackages = [pkgs.opencode];
+    environment.systemPackages = [opencodePackage];
 
     # Create working directory
     systemd.tmpfiles.rules = [
@@ -51,7 +66,7 @@ in {
         User = cfg.user;
         Group = "users";
         WorkingDirectory = cfg.workingDir;
-        ExecStart = "${pkgs.opencode}/bin/opencode web --port ${toString cfg.port} --hostname 0.0.0.0";
+        ExecStart = "${opencodePackage}/bin/opencode web --port ${toString cfg.port} --hostname 0.0.0.0";
         Restart = "on-failure";
         RestartSec = 5;
 

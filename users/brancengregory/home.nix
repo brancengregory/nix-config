@@ -21,6 +21,7 @@
       ../../modules/home/programs/r.nix
       ../../modules/home/programs/ghostty.nix
       ../../modules/home/programs/sesh.nix
+      ../../modules/home/programs/opencode.nix
       inputs.sops-nix.homeManagerModules.sops
     ]
     ++ (lib.optionals (isLinux && isDesktop) [
@@ -63,23 +64,23 @@
     else throw "Unsupported OS for this home-manager configuration";
 
   # Base packages for all hosts
-  home.packages = with pkgs;
-    [
-      age
-      alejandra
-      bat
-      delta
-      eza
-      fd
-      glow
-      gnupg
-      htop
-      hwatch
-      jaq
-      jnv
-      just
-      opencode
-      ollama
+  home.packages =
+    (with pkgs;
+      [
+        age
+        alejandra
+        bat
+        delta
+        eza
+        fd
+        glow
+        gnupg
+        htop
+        hwatch
+        jaq
+        jnv
+        just
+        ollama
       libpq
       lazygit
       nh
@@ -99,16 +100,17 @@
       sshs
       tealdeer
       google-cloud-sdk
-    ]
+      ]
+    )
     # Linux-specific packages
-    ++ (lib.optionals isLinux [
+    ++ (with pkgs; lib.optionals isLinux [
       pinentry-curses
       sudo
       rsync
       restic
     ])
     # Desktop-specific packages (Linux only)
-    ++ (lib.optionals (isLinux && isDesktop) [
+    ++ (with pkgs; lib.optionals (isLinux && isDesktop) [
       inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
       ghostty
       slack
@@ -121,7 +123,7 @@
       keymapp
     ])
     # macOS-specific packages
-    ++ (lib.optionals isDarwin [
+    ++ (with pkgs; lib.optionals isDarwin [
       pinentry-curses
       positron-bin
       rstudio
@@ -148,4 +150,7 @@
     starship.enable = true;
     ghostty.enable = isDesktop;
   };
+
+  # OpenCode AI coding agent with declarative config
+  programs.opencode-config.enable = true;
 }

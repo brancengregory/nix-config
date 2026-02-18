@@ -1,0 +1,51 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"default_agent": "plan",
+	"permission": {
+		"*": "ask",
+		"read": "allow",
+		"bash": {
+			"*": "ask",
+			"git status*": "allow",
+			"git log*": "allow",
+			"git diff*": "allow",
+			"git branch*": "allow",
+			"git add*": "allow",
+			"brew *": "allow",
+			"paru *": "allow",
+			"cargo *": "allow",
+			"Rscript *": "allow",
+			"R *": "allow",
+			"grep *": "allow",
+			"ls *": "allow",
+			"cat *": "allow",
+			"head *": "allow",
+			"tail *": "allow",
+			"echo *": "allow",
+			"which *": "allow",
+			"rm *": "deny",
+			"sudo *": "deny",
+			"chmod *": "ask",
+			"chown *": "ask"
+		},
+		"edit": {
+			"*": "allow",
+			"*.env": "ask",
+			"*.env.*": "ask",
+			".env*": "ask",
+			"Cargo.toml": "ask",
+			"Cargo.lock": "deny",
+			"renv.lock": "deny",
+			".Rprofile": "ask",
+			"DESCRIPTION": "ask",
+			"NAMESPACE": "ask"
+		},
+		"external_directory": {
+			"~/code/**": "allow",
+			"*": "ask"
+		},
+		"webfetch": "ask",
+		"websearch": "allow",
+		"codesearch": "allow"
+	}
+}
