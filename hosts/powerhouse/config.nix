@@ -15,14 +15,12 @@
     ../../modules/hardware # Bundle: nvidia, bluetooth
     ../../modules/desktop # Bundle: plasma, sddm, etc.
     ../../modules/media # Bundle: audio
-    ../../modules/services/monitoring.nix
-    ../../modules/services/backup.nix
+    ../../modules/services # Bundle: backup, monitoring, etc.
     ../../modules/network/wireguard.nix # WireGuard hub-and-spoke VPN
     ../../modules/security/sops.nix
     ../../modules/security/gpg.nix # Declarative GPG key import
     ../../modules/security/ssh.nix # Declarative SSH host keys
-    ../../modules/virtualization/podman.nix
-    ../../modules/virtualization/qemu.nix
+    ../../modules/virtualization # Bundle: podman, qemu
     ./disks/main.nix
   ];
 
@@ -228,6 +226,30 @@
     passwordFile = config.sops.secrets."restic/password".path;
     environmentFile = config.sops.secrets."restic/env".path;
   };
+
+  # Monitoring (workstation runs exporters only, not the full server)
+  services.monitoring = {
+    enable = true;
+    exporters.enable = true;  # Lightweight metrics collection
+    exporters.collectors = [ "systemd" "cpu" "memory" "disk" ];
+    server.enable = false;    # Don't run heavy Prometheus/Grafana on desktop
+  };
+
+  # Virtualization (Powerhouse runs VMs via virt-manager)
+  virtualization.podman = {
+    enable = true;
+    dockerCompat = true;
+    dnsEnabled = true;
+  };
+  
+  virtualization.hypervisor = {
+    enable = true;
+    virtManager = true;
+    swtpm = true;  # For Windows 11 VMs
+    spice = true;
+  };
+  
+  virtualization.guest.enable = false;  # Not a VM
 
   system.stateVersion = "25.11";
 }

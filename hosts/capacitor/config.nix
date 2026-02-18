@@ -13,21 +13,14 @@
     ../../modules/os/nixos.nix # Common NixOS settings
     ./hardware.nix # Hardware-specific configuration
     ./disks.nix # Disk configuration (preserves existing LUKS vaults)
-    ../../modules/services/monitoring.nix
-    ../../modules/services/media.nix # Jellyfin, *arr apps
-    ../../modules/services/download.nix # qBittorrent, SABnzbd
-    ../../modules/services/ollama.nix # Ollama LLM server
-
-    ../../modules/services/opencode.nix # OpenCode server
-    ../../modules/services/git.nix # Forgejo
-    ../../modules/services/storage.nix # Minio, NFS, mergerfs, SnapRAID
+    ../../modules/services # Bundle: all services
     ../../modules/network/wireguard.nix # WireGuard hub
     ../../modules/network/netbird.nix # Netbird self-hosted server
     ../../modules/network/caddy.nix # Caddy reverse proxy
     ../../modules/security/sops.nix
     ../../modules/security/gpg.nix
     ../../modules/security/ssh.nix
-    ../../modules/virtualization/podman.nix
+    ../../modules/virtualization # Bundle: podman, qemu
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -354,6 +347,25 @@
 
   # Enable automatic Nix store optimization
   nix.settings.auto-optimise-store = true;
+
+  # Monitoring (Capacitor runs the full monitoring server stack)
+  services.monitoring = {
+    enable = true;
+    exporters.enable = true;  # Also run exporters on self
+    exporters.collectors = [ "systemd" "cpu" "memory" "disk" "filesystem" "loadavg" ];
+    server.enable = true;     # Run heavy Prometheus/Grafana server here
+    server.grafanaBind = "0.0.0.0";  # Bind to all interfaces for VPN access
+  };
+
+  # Virtualization (Capacitor runs containers, not VMs)
+  virtualization.podman = {
+    enable = true;
+    dockerCompat = true;
+    dnsEnabled = true;
+  };
+  
+  virtualization.hypervisor.enable = false;  # Server doesn't run VMs
+  virtualization.guest.enable = false;         # Not a VM
 
   system.stateVersion = "25.11";
 }
