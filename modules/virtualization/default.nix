@@ -1,4 +1,3 @@
-{ lib, ... }:
 {
   imports = [
     ./podman.nix

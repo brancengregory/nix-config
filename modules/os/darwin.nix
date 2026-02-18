@@ -107,7 +107,7 @@
       "visual-studio-code"
       "dbeaver-community"
       "podman-desktop"
-      
+
       # Communication (all requested)
       "slack"
       "discord"
@@ -117,25 +117,25 @@
       "signal"
       "twitch"
       "zoom"
-      
+
       # Productivity/Media
       "zotero"
       "activitywatch"
       "vlc"
       "obs"
-      
+
       # Gaming
       "steam"
       "minecraft"
       "epic-games"
-      
+
       # System
       "syncthing"
       "libreoffice"
-      
+
       # Browsers (Chrome only as requested)
       "google-chrome"
-      
+
       # Fonts
       "font-fira-code-nerd-font"
     ];

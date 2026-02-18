@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.virtualization.podman;
 in {
   options.virtualization.podman = {
@@ -20,7 +24,7 @@ in {
 
     extraPackages = mkOption {
       type = types.listOf types.package;
-      default = with pkgs; [ distrobox podman-compose podman-tui ];
+      default = with pkgs; [distrobox podman-compose podman-tui];
       description = "Additional Podman-related packages to install";
     };
   };

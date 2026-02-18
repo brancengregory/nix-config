@@ -2,7 +2,6 @@
 # Download clients: qBittorrent (multiple instances), SABnzbd
 {
   config,
-  pkgs,
   lib,
   ...
 }:

@@ -78,7 +78,7 @@ in {
       # Virtual hosts configuration
       virtualHosts = let
         # Helper to create vhost config for a service
-        mkVhost = name: svc: {
+        mkVhost = _name: svc: {
           hostName = "${svc.subdomain}.${cfg.domain}";
           extraConfig = ''
             ${optionalString cfg.vpnOnly ''

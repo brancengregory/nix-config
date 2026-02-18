@@ -4,11 +4,7 @@
 # 64GB RAM
 # Intel UHD Graphics 770
 # Storage: 1TB NVMe (boot) + 3x HDDs (vaults)
-{
-  config,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Intel CPU microcode updates
   hardware.cpu.intel.updateMicrocode = true;
 

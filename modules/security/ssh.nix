@@ -3,7 +3,6 @@
 # Deploys pre-generated host keys from sops secrets
 {
   config,
-  pkgs,
   lib,
   ...
 }:

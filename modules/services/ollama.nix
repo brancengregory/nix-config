@@ -2,7 +2,6 @@
 # Ollama LLM server
 {
   config,
-  pkgs,
   lib,
   ...
 }:

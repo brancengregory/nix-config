@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Sesh configuration for tmux session management
   home.packages = with pkgs; [
     sesh

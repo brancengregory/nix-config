@@ -2,7 +2,6 @@
 # Git services: Forgejo (self-hosted Git forge)
 {
   config,
-  pkgs,
   lib,
   ...
 }:

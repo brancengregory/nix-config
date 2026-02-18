@@ -11,7 +11,7 @@
 # - /mnt/storage/critical = vault1/critical + vault2/critical
 # - /mnt/storage/standard = vault1/standard + vault2/standard
 # - /mnt/storage/ephemeral = vault1/ephemeral + vault2/ephemeral
-{config, ...}: {
+{...}: {
   # Boot drive (nvme0n1) - will be reformatted during install
   # This preserves the existing LUKS UUID and btrfs subvolumes
   disko.devices = {

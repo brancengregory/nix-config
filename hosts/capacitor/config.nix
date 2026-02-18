@@ -2,10 +2,6 @@
   config,
   pkgs,
   lib,
-  inputs,
-  isLinux,
-  isDarwin,
-  isDesktop,
   ...
 }: {
   imports = [
@@ -351,10 +347,10 @@
   # Monitoring (Capacitor runs the full monitoring server stack)
   services.monitoring = {
     enable = true;
-    exporters.enable = true;  # Also run exporters on self
-    exporters.collectors = [ "systemd" "cpu" "memory" "disk" "filesystem" "loadavg" ];
-    server.enable = true;     # Run heavy Prometheus/Grafana server here
-    server.grafanaBind = "0.0.0.0";  # Bind to all interfaces for VPN access
+    exporters.enable = true; # Also run exporters on self
+    exporters.collectors = ["systemd" "cpu" "memory" "disk" "filesystem" "loadavg"];
+    server.enable = true; # Run heavy Prometheus/Grafana server here
+    server.grafanaBind = "0.0.0.0"; # Bind to all interfaces for VPN access
   };
 
   # Virtualization (Capacitor runs containers, not VMs)
@@ -363,9 +359,9 @@
     dockerCompat = true;
     dnsEnabled = true;
   };
-  
-  virtualization.hypervisor.enable = false;  # Server doesn't run VMs
-  virtualization.guest.enable = false;         # Not a VM
+
+  virtualization.hypervisor.enable = false; # Server doesn't run VMs
+  virtualization.guest.enable = false; # Not a VM
 
   system.stateVersion = "25.11";
 }

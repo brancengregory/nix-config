@@ -1,6 +1,9 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.modules.hardware.nvidia;
 in {
   options.modules.hardware.nvidia = {
@@ -41,7 +44,7 @@ in {
     };
 
     # Load NVIDIA driver for Xorg and Wayland
-    services.xserver.videoDrivers = [ "nvidia" ];
+    services.xserver.videoDrivers = ["nvidia"];
 
     hardware.nvidia = {
       modesetting.enable = true;

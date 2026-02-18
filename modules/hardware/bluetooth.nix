@@ -1,6 +1,9 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.modules.hardware.bluetooth;
 in {
   options.modules.hardware.bluetooth = {

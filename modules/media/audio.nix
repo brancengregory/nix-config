@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.media.audio;
 in {
   options.media.audio = {
@@ -11,7 +15,7 @@ in {
     proAudio = mkEnableOption "pro audio configuration (JACK, real-time limits, Bitwig Studio)";
 
     server = mkOption {
-      type = types.enum [ "pipewire" "pulse" "alsa" "none" ];
+      type = types.enum ["pipewire" "pulse" "alsa" "none"];
       default = "pipewire";
       description = "Audio server implementation";
     };
@@ -69,7 +73,7 @@ in {
       }
     ];
 
-    users.users.${cfg.user}.extraGroups = [ "audio" ];
+    users.users.${cfg.user}.extraGroups = ["audio"];
 
     # Pro audio software
     environment.systemPackages = mkIf cfg.proAudio (with pkgs; [

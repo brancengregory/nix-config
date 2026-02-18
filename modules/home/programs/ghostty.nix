@@ -1,12 +1,9 @@
-{
-  isLinux,
-  isDarwin,
-  ...
-}: {
+{isDarwin, ...}: {
   # Ghostty configuration with cross-platform templates
   # Based on chezmoi: private_dot_config/ghostty/config
-  home.file.".config/ghostty/config".text = 
-    if isDarwin then ''
+  home.file.".config/ghostty/config".text =
+    if isDarwin
+    then ''
       font-size = 16
       font-family = "Fira Code Nerd Font"
       theme = "Snazzy"
@@ -16,7 +13,8 @@
       clipboard-write = allow
       clipboard-trim-trailing-spaces = true
       keybind = shift+enter=text:\n
-    '' else ''
+    ''
+    else ''
       font-family = "Fira Code Nerd Font"
       theme = "Snazzy"
       window-padding-x = 8

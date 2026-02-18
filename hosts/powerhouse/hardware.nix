@@ -3,11 +3,7 @@
 # NVIDIA GeForce RTX 3070 Ti
 # 64GB RAM
 # Dual NVMe drives (nvme0n1: Windows, nvme1n1: NixOS)
-{
-  config,
-  pkgs,
-  ...
-}: {
+{...}: {
   # AMD CPU microcode updates
   hardware.cpu.amd.updateMicrocode = true;
 

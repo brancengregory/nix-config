@@ -1,8 +1,6 @@
 {
   inputs,
   pkgs,
-  isLinux,
-  isDarwin,
   ...
 }: {
   imports = [
@@ -41,38 +39,134 @@
     # Keymaps (from lua/config/keymaps.lua)
     keymaps = [
       # Core mappings
-      { mode = "n"; key = "<leader>pv"; action = "<cmd>Ex<cr>"; }
-      { mode = "n"; key = "<leader>u"; action = "<cmd>UndotreeToggle<cr>"; }
-      
+      {
+        mode = "n";
+        key = "<leader>pv";
+        action = "<cmd>Ex<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>u";
+        action = "<cmd>UndotreeToggle<cr>";
+      }
+
       # Telescope
-      { mode = "n"; key = "<leader>pf"; action = "<cmd>Telescope find_files<cr>"; }
-      { mode = "n"; key = "<C-p>"; action = "<cmd>Telescope git_files<cr>"; }
-      { mode = "n"; key = "<leader>ps"; action = "<cmd>Telescope live_grep<cr>"; }
-      { mode = "n"; key = "<leader>pb"; action = "<cmd>Telescope buffers<cr>"; }
-      { mode = "n"; key = "<leader>ph"; action = "<cmd>Telescope help_tags<cr>"; }
-      
+      {
+        mode = "n";
+        key = "<leader>pf";
+        action = "<cmd>Telescope find_files<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-p>";
+        action = "<cmd>Telescope git_files<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>ps";
+        action = "<cmd>Telescope live_grep<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>pb";
+        action = "<cmd>Telescope buffers<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>ph";
+        action = "<cmd>Telescope help_tags<cr>";
+      }
+
       # Harpoon
-      { mode = "n"; key = "<leader>a"; action = "<cmd>lua require('harpoon'):list():append()<cr>"; }
-      { mode = "n"; key = "<C-e>"; action = "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())<cr>"; }
-      { mode = "n"; key = "<C-h>"; action = "<cmd>lua require('harpoon'):list():select(1)<cr>"; }
-      { mode = "n"; key = "<C-t>"; action = "<cmd>lua require('harpoon'):list():select(2)<cr>"; }
-      { mode = "n"; key = "<C-n>"; action = "<cmd>lua require('harpoon'):list():select(3)<cr>"; }
-      { mode = "n"; key = "<C-s>"; action = "<cmd>lua require('harpoon'):list():select(4)<cr>"; }
-      
+      {
+        mode = "n";
+        key = "<leader>a";
+        action = "<cmd>lua require('harpoon'):list():append()<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-e>";
+        action = "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-h>";
+        action = "<cmd>lua require('harpoon'):list():select(1)<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-t>";
+        action = "<cmd>lua require('harpoon'):list():select(2)<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-n>";
+        action = "<cmd>lua require('harpoon'):list():select(3)<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-s>";
+        action = "<cmd>lua require('harpoon'):list():select(4)<cr>";
+      }
+
       # LSP
-      { mode = "n"; key = "gd"; action = "<cmd>lua vim.lsp.buf.definition()<cr>"; }
-      { mode = "n"; key = "gr"; action = "<cmd>lua vim.lsp.buf.references()<cr>"; }
-      { mode = "n"; key = "gI"; action = "<cmd>lua vim.lsp.buf.implementation()<cr>"; }
-      { mode = "n"; key = "<leader>D"; action = "<cmd>lua vim.lsp.buf.type_definition()<cr>"; }
-      { mode = "n"; key = "<leader>rn"; action = "<cmd>lua vim.lsp.buf.rename()<cr>"; }
-      { mode = "n"; key = "<leader>ca"; action = "<cmd>lua vim.lsp.buf.code_action()<cr>"; }
-      { mode = "n"; key = "K"; action = "<cmd>lua vim.lsp.buf.hover()<cr>"; }
-      { mode = "n"; key = "<C-k>"; action = "<cmd>lua vim.lsp.buf.signature_help()<cr>"; }
-      
+      {
+        mode = "n";
+        key = "gd";
+        action = "<cmd>lua vim.lsp.buf.definition()<cr>";
+      }
+      {
+        mode = "n";
+        key = "gr";
+        action = "<cmd>lua vim.lsp.buf.references()<cr>";
+      }
+      {
+        mode = "n";
+        key = "gI";
+        action = "<cmd>lua vim.lsp.buf.implementation()<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>D";
+        action = "<cmd>lua vim.lsp.buf.type_definition()<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>rn";
+        action = "<cmd>lua vim.lsp.buf.rename()<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>ca";
+        action = "<cmd>lua vim.lsp.buf.code_action()<cr>";
+      }
+      {
+        mode = "n";
+        key = "K";
+        action = "<cmd>lua vim.lsp.buf.hover()<cr>";
+      }
+      {
+        mode = "n";
+        key = "<C-k>";
+        action = "<cmd>lua vim.lsp.buf.signature_help()<cr>";
+      }
+
       # Git
-      { mode = "n"; key = "<leader>gs"; action = "<cmd>Git<cr>"; }
-      { mode = "n"; key = "<leader>gc"; action = "<cmd>Git commit<cr>"; }
-      { mode = "n"; key = "<leader>gp"; action = "<cmd>Git push<cr>"; }
+      {
+        mode = "n";
+        key = "<leader>gs";
+        action = "<cmd>Git<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>gc";
+        action = "<cmd>Git commit<cr>";
+      }
+      {
+        mode = "n";
+        key = "<leader>gp";
+        action = "<cmd>Git push<cr>";
+      }
     ];
 
     # Plugins (all 20 from lazy-lock.json)
@@ -145,10 +239,10 @@
         enable = true;
         settings = {
           sources = [
-            { name = "nvim_lsp"; }
-            { name = "luasnip"; }
-            { name = "buffer"; }
-            { name = "path"; }
+            {name = "nvim_lsp";}
+            {name = "luasnip";}
+            {name = "buffer";}
+            {name = "path";}
           ];
           mapping = {
             "<C-n>" = "cmp.mapping.select_next_item()";
@@ -173,8 +267,14 @@
         settings = {
           options = {
             theme = "auto";
-            component_separators = { left = ""; right = ""; };
-            section_separators = { left = ""; right = ""; };
+            component_separators = {
+              left = "";
+              right = "";
+            };
+            section_separators = {
+              left = "";
+              right = "";
+            };
           };
         };
       };

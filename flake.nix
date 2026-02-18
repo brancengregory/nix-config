@@ -68,19 +68,13 @@
   outputs = {
     self,
     nixpkgs,
-    nixpkgs-unstable,
     nix-darwin,
     home-manager,
-    plasma-manager,
-    stylix,
-    nvim-config,
     sops-nix,
     disko,
-    nixvim,
-    opencode-flake,
     ...
   } @ inputs: let
-    lib = import ./lib { inherit inputs; };
+    lib = import ./lib {inherit inputs;};
   in {
     nixosConfigurations = {
       powerhouse = lib.mkHost {

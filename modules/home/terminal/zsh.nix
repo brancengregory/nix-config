@@ -33,7 +33,7 @@
     enableCompletion = true;
     syntaxHighlighting.enable = true;
     historySubstringSearch.enable = true;
-    
+
     # Additional plugins managed natively
     plugins = [
       {
@@ -106,11 +106,15 @@
       fi
 
       # Platform-specific paths
-      ${if isLinux then ''
-        path+=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin')
-      '' else ''
-        path+=('/Users/brancengregory/.cargo/bin' '/Users/brancengregory/go/bin')
-      ''}
+      ${
+        if isLinux
+        then ''
+          path+=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin')
+        ''
+        else ''
+          path+=('/Users/brancengregory/.cargo/bin' '/Users/brancengregory/go/bin')
+        ''
+      }
 
       # Autocompletion
       autoload -Uz compinit && compinit
@@ -167,22 +171,26 @@
       fi
 
       # Platform-specific configuration
-      ${if isLinux then ''
-        # Linux: Use GPG agent for SSH authentication
-        export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+      ${
+        if isLinux
+        then ''
+          # Linux: Use GPG agent for SSH authentication
+          export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 
-        # Tmux-specific improvements
-        if [ -n "$TMUX" ]; then
-          stty sane
-        fi
+          # Tmux-specific improvements
+          if [ -n "$TMUX" ]; then
+            stty sane
+          fi
 
-        export PROJ_DATA=/usr/share/proj
-      '' else ''
-        # macOS: Use GPG agent for SSH authentication
-        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-        # Ensure GPG agent is running (lazy start)
-        gpgconf --launch gpg-agent 2>/dev/null || true
-      ''}
+          export PROJ_DATA=/usr/share/proj
+        ''
+        else ''
+          # macOS: Use GPG agent for SSH authentication
+          export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+          # Ensure GPG agent is running (lazy start)
+          gpgconf --launch gpg-agent 2>/dev/null || true
+        ''
+      }
 
       # Tmux integration with performance optimization
       if [ -n "$TMUX" ]; then
@@ -204,11 +212,14 @@
       # Conda initialization (if available)
       [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
       export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
-      
+
       # Platform-specific Homebrew settings
-      ${if isDarwin then ''
-        export HOMEBREW_NO_INSTALL_CLEANUP=1
-      '' else ""
+      ${
+        if isDarwin
+        then ''
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+        ''
+        else ""
       }
     '';
 

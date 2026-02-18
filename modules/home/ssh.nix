@@ -2,7 +2,6 @@
 # Home-manager SSH client configuration
 # User-level SSH client settings and host configurations
 {
-  config,
   pkgs,
   lib,
   ...

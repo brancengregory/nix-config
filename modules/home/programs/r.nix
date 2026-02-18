@@ -16,30 +16,30 @@
     purrr
     stringr
     lubridate
-    
+
     # Development
     devtools
     renv
     usethis
     testthat
     roxygen2
-    
+
     # Database
     DBI
     RPostgres
-    
+
     # Documentation
     knitr
     rmarkdown
-    
+
     # Web/API
     httr2
     jsonlite
-    
+
     # Utilities
     rlang
     glue
-    
+
     # OJO Internal
     ojodb
   ];
@@ -76,13 +76,13 @@ in {
     # Optional: also set it globally for Rstudio or other tools
     # R_LIBS_SITE = "${my-r-env}/library";
   };
-  
+
   # .Rprofile configuration from chezmoi
   home.file.".Rprofile".text = ''
     options(
       renv.config.pak.enabled = TRUE
     )
-    
+
     rlang::global_entrace()
   '';
 }

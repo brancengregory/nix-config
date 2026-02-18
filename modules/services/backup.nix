@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.services.backup;
 in {
   options.services.backup = {
@@ -73,11 +77,13 @@ in {
   };
 
   config = mkIf cfg.enable {
-    services.restic.backups.${cfg.backupName} = {
-      inherit (cfg) repository paths exclude timerConfig pruneOpts passwordFile environmentFile;
-      initialize = true;
-    } // cfg.extraConfig;
+    services.restic.backups.${cfg.backupName} =
+      {
+        inherit (cfg) repository paths exclude timerConfig pruneOpts passwordFile environmentFile;
+        initialize = true;
+      }
+      // cfg.extraConfig;
 
-    environment.systemPackages = [ pkgs.restic ];
+    environment.systemPackages = [pkgs.restic];
   };
 }

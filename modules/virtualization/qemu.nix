@@ -1,6 +1,10 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.virtualization;
 in {
   options.virtualization = {
@@ -51,10 +55,10 @@ in {
 
       programs.virt-manager.enable = cfg.hypervisor.virtManager;
 
-      users.users.brancengregory.extraGroups = [ "libvirtd" ];
+      users.users.brancengregory.extraGroups = ["libvirtd"];
 
-      environment.systemPackages = with pkgs; 
-        [ ] 
+      environment.systemPackages = with pkgs;
+        []
         ++ optional cfg.hypervisor.spice spice
         ++ optional cfg.hypervisor.spice spice-gtk
         ++ optional cfg.hypervisor.spice spice-protocol
@@ -66,7 +70,7 @@ in {
       services.qemuGuest.enable = true;
       # Note: SPICE vdagent is typically installed as a package and run via systemd user service
       # Install the package if spice support is needed for clipboard/resolution
-      environment.systemPackages = mkIf cfg.guest.spice (with pkgs; [ spice-vdagent ]);
+      environment.systemPackages = mkIf cfg.guest.spice (with pkgs; [spice-vdagent]);
     })
   ];
 }

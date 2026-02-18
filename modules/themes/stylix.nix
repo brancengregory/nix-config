@@ -1,6 +1,10 @@
-{ config, pkgs, inputs, lib, ... }:
-with lib;
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.themes.stylix;
 in {
   options.themes.stylix = {

@@ -1,10 +1,6 @@
 {
   config,
   pkgs,
-  inputs,
-  isLinux,
-  isDarwin,
-  isDesktop,
   ...
 }: {
   imports = [
@@ -230,9 +226,9 @@
   # Monitoring (workstation runs exporters only, not the full server)
   services.monitoring = {
     enable = true;
-    exporters.enable = true;  # Lightweight metrics collection
-    exporters.collectors = [ "systemd" "cpu" "memory" "disk" ];
-    server.enable = false;    # Don't run heavy Prometheus/Grafana on desktop
+    exporters.enable = true; # Lightweight metrics collection
+    exporters.collectors = ["systemd" "cpu" "memory" "disk"];
+    server.enable = false; # Don't run heavy Prometheus/Grafana on desktop
   };
 
   # Virtualization (Powerhouse runs VMs via virt-manager)
@@ -241,15 +237,15 @@
     dockerCompat = true;
     dnsEnabled = true;
   };
-  
+
   virtualization.hypervisor = {
     enable = true;
     virtManager = true;
-    swtpm = true;  # For Windows 11 VMs
+    swtpm = true; # For Windows 11 VMs
     spice = true;
   };
-  
-  virtualization.guest.enable = false;  # Not a VM
+
+  virtualization.guest.enable = false; # Not a VM
 
   system.stateVersion = "25.11";
 }

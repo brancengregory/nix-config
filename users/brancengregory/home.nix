@@ -31,8 +31,8 @@
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
-    age.keyFile = 
-      if isLinux 
+    age.keyFile =
+      if isLinux
       then "/home/brancengregory/.config/sops/age/keys.txt"
       else "/Users/brancengregory/.config/sops/age/keys.txt";
 
@@ -65,8 +65,8 @@
 
   # Base packages for all hosts
   home.packages =
-    (with pkgs;
-      [
+    (
+      with pkgs; [
         age
         alejandra
         bat
@@ -81,53 +81,56 @@
         jnv
         just
         ollama
-      libpq
-      lazygit
-      nh
-      nmap
-      sops
-      ssh-to-age
-      openssh
-      procs
-      yazi
-      duckdb
-      postgresql
-      sqlite
-      arrow-cpp
-      ripgrep
-      scc
-      sesh
-      sshs
-      tealdeer
-      google-cloud-sdk
+        libpq
+        lazygit
+        nh
+        nmap
+        sops
+        ssh-to-age
+        openssh
+        procs
+        yazi
+        duckdb
+        postgresql
+        sqlite
+        arrow-cpp
+        ripgrep
+        scc
+        sesh
+        sshs
+        tealdeer
+        google-cloud-sdk
       ]
     )
     # Linux-specific packages
-    ++ (with pkgs; lib.optionals isLinux [
-      pinentry-curses
-      sudo
-      rsync
-      restic
-    ])
+    ++ (with pkgs;
+      lib.optionals isLinux [
+        pinentry-curses
+        sudo
+        rsync
+        restic
+      ])
     # Desktop-specific packages (Linux only)
-    ++ (with pkgs; lib.optionals (isLinux && isDesktop) [
-      inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
-      ghostty
-      slack
-      discord
-      zoom-us
-      positron-bin
-      rstudio
-      rustup
-      snapper-gui
-      keymapp
-    ])
+    ++ (with pkgs;
+      lib.optionals (isLinux && isDesktop) [
+        inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
+        ghostty
+        slack
+        discord
+        zoom-us
+        positron-bin
+        rstudio
+        rustup
+        snapper-gui
+        keymapp
+      ])
     # macOS-specific packages
-    ++ (with pkgs; lib.optionals isDarwin [
-      pinentry-curses
-      positron-bin
-      rstudio
-    ]);
+    ++ (with pkgs;
+      lib.optionals isDarwin [
+        pinentry-curses
+        positron-bin
+        rstudio
+      ]);
 
   xdg.mimeApps =
     if (isLinux && isDesktop)

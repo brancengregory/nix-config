@@ -1,6 +1,9 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.services.monitoring;
 in {
   options.services.monitoring = {
@@ -8,35 +11,35 @@ in {
 
     exporters = {
       enable = mkEnableOption "Prometheus node exporters (lightweight metrics collection)";
-      
+
       port = mkOption {
         type = types.port;
         default = 9100;
         description = "Port for node exporter";
       };
-      
+
       collectors = mkOption {
         type = types.listOf types.str;
-        default = [ "systemd" ];
+        default = ["systemd"];
         description = "Enabled metric collectors";
       };
     };
 
     server = {
       enable = mkEnableOption "Prometheus server (HEAVY - only enable on monitoring host)";
-      
+
       prometheusPort = mkOption {
         type = types.port;
         default = 9090;
         description = "Port for Prometheus server";
       };
-      
+
       grafanaPort = mkOption {
         type = types.port;
         default = 3000;
         description = "Port for Grafana dashboard";
       };
-      
+
       grafanaBind = mkOption {
         type = types.str;
         default = "127.0.0.1";
@@ -65,7 +68,7 @@ in {
             job_name = "node";
             static_configs = [
               {
-                targets = [ "localhost:${toString cfg.exporters.port}" ];
+                targets = ["localhost:${toString cfg.exporters.port}"];
               }
             ];
           }

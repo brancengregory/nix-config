@@ -1,6 +1,9 @@
-{ config, pkgs, lib, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  ...
+}:
+with lib; let
   cfg = config.desktop.sddm;
 in {
   options.desktop.sddm = {

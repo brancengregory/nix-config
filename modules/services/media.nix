@@ -2,7 +2,6 @@
 # Media server stack: Jellyfin, Sonarr, Radarr, Lidarr, Readarr, Prowlarr
 {
   config,
-  pkgs,
   lib,
   ...
 }:
