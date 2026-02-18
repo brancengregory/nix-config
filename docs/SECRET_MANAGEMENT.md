@@ -288,11 +288,12 @@ sops updatekeys secrets/secrets.yaml
 ```nix
 { config, ... }:
 {
-  imports = [ ../../modules/network/wireguard-hub.nix ];
+  imports = [ ../../modules/network ];  # Bundle: wireguard available
   
-  networking.wireguard-hub = {
+  networking.wireguard-mesh = {
     enable = true;
     nodeName = "capacitor";
+    hubNodeName = "capacitor";  # This is the hub
     nodes = {
       capacitor = {
         ip = "10.0.0.1";
@@ -318,16 +319,18 @@ sops updatekeys secrets/secrets.yaml
 ```nix
 { config, ... }:
 {
-  imports = [ ../../modules/network/wireguard-hub.nix ];
+  imports = [ ../../modules/network ];  # Bundle: wireguard available
   
-  networking.wireguard-hub = {
+  networking.wireguard-mesh = {
     enable = true;
     nodeName = "powerhouse";
+    hubNodeName = "capacitor";  # Connects to capacitor
     nodes = {
       capacitor = {
         ip = "10.0.0.1";
         publicKey = "CAPACITOR_PUBLIC_KEY";
         isServer = true;
+        endpoint = "capacitor.example.com:51820";
       };
       powerhouse = {
         ip = "10.0.0.2";
@@ -350,9 +353,9 @@ sops updatekeys secrets/secrets.yaml
 ```nix
 { config, ... }:
 {
-  imports = [ ../../modules/security/gpg-import.nix ];
+  imports = [ ../../modules/security ];  # Bundle: gpg, ssh available
   
-  security.gpg-import = {
+  security.gpg = {
     enable = true;
     user = "brancengregory";
     secretKeysFile = config.sops.secrets."gpg/powerhouse/secret_keys".path;
@@ -372,7 +375,7 @@ sops updatekeys secrets/secrets.yaml
 ```nix
 { config, ... }:
 {
-  imports = [ ../../modules/security/ssh-host.nix ];
+  imports = [ ../../modules/security ];  # Bundle: gpg, ssh available
   
   services.openssh.hostKeysDeclarative = {
     enable = true;

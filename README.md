@@ -1,20 +1,21 @@
 # Nix Config
 
-A set of configs for my machines:
+A set of configs for my machines using the **Pure Module Pattern**:
 
-- **powerhouse** (desktop) - NixOS
-- **capacitor** (server) - NixOS  
+- **powerhouse** (desktop) - NixOS with Plasma, NVIDIA, Pro Audio
+- **capacitor** (server) - NixOS headless server with monitoring stack
 - **turbine** (laptop) - macOS with nix-darwin (Intel)
 - **battery** (future) - NixOS
 
 ## Features
 
-- **Modular Architecture**: 20+ organized modules across 10 categories for maximum reusability
+- **Pure Module Architecture**: 20+ modules using `mkEnableOption` - import to make available, enable to activate
+- **Bundle-Based Organization**: Clean imports via `modules/desktop`, `modules/hardware`, `modules/services`
+- **Declarative API**: Hosts declare capabilities via `desktop.plasma.enable = true`, not file imports
 - **Cross-platform**: Supports both NixOS and macOS with shared configurations
 - **Home Manager integration**: User-specific configs with modular component imports
 - **Unified GPG/SSH**: Integrated authentication and encryption strategy
 - **Homebrew support** (macOS): GUI applications and Mac-specific software
-- **Minimal approach**: Prefer nixpkgs over Homebrew when possible
 - **Cross-compilation**: Build and validate nix-darwin configs from Linux
 - **ISO Installers**: Custom NixOS installer ISOs with pre-configured flakes
 
@@ -39,64 +40,152 @@ A set of configs for my machines:
 │   ├── capacitor/      # NixOS homelab server
 │   ├── powerhouse/     # NixOS desktop
 │   └── turbine/        # macOS laptop
-├── modules/            # Modular components (20+ modules)
-│   ├── desktop/        # Desktop environments (plasma, hyprland)
-│   ├── fonts/          # Font configurations
-│   ├── hardware/       # Hardware-specific modules (nvidia, bluetooth)
-│   ├── media/          # Media modules (audio)
-│   ├── network/        # Network configurations (wireguard)
-│   ├── os/             # Operating system modules (common, darwin, nixos)
-│   ├── programs/       # Application configurations (git)
-│   ├── security/       # Security modules (gpg, ssh, gpg-agent)
-│   ├── services/       # Service modules (backup/restic)
-│   ├── terminal/       # Terminal tools (nvim, starship, tmux, zsh)
-│   └── virtualization/ # Virtualization tools (podman, qemu)
+├── lib/                # Shared library functions (mkHost abstraction)
+├── modules/            # Modular components (20+ Pure Modules)
+│   ├── desktop/        # Desktop environments bundle (plasma, sddm)
+│   ├── hardware/       # Hardware bundle (nvidia, bluetooth)
+│   ├── media/          # Media bundle (audio)
+│   ├── services/       # Services bundle (backup, monitoring, etc.)
+│   └── virtualization/ # Virtualization bundle (podman, qemu)
 ├── users/              # User-specific configurations
-├── flake.nix           # Main flake configuration
-├── mise.toml           # Development commands and tasks
-└── SETUP_STATUS.md     # Current configuration status
+├── flake.nix           # Main flake configuration with mkHost
+└── mise.toml           # Development commands and tasks
 ```
 
-### Module Architecture
+### The Pure Module Pattern
 
-The configuration is built using a modular approach where each component serves a specific purpose:
+This repository uses **Pure Modules** with explicit enable options. Unlike traditional Nix configs where importing = activating, here you:
 
-#### OS Modules (`modules/os/`)
-- `common.nix` - Universal settings for all systems
-- `nixos.nix` - NixOS-specific system configurations
-- `darwin.nix` - macOS-specific system configurations
+1. **Import the bundle** to make options available
+2. **Explicitly enable** what you want
 
-#### User-specific Modules
-- `modules/terminal/` - Shell, terminal emulators, and CLI tools
-- `modules/security/` - GPG, SSH, and authentication
-- `modules/programs/` - Application-specific configurations
-
-#### System Modules
-- `modules/hardware/` - Hardware-specific configurations
-- `modules/network/` - Network and VPN configurations
-- `modules/desktop/` - Desktop environment configurations
-- `modules/virtualization/` - Container and VM configurations
-- `modules/services/` - Background services and backups
-
-### Configuration Import Strategy
-
-**Host Configurations** (`hosts/*/config.nix`):
+**Example - Old Pattern (import = activate):**
 ```nix
+# Problem: Just importing activates the feature
 imports = [
-  ../../modules/os/common.nix    # Universal settings
-  ../../modules/os/nixos.nix     # or darwin.nix for macOS
-  ./hardware.nix                 # Host-specific hardware
+  ../../modules/desktop/plasma.nix  # Always enables Plasma
 ];
 ```
 
-**User Configurations** (`users/*/home.nix`):
+**Example - New Pattern (Pure Module):**
 ```nix
+# Import makes options available
 imports = [
-  ../../modules/terminal/zsh.nix
-  ../../modules/security/default.nix
-  ../../modules/programs/git.nix
-  # Add modules as needed
+  ../../modules/desktop  # Bundle: plasma, sddm available
 ];
+
+# Explicitly choose what to enable
+desktop.plasma.enable = true;
+desktop.sddm.enable = true;
+
+# Other options available but inactive:
+# desktop.sddm.enable = false;  # Implicit - not enabled
+```
+
+### Declarative API Examples
+
+**Desktop/Workstation (powerhouse):**
+```nix
+# Desktop Environment
+desktop.plasma.enable = true;
+desktop.sddm.enable = true;
+themes.stylix.enable = true;
+
+# Hardware
+modules.hardware.nvidia.enable = true;
+modules.hardware.bluetooth.enable = true;
+media.audio.enable = true;
+media.audio.lowLatency = true;
+
+# Services
+services.backup.enable = true;
+services.monitoring.enable = true;
+services.monitoring.exporters.enable = true;
+
+# Virtualization
+virtualization.podman.enable = true;
+virtualization.hypervisor.enable = true;  # Run VMs
+```
+
+**Server (capacitor):**
+```nix
+# No desktop environment - headless server
+# services.backup.enable = true;  # Already enabled via service config
+services.monitoring.enable = true;
+services.monitoring.server.enable = true;  # Full Prometheus/Grafana
+
+# Virtualization for containers only
+virtualization.podman.enable = true;
+virtualization.hypervisor.enable = false;  # Don't run VMs on server
+```
+
+### Available Module Bundles
+
+**Desktop Bundle** (`modules/desktop/`):
+- `desktop.plasma.enable` - KDE Plasma 6 desktop
+- `desktop.sddm.enable` - SDDM display manager
+- `desktop.sddm.theme` - Optional theme
+
+**Hardware Bundle** (`modules/hardware/`):
+- `modules.hardware.nvidia.enable` - NVIDIA GPU drivers
+- `modules.hardware.nvidia.open` - Use open-source kernel modules
+- `modules.hardware.bluetooth.enable` - Bluetooth subsystem
+- `modules.hardware.bluetooth.powerOnBoot` - Auto-power behavior
+
+**Media Bundle** (`modules/media/`):
+- `media.audio.enable` - PipeWire audio stack
+- `media.audio.lowLatency` - Zen kernel for pro audio (⚠️ changes kernel)
+- `media.audio.proAudio` - JACK support, Bitwig Studio
+
+**Services Bundle** (`modules/services/`):
+- `services.backup.enable` - Restic backup
+- `services.monitoring.enable` - Prometheus/Grafana stack
+- `services.monitoring.exporters.enable` - Lightweight node exporters
+- `services.monitoring.server.enable` - Heavy monitoring server
+- Plus: download, git, media, ollama, opencode, storage
+
+**Virtualization Bundle** (`modules/virtualization/`):
+- `virtualization.podman.enable` - Container engine
+- `virtualization.podman.dockerCompat` - Docker alias
+- `virtualization.hypervisor.enable` - Run VMs (libvirtd, virt-manager)
+- `virtualization.guest.enable` - QEMU guest agent (when this IS a VM)
+
+### Adding a New Host
+
+The `lib.mkHost` function provides the abstraction:
+
+```nix
+# flake.nix
+my-new-host = lib.mkHost {
+  hostname = "my-new-host";
+  system = "x86_64-linux";
+  user = "brancengregory";
+  builder = nixpkgs.lib.nixosSystem;
+  homeManagerModule = home-manager.nixosModules.home-manager;
+  sopsModule = sops-nix.nixosModules.sops;
+  isDesktop = true;  # or false for server
+  extraModules = [
+    # Additional modules specific to this host
+  ];
+};
+```
+
+Then in `hosts/my-new-host/config.nix`:
+```nix
+{
+  imports = [
+    ../../modules/desktop
+    ../../modules/hardware
+    ../../modules/services
+  ];
+  
+  # Declare capabilities
+  desktop.plasma.enable = true;
+  modules.hardware.nvidia.enable = true;
+  services.backup.enable = true;
+  
+  system.stateVersion = "25.11";
+}
 ```
 
 ## Quick Start
@@ -139,3 +228,15 @@ mise build-powerhouse-iso
 mise build-capacitor-iso
 ```
 
+## Design Philosophy
+
+1. **Pure Modules**: All modules use `mkEnableOption` with `default = false`
+2. **Explicit over Implicit**: No accidental activation via imports
+3. **Safe Defaults**: Hardware defaults to disabled (prevents kernel panics)
+4. **Clear Separation**: Server, Desktop, and Laptop have distinct capabilities
+5. **Bundle Organization**: Related modules grouped for clean imports
+6. **Declarative Intent**: Host configs read like a capability manifest
+
+---
+
+**Status**: ✅ Refactor Complete - All system modules use Pure Module pattern
