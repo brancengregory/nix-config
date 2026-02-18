@@ -41,8 +41,8 @@
         src = pkgs.fetchFromGitHub {
           owner = "joshskidmore";
           repo = "zsh-fzf-history-search";
-          rev = "d1a287b9b529a3e9c561d463547997c401a73da4";
-          sha256 = "sha256-4Dp4/+AMZnXqdc+gbv3B1pK75o7WbDyNhR9eBz5p9sI=";
+          rev = "35df458f7d9478fa88c74af762dcd296cdfd485d";
+          sha256 = "0lnm5j3kzwsfmlwmzyaf08j27kp4h403vnwxxfh5q99xaiyacig9";
         };
       }
     ];
