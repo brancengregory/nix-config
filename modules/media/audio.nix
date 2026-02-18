@@ -1,66 +1,83 @@
-{pkgs, ...}: {
-  # --- Low Latency Audio Setup ---
+{ config, pkgs, lib, ... }:
+with lib;
+let
+  cfg = config.media.audio;
+in {
+  options.media.audio = {
+    enable = mkEnableOption "PipeWire audio subsystem";
 
-  # Enable RealtimeKit for real-time scheduling priorities
-  security.rtkit.enable = true;
+    lowLatency = mkEnableOption "low-latency audio with Zen kernel (WARNING: changes kernel)";
 
-  # Kernel Selection
-  # ----------------
-  # Standard Kernel (Default): Good balance, usually sufficient for PipeWire.
-  # Zen Kernel: Optimized for desktop responsiveness and multimedia.
-  boot.kernelPackages = pkgs.linuxPackages_zen;
-  # Low-Latency Kernel: Strict audio priority, might impact power/other tasks.
-  # boot.kernelPackages = pkgs.linuxPackages_lowlatency;
+    proAudio = mkEnableOption "pro audio configuration (JACK, real-time limits, Bitwig Studio)";
 
-  # PipeWire configuration is already enabled in modules/os/nixos.nix,
-  # but we ensure the necessary components for pro audio are present.
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
+    server = mkOption {
+      type = types.enum [ "pipewire" "pulse" "alsa" "none" ];
+      default = "pipewire";
+      description = "Audio server implementation";
+    };
 
-    # JACK support is crucial for professional audio applications like Bitwig
-    jack.enable = true;
+    user = mkOption {
+      type = types.str;
+      default = "brancengregory";
+      description = "User to add to audio group";
+    };
   };
 
-  # Configure limits for real-time audio
-  security.pam.loginLimits = [
-    {
-      domain = "@audio";
-      item = "memlock";
-      type = "-";
-      value = "unlimited";
-    }
-    {
-      domain = "@audio";
-      item = "rtprio";
-      type = "-";
-      value = "99";
-    }
-    {
-      domain = "@audio";
-      item = "nofile";
-      type = "soft";
-      value = "99999";
-    }
-    {
-      domain = "@audio";
-      item = "nofile";
-      type = "hard";
-      value = "99999";
-    }
-  ];
+  config = mkIf cfg.enable {
+    # Real-time scheduling for audio
+    security.rtkit.enable = true;
 
-  users.users.brancengregory.extraGroups = ["audio"];
+    # Audio server configuration
+    services.pipewire = mkIf (cfg.server == "pipewire") {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+      jack.enable = cfg.proAudio;
+    };
 
-  # --- Pro Audio Software ---
+    services.pulseaudio.enable = mkIf (cfg.server == "pulse") true;
 
-  environment.systemPackages = with pkgs; [
-    bitwig-studio
-    pavucontrol # Audio control
-    qjackctl # JACK control/patchbay (useful for routing)
-    yabridge # For using Windows VSTs (optional but common)
-    yabridgectl
-  ];
+    # Low-latency kernel switch - ONLY if explicitly requested
+    boot.kernelPackages = mkIf cfg.lowLatency pkgs.linuxPackages_zen;
+
+    # Pro audio configuration
+    security.pam.loginLimits = mkIf cfg.proAudio [
+      {
+        domain = "@audio";
+        item = "memlock";
+        type = "-";
+        value = "unlimited";
+      }
+      {
+        domain = "@audio";
+        item = "rtprio";
+        type = "-";
+        value = "99";
+      }
+      {
+        domain = "@audio";
+        item = "nofile";
+        type = "soft";
+        value = "99999";
+      }
+      {
+        domain = "@audio";
+        item = "nofile";
+        type = "hard";
+        value = "99999";
+      }
+    ];
+
+    users.users.${cfg.user}.extraGroups = [ "audio" ];
+
+    # Pro audio software
+    environment.systemPackages = mkIf cfg.proAudio (with pkgs; [
+      bitwig-studio
+      pavucontrol
+      qjackctl
+      yabridge
+      yabridgectl
+    ]);
+  };
 }

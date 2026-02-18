@@ -1,45 +1,53 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
-  # Enable OpenGL/Vulkan
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
+{ config, pkgs, lib, ... }:
+with lib;
+let
+  cfg = config.modules.hardware.nvidia;
+in {
+  options.modules.hardware.nvidia = {
+    enable = mkEnableOption "NVIDIA GPU drivers and configuration";
+
+    open = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Use open-source NVIDIA kernel modules (Turing+ GPUs only)";
+    };
+
+    powerManagement = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable NVIDIA power management (saves VRAM to /tmp/ on sleep). Experimental - can cause sleep/suspend issues.";
+      };
+
+      finegrained = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable fine-grained power management (turns off GPU when not in use). Experimental, requires modern GPU (Turing+).";
+      };
+    };
+
+    nvidiaSettings = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable nvidia-settings GUI tool";
+    };
   };
 
-  # Load NVIDIA driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+  config = mkIf cfg.enable {
+    # Enable OpenGL/Vulkan
+    hardware.graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
 
-  hardware.nvidia = {
-    # Modesetting is required.
-    modesetting.enable = true;
+    # Load NVIDIA driver for Xorg and Wayland
+    services.xserver.videoDrivers = [ "nvidia" ];
 
-    # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-    # Enable this if you have graphical corruption issues or application crashes after waking
-    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
-    # of just the bare essentials.
-    powerManagement.enable = false;
-
-    # Fine-grained power management. Turns off GPU when not in use.
-    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-    powerManagement.finegrained = false;
-
-    # Use the NVidia open source kernel module (not to be confused with the
-    # independent third-party "nouveau" open source driver).
-    # Support is limited to the Turing and later architectures. Full list of
-    # supported GPUs is at:
-    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
-    # Only available from driver 515.43.04+
-    # Do not disable this unless your GPU is fairly old.
-    open = false;
-
-    # Enable the Nvidia settings menu,
-    # accessible via `nvidia-settings`.
-    nvidiaSettings = true;
-
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    hardware.nvidia = {
+      modesetting.enable = true;
+      inherit (cfg) open;
+      nvidiaSettings = cfg.nvidiaSettings;
+      powerManagement = cfg.powerManagement;
+    };
   };
 }

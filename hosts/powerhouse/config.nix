@@ -12,10 +12,9 @@
     ../../modules/os/nixos.nix # Common NixOS settings
     ./hardware.nix # Hardware-specific configuration
     ../../modules/themes # Bundle: stylix and other themes
-    ../../modules/hardware/nvidia.nix # NVIDIA GPU
+    ../../modules/hardware # Bundle: nvidia, bluetooth
     ../../modules/desktop # Bundle: plasma, sddm, etc.
-    ../../modules/media/audio.nix
-    ../../modules/hardware/bluetooth.nix
+    ../../modules/media # Bundle: audio
     ../../modules/services/monitoring.nix
     ../../modules/services/backup.nix
     ../../modules/network/wireguard.nix # WireGuard hub-and-spoke VPN
@@ -32,6 +31,16 @@
   # Desktop Environment
   desktop.plasma.enable = true;
   desktop.sddm.enable = true;
+
+  # Hardware (Powerhouse has NVIDIA GPU and needs audio)
+  modules.hardware.nvidia.enable = true;
+  modules.hardware.nvidia.open = false;
+  modules.hardware.bluetooth.enable = true;
+
+  # Audio (Pro audio setup for music production)
+  media.audio.enable = true;
+  media.audio.lowLatency = true;
+  media.audio.proAudio = true;
 
   # Theming
   themes.stylix.enable = true;
