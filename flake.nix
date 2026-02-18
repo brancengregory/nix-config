@@ -31,8 +31,8 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Stylix for unified styling
-    stylix.url = "github:danth/stylix";
+    # Stylix for unified styling (pin to release-25.11 to match Home Manager)
+    stylix.url = "github:danth/stylix/release-25.11";
 
     # Custom Neovim Configuration
     nvim-config = {

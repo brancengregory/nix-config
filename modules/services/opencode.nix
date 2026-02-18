@@ -13,8 +13,8 @@ with lib; let
   cfg = config.services.opencode-server;
   # Only define package on Linux (NixOS)
   opencodePackage =
-    if pkgs.system == "x86_64-linux" || pkgs.system == "aarch64-linux"
-    then inputs.opencode-flake.packages.${pkgs.system}.default
+    if pkgs.stdenv.hostPlatform.system == "x86_64-linux" || pkgs.stdenv.hostPlatform.system == "aarch64-linux"
+    then inputs.opencode-flake.packages.${pkgs.stdenv.hostPlatform.system}.default
     else null;
 in {
   options.services.opencode-server = {
