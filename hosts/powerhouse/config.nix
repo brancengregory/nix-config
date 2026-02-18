@@ -4,6 +4,7 @@
   inputs,
   isLinux,
   isDarwin,
+  isDesktop,
   ...
 }: {
   imports = [
@@ -27,7 +28,6 @@
     ./disks/main.nix
   ];
 
-  networking.hostName = "powerhouse";
   nixpkgs.config.allowUnfree = true;
 
   # Bootloader - systemd-boot for UEFI with Windows dual-boot support
@@ -116,23 +116,6 @@
       '';
       deps = [];
     };
-  };
-
-  home-manager.extraSpecialArgs = {
-    inherit inputs isLinux isDarwin;
-    isDesktop = true;
-  };
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.backupFileExtension = "backup2";
-  home-manager.sharedModules = [
-    {stylix.enableReleaseChecks = false;}
-  ];
-  home-manager.users.brancengregory = {
-    imports = [
-      inputs.plasma-manager.homeModules.plasma-manager
-      ../../users/brancengregory/home.nix
-    ];
   };
 
   # Declarative WireGuard Configuration (Spoke - connects to Capacitor hub)

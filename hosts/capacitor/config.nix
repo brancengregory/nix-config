@@ -5,6 +5,7 @@
   inputs,
   isLinux,
   isDarwin,
+  isDesktop,
   ...
 }: {
   imports = [
@@ -30,7 +31,6 @@
     ../../modules/virtualization/podman.nix
   ];
 
-  networking.hostName = "capacitor";
   nixpkgs.config.allowUnfree = true;
 
   # Bootloader - systemd-boot for UEFI
@@ -355,22 +355,6 @@
 
   # Enable automatic Nix store optimization
   nix.settings.auto-optimise-store = true;
-
-  home-manager.extraSpecialArgs = {
-    inherit inputs isLinux isDarwin;
-    isDesktop = false;
-  };
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.backupFileExtension = "backup";
-  home-manager.sharedModules = [
-    {stylix.enableReleaseChecks = false;}
-  ];
-  home-manager.users.brancengregory = {
-    imports = [
-      ../../users/brancengregory/home.nix
-    ];
-  };
 
   system.stateVersion = "25.11";
 }

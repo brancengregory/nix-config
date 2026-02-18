@@ -79,30 +79,43 @@
     nixvim,
     opencode-flake,
     ...
-  } @ inputs: {
+  } @ inputs: let
+    lib = import ./lib { inherit inputs; };
+  in {
     nixosConfigurations = {
-      powerhouse = nixpkgs.lib.nixosSystem {
+      powerhouse = lib.mkHost {
+        hostname = "powerhouse";
         system = "x86_64-linux";
-        specialArgs = {
-          inherit inputs;
-          isLinux = true;
-          isDarwin = false;
-        }; # Pass inputs to modules
-        modules = [
-          {
-            nixpkgs.overlays = [
-              (import ./overlays/ojodb.nix)
-            ];
-          }
-          home-manager.nixosModules.home-manager
+        user = "brancengregory";
+        builder = nixpkgs.lib.nixosSystem;
+        homeManagerModule = home-manager.nixosModules.home-manager;
+        sopsModule = sops-nix.nixosModules.sops;
+        isDesktop = true;
+        extraModules = [
           inputs.stylix.nixosModules.stylix
           inputs.disko.nixosModules.disko
-          ./hosts/powerhouse/config.nix
+        ];
+        extraHomeModules = [
+          inputs.plasma-manager.homeModules.plasma-manager
         ];
       };
 
-      # Capacitor - Homelab server (Intel 12th gen, 64GB RAM, storage server)
-      capacitor = nixpkgs.lib.nixosSystem {
+      capacitor = lib.mkHost {
+        hostname = "capacitor";
+        system = "x86_64-linux";
+        user = "brancengregory";
+        builder = nixpkgs.lib.nixosSystem;
+        homeManagerModule = home-manager.nixosModules.home-manager;
+        sopsModule = sops-nix.nixosModules.sops;
+        isDesktop = false;
+        extraModules = [
+          inputs.stylix.nixosModules.stylix
+          inputs.disko.nixosModules.disko
+        ];
+      };
+
+      # ISO Installer configurations - kept as raw configs per scope discipline
+      capacitor-iso = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {
           inherit inputs;
@@ -115,161 +128,129 @@
               (import ./overlays/ojodb.nix)
             ];
           }
-          home-manager.nixosModules.home-manager
-          inputs.stylix.nixosModules.stylix
+          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+          inputs.sops-nix.nixosModules.sops
           inputs.disko.nixosModules.disko
-          ./hosts/capacitor/config.nix
+          ./hosts/capacitor/hardware.nix
+          ./hosts/capacitor/disks.nix
+          {
+            # ISO-specific settings
+            isoImage.squashfsCompression = "zstd -Xcompression-level 3";
+
+            # Basic system settings
+            networking.hostName = "capacitor-installer";
+            time.timeZone = "America/Chicago";
+            i18n.defaultLocale = "en_US.UTF-8";
+
+            # Add tools needed for installation
+            environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
+              git
+              vim
+              curl
+              wget
+              gptfdisk
+              cryptsetup
+              btrfs-progs
+              mergerfs
+              snapraid
+              disko
+            ];
+
+            # Enable SSH in the installer
+            services.openssh = {
+              enable = true;
+              ports = [77];
+              settings.PermitRootLogin = "yes";
+            };
+
+            # Set a temporary root password for the installer
+            # Note: Base ISO already sets initialHashedPassword = ""
+            users.users.root.initialPassword = "nixos";
+
+            # Boot loader for ISO
+            boot.loader.systemd-boot.enable = true;
+            boot.loader.efi.canTouchEfiVariables = true;
+
+            # Install tools
+            programs.git.enable = true;
+          }
+        ];
+      };
+
+      powerhouse-iso = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {
+          inherit inputs;
+          isLinux = true;
+          isDarwin = false;
+        };
+        modules = [
+          {
+            nixpkgs.overlays = [
+              (import ./overlays/ojodb.nix)
+            ];
+          }
+          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+          inputs.sops-nix.nixosModules.sops
+          inputs.disko.nixosModules.disko
+          ./hosts/powerhouse/hardware.nix
+          ./hosts/powerhouse/disks/main.nix
+          {
+            # ISO-specific settings
+            isoImage.squashfsCompression = "zstd -Xcompression-level 3";
+
+            # Basic system settings
+            networking.hostName = "powerhouse-installer";
+            time.timeZone = "America/Chicago";
+            i18n.defaultLocale = "en_US.UTF-8";
+
+            # Add tools needed for installation
+            environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
+              git
+              vim
+              curl
+              wget
+              gptfdisk
+              cryptsetup
+              btrfs-progs
+              disko
+            ];
+
+            # Enable SSH in the installer
+            services.openssh = {
+              enable = true;
+              ports = [22];
+              settings.PermitRootLogin = "yes";
+            };
+
+            # Set a temporary root password for the installer
+            # Note: Base ISO already sets initialHashedPassword = ""
+            users.users.root.initialPassword = "nixos";
+
+            # Boot loader for ISO
+            boot.loader.systemd-boot.enable = true;
+            boot.loader.efi.canTouchEfiVariables = true;
+
+            # Install tools
+            programs.git.enable = true;
+          }
         ];
       };
     };
 
     darwinConfigurations = {
-      turbine = nix-darwin.lib.darwinSystem {
-        system = "x86_64-darwin"; # Intel CPU
-
-        specialArgs = {
-          inherit inputs;
-          isLinux = false;
-          isDarwin = true;
-        };
-
-        modules = [
-          {
-            nixpkgs.overlays = [
-              (import ./overlays/ojodb.nix)
-            ];
-          }
-          home-manager.darwinModules.home-manager
+      turbine = lib.mkHost {
+        hostname = "turbine";
+        system = "x86_64-darwin";
+        user = "brancengregory";
+        builder = nix-darwin.lib.darwinSystem;
+        homeManagerModule = home-manager.darwinModules.home-manager;
+        sopsModule = sops-nix.darwinModules.sops;
+        isDesktop = true;
+        extraModules = [
           inputs.stylix.darwinModules.stylix
-          ./hosts/turbine/config.nix
         ];
       };
-
-      # Additional Mac systems here
-    };
-
-    # ISO Installer configurations
-    nixosConfigurations.capacitor-iso = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {
-        inherit inputs;
-        isLinux = true;
-        isDarwin = false;
-      };
-      modules = [
-        {
-          nixpkgs.overlays = [
-            (import ./overlays/ojodb.nix)
-          ];
-        }
-        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-        inputs.sops-nix.nixosModules.sops
-        inputs.disko.nixosModules.disko
-        ./hosts/capacitor/hardware.nix
-        ./hosts/capacitor/disks.nix
-        {
-          # ISO-specific settings
-          isoImage.squashfsCompression = "zstd -Xcompression-level 3";
-
-          # Basic system settings
-          networking.hostName = "capacitor-installer";
-          time.timeZone = "America/Chicago";
-          i18n.defaultLocale = "en_US.UTF-8";
-
-          # Add tools needed for installation
-          environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
-            git
-            vim
-            curl
-            wget
-            gptfdisk
-            cryptsetup
-            btrfs-progs
-            mergerfs
-            snapraid
-            disko
-          ];
-
-          # Enable SSH in the installer
-          services.openssh = {
-            enable = true;
-            ports = [77];
-            settings.PermitRootLogin = "yes";
-          };
-
-          # Set a temporary root password for the installer
-          # Note: Base ISO already sets initialHashedPassword = ""
-          users.users.root.initialPassword = "nixos";
-
-          # Boot loader for ISO
-          boot.loader.systemd-boot.enable = true;
-          boot.loader.efi.canTouchEfiVariables = true;
-
-          # Install tools
-          programs.git.enable = true;
-        }
-      ];
-    };
-
-    # ISO Installer configurations - Powerhouse
-    nixosConfigurations.powerhouse-iso = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {
-        inherit inputs;
-        isLinux = true;
-        isDarwin = false;
-      };
-      modules = [
-        {
-          nixpkgs.overlays = [
-            (import ./overlays/ojodb.nix)
-          ];
-        }
-        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-        inputs.sops-nix.nixosModules.sops
-        inputs.disko.nixosModules.disko
-        ./hosts/powerhouse/hardware.nix
-        ./hosts/powerhouse/disks/main.nix
-        {
-          # ISO-specific settings
-          isoImage.squashfsCompression = "zstd -Xcompression-level 3";
-
-          # Basic system settings
-          networking.hostName = "powerhouse-installer";
-          time.timeZone = "America/Chicago";
-          i18n.defaultLocale = "en_US.UTF-8";
-
-          # Add tools needed for installation
-          environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
-            git
-            vim
-            curl
-            wget
-            gptfdisk
-            cryptsetup
-            btrfs-progs
-            disko
-          ];
-
-          # Enable SSH in the installer
-          services.openssh = {
-            enable = true;
-            ports = [22];
-            settings.PermitRootLogin = "yes";
-          };
-
-          # Set a temporary root password for the installer
-          # Note: Base ISO already sets initialHashedPassword = ""
-          users.users.root.initialPassword = "nixos";
-
-          # Boot loader for ISO
-          boot.loader.systemd-boot.enable = true;
-          boot.loader.efi.canTouchEfiVariables = true;
-
-          # Install tools
-          programs.git.enable = true;
-        }
-      ];
     };
 
     # Create a VM for testing and cross-compilation targets
