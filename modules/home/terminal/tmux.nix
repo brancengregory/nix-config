@@ -37,7 +37,7 @@
 			# Pane borders
 			set -g pane-border-style fg=gray
 			set -g pane-active-border-style fg=brightcyan
-			set -g pane-boarder-format " #{pane_index} "
+			set -g pane-border-format " #{pane_index} "
 
       # Reload configuration
       bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded!"
