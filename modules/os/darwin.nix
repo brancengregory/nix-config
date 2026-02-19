@@ -90,7 +90,7 @@
 
     # Homebrew taps (additional repositories)
     taps = [
-      "homebrew/services"
+			"anomalyco/tap"
     ];
 
     # CLI packages from Homebrew (use sparingly, prefer nixpkgs)
