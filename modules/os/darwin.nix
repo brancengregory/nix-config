@@ -83,7 +83,7 @@
 
     # Automatically cleanup unreferenced formulae and casks
     onActivation = {
-      cleanup = "zap";
+      cleanup = "none";
       autoUpdate = true;
       upgrade = true;
     };
@@ -114,6 +114,8 @@
       "telegram"
       "messenger"
       "microsoft-teams"
+			"positron"
+			"rstudio"
       "signal"
       "twitch"
       "zoom"

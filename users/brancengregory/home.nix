@@ -128,8 +128,6 @@
     ++ (with pkgs;
       lib.optionals isDarwin [
         pinentry-curses
-        positron-bin
-        rstudio
       ]);
 
   xdg.mimeApps =
