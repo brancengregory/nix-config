@@ -14,7 +14,14 @@
 
     # Plugins managed by home-manager (replaces tpm)
     plugins = with pkgs.tmuxPlugins; [
-      sensible
+			{
+        plugin = resurrect;
+				extraConfig = ''
+				  set -g @resurrect-strategy-nvim 'session'
+					set -g @resurrect-capture-pane-contents 'on'
+				'';
+			}
+			sensible
     ];
 
     extraConfig = ''
