@@ -11,7 +11,7 @@
     defaults = {
       NSGlobalDomain = {
         AppleInterfaceStyle = "Dark";
-        ApplePressAndHoldEnabled = true;
+        ApplePressAndHoldEnabled = false;
         AppleScrollerPagingBehavior = true;
         AppleShowAllExtensions = true;
         AppleShowAllFiles = false;
