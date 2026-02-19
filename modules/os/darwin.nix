@@ -132,7 +132,7 @@
       "epic-games"
 
       # System
-      "syncthing"
+      "syncthing-app"
       "libreoffice"
 
       # Browsers (Chrome only as requested)
