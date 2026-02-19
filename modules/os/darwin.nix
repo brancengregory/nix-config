@@ -45,7 +45,7 @@
         appswitcher-all-displays = true;
         autohide = true;
         persistent-others = [
-          "~/Downloads"
+          "/Users/brancengregory/Downloads"
         ];
         show-recents = false;
         wvous-bl-corner = 1;
