@@ -7,7 +7,7 @@
 
     # Key bindings
     keyMode = "vi";
-    prefix = "C-a";
+    prefix = "C-b";
 
     # Terminal and environment settings
     terminal = "tmux-256color";
