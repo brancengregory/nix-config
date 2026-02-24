@@ -14,6 +14,10 @@
     viAlias = true;
 
     # Settings (from lua/config/settings.lua)
+    globals = {
+      mapleader = " ";
+    };
+
     opts = {
       number = true;
       relativenumber = true;
@@ -50,7 +54,95 @@
         action = "<cmd>UndotreeToggle<cr>";
       }
 
-      # Telescope
+      # File operations under <leader>f
+      {
+        mode = "n";
+        key = "<leader>ff";
+        action = "<cmd>Telescope find_files<cr>";
+        options.desc = "Find files";
+      }
+      {
+        mode = "n";
+        key = "<leader>fr";
+        action = "<cmd>Telescope oldfiles<cr>";
+        options.desc = "Recent files";
+      }
+      {
+        mode = "n";
+        key = "<leader>fn";
+        action = "<cmd>enew<cr>";
+        options.desc = "New file";
+      }
+      {
+        mode = "n";
+        key = "<leader>fW";
+        action = ":w ";
+        options.desc = "Write as (name file)";
+      }
+      {
+        mode = "n";
+        key = "<leader>fj";
+        action = "<cmd>e #<cr>";
+        options.desc = "Last file (alternate)";
+      }
+      {
+        mode = "n";
+        key = "<leader>fs";
+        action = "<cmd>w<cr>";
+        options.desc = "Save file";
+      }
+      {
+        mode = "n";
+        key = "<leader>fS";
+        action = "<cmd>wa<cr>";
+        options.desc = "Save all";
+      }
+      {
+        mode = "n";
+        key = "<leader>fh";
+        action = "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())<cr>";
+        options.desc = "Harpoon quick menu";
+      }
+      {
+        mode = "n";
+        key = "<leader>fa";
+        action = "<cmd>lua require('harpoon'):list():append()<cr>";
+        options.desc = "Add to Harpoon";
+      }
+
+      # Buffer operations under <leader>b
+      {
+        mode = "n";
+        key = "<leader>bb";
+        action = "<cmd>Telescope buffers<cr>";
+        options.desc = "List buffers";
+      }
+      {
+        mode = "n";
+        key = "<leader>bl";
+        action = "<cmd>e #<cr>";
+        options.desc = "Last buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>bn";
+        action = "<cmd>bnext<cr>";
+        options.desc = "Next buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>bp";
+        action = "<cmd>bprev<cr>";
+        options.desc = "Prev buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>bd";
+        action = "<cmd>bd<cr>";
+        options.desc = "Delete buffer";
+      }
+
+      # Legacy Telescope (keep for compatibility)
       {
         mode = "n";
         key = "<leader>pf";
@@ -77,36 +169,42 @@
         action = "<cmd>Telescope help_tags<cr>";
       }
 
-      # Harpoon
+      # Harpoon (reorganized)
       {
         mode = "n";
-        key = "<leader>a";
+        key = "<leader>ha";
         action = "<cmd>lua require('harpoon'):list():append()<cr>";
+        options.desc = "Add file";
       }
       {
         mode = "n";
-        key = "<C-e>";
+        key = "<leader>hh";
         action = "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())<cr>";
+        options.desc = "Quick menu";
       }
       {
         mode = "n";
-        key = "<C-h>";
+        key = "<leader>h1";
         action = "<cmd>lua require('harpoon'):list():select(1)<cr>";
+        options.desc = "File 1";
       }
       {
         mode = "n";
-        key = "<C-t>";
+        key = "<leader>h2";
         action = "<cmd>lua require('harpoon'):list():select(2)<cr>";
+        options.desc = "File 2";
       }
       {
         mode = "n";
-        key = "<C-n>";
+        key = "<leader>h3";
         action = "<cmd>lua require('harpoon'):list():select(3)<cr>";
+        options.desc = "File 3";
       }
       {
         mode = "n";
-        key = "<C-s>";
+        key = "<leader>h4";
         action = "<cmd>lua require('harpoon'):list():select(4)<cr>";
+        options.desc = "File 4";
       }
 
       # LSP
@@ -151,21 +249,82 @@
         action = "<cmd>lua vim.lsp.buf.signature_help()<cr>";
       }
 
-      # Git
+      # Git (now under <leader>g group)
       {
         mode = "n";
         key = "<leader>gs";
         action = "<cmd>Git<cr>";
+        options.desc = "Git status";
       }
       {
         mode = "n";
         key = "<leader>gc";
         action = "<cmd>Git commit<cr>";
+        options.desc = "Git commit";
       }
       {
         mode = "n";
         key = "<leader>gp";
         action = "<cmd>Git push<cr>";
+        options.desc = "Git push";
+      }
+
+      # Comment.nvim mappings (Ctrl+/ for line, Ctrl+Shift+/ for block)
+      {
+        mode = ["n" "i"];
+        key = "<C-/>";
+        action = "<cmd>lua require('Comment.api').toggle.linewise.current()<cr>";
+        options.desc = "Toggle line comment";
+      }
+      {
+        mode = "v";
+        key = "<C-/>";
+        action = "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<cr>";
+        options.desc = "Toggle line comment (visual)";
+      }
+      {
+        mode = ["n" "i"];
+        key = "<C-?>";
+        action = "<cmd>lua require('Comment.api').toggle.blockwise.current()<cr>";
+        options.desc = "Toggle block comment";
+      }
+      {
+        mode = "v";
+        key = "<C-?>";
+        action = "<esc><cmd>lua require('Comment.api').toggle.blockwise(vim.fn.visualmode())<cr>";
+        options.desc = "Toggle block comment (visual)";
+      }
+
+      # R.nvim keybindings (R development)
+      {
+        mode = "n";
+        key = "<leader>rf";
+        action = "<cmd>lua require('r.send').source_file()<cr>";
+        options.desc = "R: Send file";
+      }
+      {
+        mode = "n";
+        key = "<leader>rl";
+        action = "<cmd>lua require('r.send').line()<cr>";
+        options.desc = "R: Send line";
+      }
+      {
+        mode = "v";
+        key = "<leader>rs";
+        action = "<cmd>lua require('r.send').selection()<cr>";
+        options.desc = "R: Send selection";
+      }
+      {
+        mode = "n";
+        key = "<leader>ro";
+        action = "<cmd>lua require('r.browser').start()<cr>";
+        options.desc = "R: Show objects";
+      }
+      {
+        mode = "n";
+        key = "<leader>rr";
+        action = "<cmd>lua require('r.run').start_R('R')<cr>";
+        options.desc = "R: Start R";
       }
     ];
 
@@ -180,6 +339,14 @@
           r_language_server = {
             enable = true;
             package = pkgs.rPackages.languageserver;
+            settings = {
+              r = {
+                lsp = {
+                  diagnostics = true;
+                  rich_documentation = true;
+                };
+              };
+            };
           };
           # rust-analyzer disabled - using rustaceanvim instead
           pyright.enable = true;
@@ -232,34 +399,48 @@
         extensions = {
           fzf-native.enable = true;
         };
+        settings.defaults = {
+          vimgrep_arguments = [
+            "${pkgs.ripgrep}/bin/rg"
+            "--color=never"
+            "--no-heading"
+            "--with-filename"
+            "--line-number"
+            "--column"
+            "--smart-case"
+            "--hidden"
+          ];
+        };
       };
 
-      # Completions
-      cmp = {
+      # Modern completion with blink-cmp
+      blink-cmp = {
         enable = true;
         settings = {
-          sources = [
-            {name = "nvim_lsp";}
-            {name = "luasnip";}
-            {name = "buffer";}
-            {name = "path";}
-          ];
-          mapping = {
-            "<C-n>" = "cmp.mapping.select_next_item()";
-            "<C-p>" = "cmp.mapping.select_prev_item()";
-            "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-            "<C-f>" = "cmp.mapping.scroll_docs(4)";
-            "<C-Space>" = "cmp.mapping.complete()";
-            "<CR>" = "cmp.mapping.confirm({ select = true })";
-            "<Tab>" = "cmp.mapping(function(fallback) if cmp.visible() then cmp.select_next_item() elseif luasnip.expand_or_jumpable() then luasnip.expand_or_jump() else fallback() end end, { 'i', 's' })";
-            "<S-Tab>" = "cmp.mapping(function(fallback) if cmp.visible() then cmp.select_prev_item() elseif luasnip.jumpable(-1) then luasnip.jump(-1) else fallback() end end, { 'i', 's' })";
+          keymap = {
+            preset = "default";
+          };
+          sources = {
+            default = ["lsp" "path" "snippets" "buffer"];
+          };
+          completion = {
+            documentation = {
+              auto_show = true;
+              window = {
+                border = "rounded";
+              };
+            };
+            menu = {
+              draw = {
+                treesitter = ["lsp"];
+              };
+            };
           };
         };
       };
 
-      # Luasnip
+      # Luasnip for snippets
       luasnip.enable = true;
-      cmp_luasnip.enable = true;
 
       # Lualine
       lualine = {
@@ -284,6 +465,43 @@
         enable = true;
         settings = {
           preset = "modern";
+          spec = [
+            {
+              __unkeyed-1 = "<leader>f";
+              group = "File";
+              icon = "󰈔";
+            }
+            {
+              __unkeyed-1 = "<leader>b";
+              group = "Buffer";
+              icon = "󰓩";
+            }
+            {
+              __unkeyed-1 = "<leader>g";
+              group = "Git";
+              icon = "󰊢";
+            }
+            {
+              __unkeyed-1 = "<leader>h";
+              group = "Harpoon";
+              icon = "󱡀";
+            }
+            {
+              __unkeyed-1 = "<leader>r";
+              group = "R";
+              icon = "󰟔";
+            }
+            {
+              __unkeyed-1 = "gc";
+              group = "Comment";
+              icon = "󰅺";
+            }
+            {
+              __unkeyed-1 = "gb";
+              group = "Block Comment";
+              icon = "󰅺";
+            }
+          ];
         };
       };
 
@@ -329,16 +547,58 @@
       # Devicons
       web-devicons.enable = true;
 
-      # Rust tools - using rustaceanvim instead of abandoned rust-tools
+      # Rust tools - rustaceanvim (modern standard)
       rustaceanvim = {
         enable = true;
         settings = {
           server = {
             enable = true;
+            default_settings = {
+              rust-analyzer = {
+                cargo = {
+                  allFeatures = true;
+                };
+                checkOnSave = true;
+                check = {
+                  command = "clippy";
+                };
+              };
+            };
           };
         };
       };
+
+      # Comment.nvim - Smart commenting
+      comment = {
+        enable = true;
+        settings = {
+          mappings = {
+            basic = true;
+            extra = true;
+          };
+        };
+      };
+
+      # R.nvim - R development environment (v0.99.3)
+      # Built from source since not available in nixvim modules
     };
+
+    # Extra plugins built from source
+    extraPlugins = with pkgs.vimUtils; [
+      (buildVimPlugin {
+        name = "r-nvim";
+        src = pkgs.fetchFromGitHub {
+          owner = "R-nvim";
+          repo = "R.nvim";
+          rev = "v0.99.3";
+          sha256 = "sha256-oQSHHu6filJkAyH94yEvyTVuxA+5MU2dMOEAnsIjJKQ=";
+        };
+        buildInputs = [ 
+          pkgs.which
+          pkgs.zip
+        ];
+      })
+    ];
 
     # Colorscheme - use default neovim colorscheme
     # Can be overridden by user config or stylix
@@ -349,6 +609,22 @@
       -- Harpoon 2 setup
       local harpoon = require("harpoon")
       harpoon:setup()
+
+      -- R.nvim setup for R development (v0.99.3)
+      -- Completion works via built-in LSP, no manual hook needed
+      require("r").setup({
+        R_app = "radian",
+        quarto_chunk_hl = {
+          highlight = true,
+          yaml_hl = true,
+          virtual_title = true,
+          bg = "",
+          events = "",
+        },
+        R_args = {"--no-save", "--no-restore"},
+        min_editor_width = 80,
+        pdfviewer = "zathura",
+      })
 
       -- Dashboard header
       require("dashboard").setup({

@@ -26,6 +26,7 @@
     pkgs.rPackages.config
     logger
     here
+    languageserver
 
     # Database
     DBI
