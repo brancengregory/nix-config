@@ -47,6 +47,11 @@
     glue
     janitor
 
+		# Targets
+		targets
+		tarchetypes
+		qs2
+
     # OJO Internal
     ojodb
   ];
