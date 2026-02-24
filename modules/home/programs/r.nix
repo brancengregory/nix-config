@@ -36,6 +36,7 @@
     # Documentation
     knitr
     rmarkdown
+    gt
 
     # Web/API
     httr2
