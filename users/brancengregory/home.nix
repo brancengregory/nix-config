@@ -19,6 +19,7 @@
       ../../modules/home/programs/nixvim.nix
       ../../modules/home/programs/git.nix
       ../../modules/home/programs/r.nix
+      ../../modules/home/programs/direnv.nix
       ../../modules/home/programs/ghostty.nix
       ../../modules/home/programs/sesh.nix
       ../../modules/home/programs/opencode.nix
