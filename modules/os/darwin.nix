@@ -158,8 +158,12 @@
   # Ensure nix-daemon is running
   nix.package = pkgs.nix;
 
+  # Add nix zsh to available shells
+  environment.shells = with pkgs; [ zsh ];
+
   # Define the user account for nix-darwin
   users.users.brancengregory = {
     home = "/Users/brancengregory";
+    shell = pkgs.zsh;
   };
 }
