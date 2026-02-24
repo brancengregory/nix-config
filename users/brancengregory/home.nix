@@ -71,6 +71,7 @@
         alejandra
         bat
         delta
+				devenv
         eza
         fd
         glow
