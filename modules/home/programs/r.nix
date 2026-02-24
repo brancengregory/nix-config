@@ -47,10 +47,11 @@
     glue
     janitor
 
-		# Targets
-		targets
-		tarchetypes
-		qs2
+    # Targets
+    targets
+    tarchetypes
+    # qs2 temporarily removed - depends on broken RcppParallel
+    # qs2
 
     # OJO Internal
     ojodb
