@@ -45,7 +45,11 @@
         appswitcher-all-displays = true;
         autohide = true;
         persistent-others = [
-          "/Users/brancengregory/Downloads"
+					{ folder = {
+					    path = "/Users/brancengregory/Downloads";
+					    arrangement = "date-added";
+					  };
+					}
         ];
         show-recents = false;
         wvous-bl-corner = 1;
