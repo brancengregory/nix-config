@@ -94,5 +94,11 @@
     pciutils
     dmidecode
     git
+    google-chrome
   ];
+
+  # --- Default Browser ---
+  environment.variables = {
+    BROWSER = "google-chrome";
+  };
 }

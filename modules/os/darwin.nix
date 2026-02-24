@@ -45,11 +45,12 @@
         appswitcher-all-displays = true;
         autohide = true;
         persistent-others = [
-					{ folder = {
-					    path = "/Users/brancengregory/Downloads";
-					    arrangement = "date-added";
-					  };
-					}
+          {
+            folder = {
+              path = "/Users/brancengregory/Downloads";
+              arrangement = "date-added";
+            };
+          }
         ];
         show-recents = false;
         wvous-bl-corner = 1;
@@ -163,7 +164,11 @@
   nix.package = pkgs.nix;
 
   # Add nix zsh to available shells
-  environment.shells = with pkgs; [ zsh ];
+  environment.shells = with pkgs; [zsh];
+
+  environment.variables.BROWSER = "${pkgs.writeShellScriptBin "google-chrome" ''
+    exec /usr/bin/open -a "Google Chrome" "$@"
+  ''}/bin/google-chrome";
 
   # Define the user account for nix-darwin
   users.users.brancengregory = {
