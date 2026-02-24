@@ -4,6 +4,7 @@
 {
   pkgs,
   lib,
+  isLinux,
   ...
 }:
 with lib; {
@@ -40,7 +41,7 @@ with lib; {
     enableScDaemon = true;
 
     pinentry.package =
-      if pkgs.stdenv.isLinux
+      if isLinux
       then pkgs.pinentry-curses
       else pkgs.pinentry-tty;
 

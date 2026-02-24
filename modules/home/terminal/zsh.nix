@@ -77,7 +77,7 @@
         gpg-refresh = "refresh_gpg";
       }
       // (
-        if pkgs.stdenv.isLinux
+        if isLinux
         then {
           open = "xdg-open";
           ports = "ss -tuln";

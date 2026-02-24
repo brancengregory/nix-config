@@ -57,9 +57,9 @@
 
   home.username = "brancengregory";
   home.homeDirectory =
-    if pkgs.stdenv.isLinux
+    if isLinux
     then "/home/brancengregory"
-    else if pkgs.stdenv.isDarwin
+    else if isDarwin
     then "/Users/brancengregory"
     else throw "Unsupported OS for this home-manager configuration";
 

@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  isLinux,
   ...
 }:
 with lib; let
@@ -23,7 +24,7 @@ in {
     };
   };
 
-  config = mkIf (cfg.enable && pkgs.stdenv.isLinux) {
+  config = mkIf (cfg.enable && isLinux) {
     programs.plasma = {
       enable = true;
 
