@@ -13,6 +13,7 @@
       clipboard-write = allow
       clipboard-trim-trailing-spaces = true
       keybind = shift+enter=text:\n
+      term = xterm-256color
     ''
     else ''
       font-family = "Fira Code Nerd Font"
@@ -23,5 +24,6 @@
       clipboard-write = allow
       clipboard-trim-trailing-spaces = true
       keybind = shift+enter=text:\n
+      term = xterm-256color
     '';
 }

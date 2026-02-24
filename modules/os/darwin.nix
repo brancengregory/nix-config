@@ -90,7 +90,7 @@
 
     # Homebrew taps (additional repositories)
     taps = [
-			"anomalyco/tap"
+      "anomalyco/tap"
     ];
 
     # CLI packages from Homebrew (use sparingly, prefer nixpkgs)
@@ -114,8 +114,8 @@
       "telegram"
       "messenger"
       "microsoft-teams"
-			"positron"
-			"rstudio"
+      "positron"
+      "rstudio"
       "signal"
       "twitch"
       "zoom"

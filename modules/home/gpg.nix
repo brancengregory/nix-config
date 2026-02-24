@@ -39,11 +39,10 @@ with lib; {
     enableSshSupport = true;
     enableScDaemon = true;
 
-    # Platform-optimized pinentry
     pinentry.package =
       if pkgs.stdenv.isLinux
       then pkgs.pinentry-curses
-      else pkgs.pinentry-curses;
+      else pkgs.pinentry-tty;
 
     # Optimized cache settings
     defaultCacheTtl = 28800; # 8 hours

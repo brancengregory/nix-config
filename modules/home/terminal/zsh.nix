@@ -68,7 +68,7 @@
         h = "sesh cn home";
         md = "glow";
         g = "lazygit";
-				ai = "opencode";
+        ai = "opencode";
 
         # GPG/SSH troubleshooting aliases
         gpg-restart = "gpgconf --kill gpg-agent && gpgconf --launch gpg-agent";

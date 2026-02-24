@@ -23,10 +23,14 @@
     usethis
     testthat
     roxygen2
+    pkgs.rPackages.config
+    logger
+    here
 
     # Database
     DBI
     RPostgres
+    odbc
 
     # Documentation
     knitr
@@ -39,6 +43,7 @@
     # Utilities
     rlang
     glue
+    janitor
 
     # OJO Internal
     ojodb

@@ -127,7 +127,7 @@
     # macOS-specific packages
     ++ (with pkgs;
       lib.optionals isDarwin [
-        pinentry-curses
+        pinentry-tty
       ]);
 
   xdg.mimeApps =
