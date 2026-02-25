@@ -46,6 +46,11 @@
 		},
 		"webfetch": "ask",
 		"websearch": "allow",
-		"codesearch": "allow"
+		"codesearch": "allow",
+		"glob": "allow",
+		"grep": "allow",
+		"list": "allow",
+		"todowrite": "ask",
+		"todoread": "allow"
 	}
 }
