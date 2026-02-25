@@ -11,6 +11,8 @@
     ./plugins/treesitter.nix
     ./plugins/ui.nix
     ./plugins/development.nix
+    ./plugins/git.nix
+    ./plugins/diagnostics.nix
   ];
 
   programs.nixvim = {
