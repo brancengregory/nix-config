@@ -17,6 +17,7 @@
     ./plugins/buffers.nix
     ./plugins/session.nix
     ./plugins/focus.nix
+    ./plugins/lazygit.nix
   ];
 
   programs.nixvim = {
