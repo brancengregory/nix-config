@@ -18,12 +18,6 @@
       auto_session_root_dir = "~/.local/share/nvim/sessions/";
       bypass_save_filetypes = ["neo-tree" "trouble" "qf"];
       cwd_change_handling = true;
-      pre_save_cmds = [
-        "Neotree close"
-      ];
-      post_restore_cmds = [
-        "Neotree show"
-      ];
     };
   };
 }

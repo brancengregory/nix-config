@@ -70,6 +70,14 @@
       options.desc = "Add to Harpoon";
     }
 
+    # File explorer (neo-tree)
+    {
+      mode = "n";
+      key = "<leader>fe";
+      action = "<cmd>Neotree toggle<cr>";
+      options.desc = "Toggle file explorer";
+    }
+
     # Buffer operations under <leader>b
     {
       mode = "n";
@@ -271,20 +279,6 @@
       key = "<leader>xd";
       action = "<cmd>Trouble diagnostics toggle filter.buf=0<cr>";
       options.desc = "Buffer diagnostics";
-    }
-
-    # Neo-tree file browser
-    {
-      mode = "n";
-      key = "<leader>e";
-      action = "<cmd>Neotree toggle<cr>";
-      options.desc = "Toggle file tree";
-    }
-    {
-      mode = "n";
-      key = "<leader>o";
-      action = "<cmd>Neotree focus<cr>";
-      options.desc = "Focus file tree";
     }
 
     # R.nvim keybindings (R development)
