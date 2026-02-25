@@ -13,6 +13,10 @@
     ./plugins/development.nix
     ./plugins/git.nix
     ./plugins/diagnostics.nix
+    ./plugins/notifications.nix
+    ./plugins/buffers.nix
+    ./plugins/session.nix
+    ./plugins/focus.nix
   ];
 
   programs.nixvim = {

@@ -60,6 +60,21 @@
             group = "Block Comment";
             icon = "󰅺";
           }
+          {
+            __unkeyed-1 = "<leader>s";
+            group = "Session";
+            icon = "󰆓";
+          }
+          {
+            __unkeyed-1 = "<leader>t";
+            group = "TODO";
+            icon = "󰄱";
+          }
+          {
+            __unkeyed-1 = "<leader>z";
+            group = "Zen";
+            icon = "󰼠";
+          }
         ];
       };
     };

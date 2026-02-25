@@ -343,5 +343,67 @@
       action = "<cmd>lua require('r.run').start_R('R')<cr>";
       options.desc = "R: Start R";
     }
+
+    # Bufferline navigation (Shift+Tab / Ctrl+Tab)
+    {
+      mode = "n";
+      key = "<S-Tab>";
+      action = "<cmd>BufferLineCycleNext<cr>";
+      options.desc = "Next buffer";
+    }
+    {
+      mode = "n";
+      key = "<C-Tab>";
+      action = "<cmd>BufferLineCyclePrev<cr>";
+      options.desc = "Previous buffer";
+    }
+    {
+      mode = "n";
+      key = "<leader>bp";
+      action = "<cmd>BufferLinePick<cr>";
+      options.desc = "Pick buffer";
+    }
+    {
+      mode = "n";
+      key = "<leader>bc";
+      action = "<cmd>bdelete<cr>";
+      options.desc = "Close buffer";
+    }
+
+    # Session management (auto-session)
+    {
+      mode = "n";
+      key = "<leader>ss";
+      action = "<cmd>SessionSearch<cr>";
+      options.desc = "Search sessions";
+    }
+    {
+      mode = "n";
+      key = "<leader>sd";
+      action = "<cmd>SessionDelete<cr>";
+      options.desc = "Delete session";
+    }
+
+    # Zen mode
+    {
+      mode = "n";
+      key = "<leader>z";
+      action = "<cmd>ZenMode<cr>";
+      options.desc = "Toggle zen mode";
+    }
+
+    # Todo comments
+    {
+      mode = "n";
+      key = "<leader>td";
+      action = "<cmd>TodoTelescope<cr>";
+      options.desc = "Find todos";
+    }
+    {
+      mode = "n";
+      key = "<leader>tq";
+      action = "<cmd>TodoTelescope cwd=.<cr>";
+      options.desc = "Find todos in current file";
+    }
   ];
 }
