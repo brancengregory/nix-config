@@ -19,8 +19,19 @@
       
       # Search behavior
       search_mode = "fuzzy";
-      filter_mode = "global";
-      workspaces = true;  # Context-aware by directory (shows local commands first)
+      
+      # Start in workspace mode (git project directory context)
+      # Shares history between tmux panes and nvim toggleterm in same project
+      filter_mode = "workspace";
+      
+      # Context-aware filtering (enables workspace mode in git repos)
+      workspaces = true;
+      
+      # Custom filter mode cycle order: workspace → global → directory → session → host
+      # Optimized for seamless sharing between nvim toggleterm and tmux shells
+      search = {
+        filters = [ "workspace" "global" "directory" "session" "host" ];
+      };
     };
   };
 }
