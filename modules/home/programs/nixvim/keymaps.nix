@@ -1,32 +1,7 @@
 # Nixvim Keymaps - Deduplicated and Organized
+# Note: Window navigation (Ctrl+h/j/k/l) is handled by tmux-navigator plugin
 { ... }: {
   programs.nixvim.keymaps = [
-    # Window navigation (Ctrl+h/j/k/l)
-    {
-      mode = "n";
-      key = "<C-h>";
-      action = "<C-w>h";
-      options.desc = "Go to left window";
-    }
-    {
-      mode = "n";
-      key = "<C-j>";
-      action = "<C-w>j";
-      options.desc = "Go to bottom window";
-    }
-    {
-      mode = "n";
-      key = "<C-k>";
-      action = "<C-w>k";
-      options.desc = "Go to top window";
-    }
-    {
-      mode = "n";
-      key = "<C-l>";
-      action = "<C-w>l";
-      options.desc = "Go to right window";
-    }
-
     # Core mappings
     {
       mode = "n";

@@ -18,6 +18,7 @@
     ./plugins/session.nix
     ./plugins/focus.nix
     ./plugins/lazygit.nix
+    ./plugins/tmux-navigator.nix
   ];
 
   programs.nixvim = {

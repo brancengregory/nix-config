@@ -21,6 +21,7 @@
           set -g @resurrect-capture-pane-contents 'on'
         '';
       }
+      vim-tmux-navigator  # Seamless Ctrl+h/j/k/l navigation with nvim
       sensible
     ];
 
