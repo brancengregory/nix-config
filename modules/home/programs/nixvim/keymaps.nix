@@ -344,16 +344,16 @@
       options.desc = "R: Start R";
     }
 
-    # Bufferline navigation (Shift+Tab / Ctrl+Tab)
+    # Bufferline navigation (Tab / Shift+Tab)
     {
       mode = "n";
-      key = "<S-Tab>";
+      key = "<Tab>";
       action = "<cmd>BufferLineCycleNext<cr>";
       options.desc = "Next buffer";
     }
     {
       mode = "n";
-      key = "<C-Tab>";
+      key = "<S-Tab>";
       action = "<cmd>BufferLineCyclePrev<cr>";
       options.desc = "Previous buffer";
     }
