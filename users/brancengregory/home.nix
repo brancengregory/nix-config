@@ -16,6 +16,7 @@
       ../../modules/home/terminal/zsh.nix
       ../../modules/home/terminal/starship.nix
       ../../modules/home/terminal/tmux.nix
+      ../../modules/home/programs/atuin.nix
       ../../modules/home/programs/nixvim
       ../../modules/home/programs/git.nix
       ../../modules/home/programs/r.nix

@@ -1,5 +1,6 @@
 # Floating Terminal (toggleterm.nvim)
-{ pkgs, ... }: {
+# Uses $SHELL from environment to inherit parent shell with Atuin integration
+{ ... }: {
   programs.nixvim = {
     plugins.toggleterm = {
       enable = true;
@@ -12,7 +13,8 @@
         persist_size = true;
         direction = "float";
         close_on_exit = true;
-        shell = "${pkgs.zsh}/bin/zsh";
+        # shell is omitted - uses vim.o.shell which inherits $SHELL from environment
+        # This ensures toggleterm uses the same shell as the parent tmux session
         float_opts = {
           border = "curved";
           width = 80;
