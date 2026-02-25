@@ -75,6 +75,11 @@
             group = "Zen";
             icon = "󰼠";
           }
+          {
+            __unkeyed-1 = "<leader>`";
+            group = "Terminal";
+            icon = "󰆍";
+          }
         ];
       };
     };

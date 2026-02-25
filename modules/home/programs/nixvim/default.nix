@@ -19,6 +19,7 @@
     ./plugins/focus.nix
     ./plugins/lazygit.nix
     ./plugins/tmux-navigator.nix
+    ./plugins/toggleterm.nix
   ];
 
   programs.nixvim = {
