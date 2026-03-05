@@ -43,7 +43,7 @@ with lib; {
       "github.com" = {
         hostname = "github.com";
         user = "git";
-        identitiesOnly = true;
+        identitiesOnly = false;
         extraOptions = {
           PreferredAuthentications = "publickey";
         };
@@ -51,14 +51,14 @@ with lib; {
       "gitlab.com" = {
         hostname = "gitlab.com";
         user = "git";
-        identitiesOnly = true;
+        identitiesOnly = false;
         extraOptions = {
           PreferredAuthentications = "publickey";
         };
       };
       "*.local" = {
         user = "brancengregory";
-        identitiesOnly = true;
+        identitiesOnly = false;
       };
     };
 
