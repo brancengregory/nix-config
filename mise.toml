@@ -17,9 +17,22 @@ run = "nix build .#powerhouse"
 description = "Build capacitor NixOS configuration"
 run = "nix build .#capacitor"
 
-[tasks.build-turbine]
-description = "Cross-compile full nix-darwin config for turbine"
+[tasks.build-turbine-linux]
+description = "Cross-compile turbine nix-darwin config from Linux"
 run = "nix build .#turbine-darwin"
+
+# Darwin native commands (for working ON turbine/macos)
+[tasks.check-turbine]
+description = "Check turbine config locally (validation only)"
+run = "darwin-rebuild check --flake .#turbine"
+
+[tasks.build-turbine-local]
+description = "Build turbine config locally (build only, no activate)"
+run = "darwin-rebuild build --flake .#turbine"
+
+[tasks.apply-turbine]
+description = "Apply/switch turbine configuration (build + activate)"
+run = "darwin-rebuild switch --flake .#turbine"
 
 # Build commands - ISO Installers
 [tasks.build-powerhouse-iso]
@@ -40,8 +53,8 @@ run = "nix build .#powerhouse-vm"
 description = "Check flake syntax and validate"
 run = "nix flake check"
 
-[tasks.check-darwin]
-description = "Validate nix-darwin config (fast)"
+[tasks.check-darwin-linux]
+description = "Validate nix-darwin config from Linux (cross-compile check)"
 run = "nix build .#turbine-check"
 
 [tasks.dry-run-powerhouse]
@@ -64,13 +77,13 @@ run = "nix develop"
 # Build all (comprehensive)
 [tasks.build-all]
 description = "Build all configurations (comprehensive)"
-depends = ["build-powerhouse", "build-capacitor", "build-turbine"]
+depends = ["build-powerhouse", "build-capacitor", "build-turbine-linux"]
 run = "echo 'All configurations built successfully!'"
 
 # Testing - runs checks in parallel
 [tasks.test]
 description = "Run all validation tests"
-depends = ["check", "check-darwin"]
+depends = ["check", "check-darwin-linux"]
 run = "echo 'All tests passed'"
 
 # Maintenance
@@ -86,6 +99,10 @@ run = "nix develop -c alejandra ."
 [tasks.fmt]
 description = "Format Nix files (alias)"
 run = "nix develop -c alejandra ."
+
+[tasks.check-format]
+description = "Check if Nix files are formatted (no changes)"
+run = "nix develop -c alejandra --check ."
 
 # Secrets Management
 [tasks.secrets-edit]
