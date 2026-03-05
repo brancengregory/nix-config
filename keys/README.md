@@ -43,6 +43,58 @@ gpg --show-keys keys/brancen-gregory-public.asc
 
 ---
 
+### `id_nitrokey.pub`
+
+**Purpose:** SSH public key for authentication (derived from GPG hardware token)  
+**Source:** Exported from Nitrokey via `gpg --export-ssh-key`  
+**Last Updated:** 2026-03-04
+
+**Key Details:**
+- **Type:** OpenSSH (RFC 4716)
+- **Algorithm:** Ed25519
+- **Key ID:** openpgp:0xBCF5F8B3 (authentication subkey)
+- **Card Number:** 000F_9D1F273F0000
+- **Hardware Source:** Nitrokey 3 authentication subkey
+
+**Export Commands:**
+```bash
+# Export from GPG (recommended)
+gpg --export-ssh-key 3D9E0666449B886D > ~/.ssh/id_nitrokey.pub
+chmod 644 ~/.ssh/id_nitrokey.pub
+
+# Alternative: Copy to clipboard for GitHub (macOS)
+gpg --export-ssh-key 3D9E0666449B886D | pbcopy
+
+# Alternative: Copy to clipboard (Linux)
+gpg --export-ssh-key 3D9E0666449B886D | xclip -selection clipboard
+```
+
+**Usage:**
+- **Authentication:** Via GPG agent (`SSH_AUTH_SOCK`)
+- **GitHub:** Paste output of `ssh-add -L | grep cardno` or use this file
+- **Servers:** Add to `~/.ssh/authorized_keys`
+- **Local reference:** `~/.ssh/id_nitrokey.pub`
+
+**GitHub Upload:**
+1. Go to GitHub Settings → SSH and GPG keys
+2. Click "New SSH key"
+3. Run: `cat keys/id_nitrokey.pub | pbcopy` (or copy manually)
+4. Paste key and save
+
+**Adding to Servers:**
+```bash
+# Method 1: Direct from agent
+ssh-add -L | grep cardno | ssh user@server "cat >> ~/.ssh/authorized_keys"
+
+# Method 2: Using exported file
+ssh-copy-id -i ~/.ssh/id_nitrokey.pub user@server
+
+# Method 3: Manual copy
+# Copy content of this file and append to server's ~/.ssh/authorized_keys
+```
+
+---
+
 ## Security Notes
 
 ✅ **Safe to Commit:** These are public keys only - no secret material  

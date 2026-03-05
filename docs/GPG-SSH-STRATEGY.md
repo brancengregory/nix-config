@@ -296,6 +296,135 @@ gpg --import keys/brancen-gregory-public.asc
 
 ---
 
+## SSH Public Key Management
+
+The SSH public key is derived from the GPG authentication subkey on your Nitrokey 3. Unlike traditional SSH keys stored in `~/.ssh/`, this key lives exclusively on the hardware token and is exposed through the GPG agent.
+
+### How It Works
+
+**Authentication Flow:**
+1. SSH client requests authentication
+2. GPG agent forwards request to Nitrokey
+3. Nitrokey performs cryptographic operation
+4. Private key **never leaves** the hardware token
+
+**Key Storage:**
+- ❌ Not stored in `~/.ssh/id_*` files
+- ❌ No secret key material on filesystem
+- ✅ Key provided by GPG agent via `SSH_AUTH_SOCK`
+
+### Viewing Your SSH Key
+
+**From GPG Agent:**
+```bash
+# Shows key with cardno notation
+ssh-add -L | grep cardno
+
+# Expected output:
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... cardno:000F_9D1F273F0000
+```
+
+**From GPG:**
+```bash
+# Export SSH public key from GPG
+gpg --export-ssh-key 3D9E0666449B886D
+
+# Expected output:
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... openpgp:0xBCF5F8B3
+```
+
+### Repository Backup
+
+**SSH Public Key File:**
+- Location: `keys/id_nitrokey.pub`
+- Format: OpenSSH (RFC 4716)
+- Source: Exported from Nitrokey authentication subkey
+
+### Adding to GitHub/GitLab
+
+**Method 1: From Repository:**
+```bash
+# Copy to clipboard (macOS)
+cat keys/id_nitrokey.pub | pbcopy
+
+# Or display and copy manually
+cat keys/id_nitrokey.pub
+```
+
+**Method 2: From Agent (Live):**
+```bash
+# Copy current key from GPG agent
+ssh-add -L | grep cardno | pbcopy
+```
+
+**Then:**
+1. Go to GitHub Settings → SSH and GPG keys
+2. Click "New SSH key"
+3. Paste the key
+4. Save
+
+### Adding to Servers
+
+**Direct from Agent:**
+```bash
+# Append to remote authorized_keys
+ssh-add -L | grep cardno | ssh user@server "cat >> ~/.ssh/authorized_keys"
+```
+
+**Using Exported File:**
+```bash
+# Copy key to local .ssh first
+gpg --export-ssh-key 3D9E0666449B886D > ~/.ssh/id_nitrokey.pub
+chmod 644 ~/.ssh/id_nitrokey.pub
+
+# Then use ssh-copy-id
+ssh-copy-id -i ~/.ssh/id_nitrokey.pub user@server
+```
+
+**Manual Method:**
+```bash
+# On server, edit authorized_keys and add:
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... cardno:000F_9D1F273F0000
+```
+
+### No IdentityFile Required
+
+**Important:** You do NOT need `IdentityFile` in `~/.ssh/config`. The GPG agent provides the key automatically via `SSH_AUTH_SOCK`.
+
+**Correct Configuration:**
+```
+Host github.com
+    HostName github.com
+    User git
+    PreferredAuthentications publickey
+    # No IdentityFile - key comes from GPG agent
+```
+
+**Why No IdentityFile:**
+- GPG agent intercepts SSH authentication requests
+- Forwards to Nitrokey for cryptographic operations
+- Hardware token never exposes private key
+- More secure than file-based keys
+
+### Testing SSH Authentication
+
+**Test with GitHub:**
+```bash
+ssh git@github.com
+
+# Expected output:
+# Hi brancengregory! You've successfully authenticated...
+```
+
+**Test with Any Server:**
+```bash
+ssh user@server
+# Should prompt for PIN if not cached
+# Then prompt for touch confirmation on token
+```
+
+---
+
 ## Hardware Token Details
 
 ### Device Information
@@ -590,7 +719,8 @@ refresh_gpg
 - **Secret Management:** `docs/SECRET_MANAGEMENT.md` - SOPS and age keys
 - **Security:** `docs/SECURITY.md` - Threat model and practices
 - **FIDO2 (Future):** `docs/FIDO2-RESIDENT-KEYS.md` - Alternative SSH method
-- **Public Key:** `keys/brancen-gregory-public.asc` - Local backup
+- **GPG Public Key:** `keys/brancen-gregory-public.asc` - Local backup
+- **SSH Public Key:** `keys/id_nitrokey.pub` - SSH authentication key
 
 ---
 
@@ -608,6 +738,12 @@ gpg --list-secret-keys
 
 # Show SSH key
 ssh-add -L | grep cardno
+
+# Export SSH key
+gpg --export-ssh-key 3D9E0666449B886D
+
+# Copy SSH key to clipboard (macOS)
+gpg --export-ssh-key 3D9E0666449B886D | pbcopy
 
 # Fetch from keyserver
 gpg --card-edit -> fetch -> quit

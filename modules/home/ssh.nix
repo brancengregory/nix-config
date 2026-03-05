@@ -59,5 +59,8 @@ with lib; {
         identitiesOnly = true;
       };
     };
+
+    # Note: No IdentityFile specified - SSH keys come from GPG agent (hardware token)
+    # See docs/GPG-SSH-STRATEGY.md for details
   };
 }
