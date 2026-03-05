@@ -126,11 +126,6 @@
         rustup
         snapper-gui
         keymapp
-      ])
-    # macOS-specific packages
-    ++ (with pkgs;
-      lib.optionals isDarwin [
-        pinentry-tty
       ]);
 
   xdg.mimeApps =

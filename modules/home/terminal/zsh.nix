@@ -171,13 +171,15 @@
       # Unified GPG/SSH environment setup
       export SSH_ASKPASS_REQUIRE=never
 
+      # Detect SSH session and set pinentry mode for GPG
+      # When SSH_CONNECTION is set, use TTY-based pinentry instead of GUI
+      if [ -n "''${SSH_CONNECTION:-}" ] || [ -n "''${SSH_TTY:-}" ]; then
+        export PINENTRY_USER_DATA=USE_TTY=1
+      fi
+
       # Optimized GPG_TTY handling
       if [ -t 1 ]; then
         export GPG_TTY=$(tty)
-        # Only update GPG agent if it's running (lazy initialization)
-        if pgrep -x gpg-agent >/dev/null 2>&1; then
-          gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-        fi
       fi
 
       # Platform-specific configuration
@@ -201,6 +203,12 @@
           gpgconf --launch gpg-agent 2>/dev/null || true
         ''
       }
+
+      # Notify gpg-agent of current TTY and environment
+      # This must happen after PINENTRY_USER_DATA and GPG_TTY are set
+      if [ -t 1 ] && pgrep -x gpg-agent >/dev/null 2>&1; then
+        gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+      fi
 
       # Tmux integration with performance optimization
       if [ -n "$TMUX" ]; then

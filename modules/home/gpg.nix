@@ -9,12 +9,41 @@
   pkgs,
   lib,
   isLinux,
+  isDarwin,
   ...
 }:
-with lib; {
+with lib; let
+  # Smart pinentry wrapper for macOS that selects appropriate pinentry
+  # based on session type (local GUI vs SSH)
+  # Named 'pinentry' to match what gpg-agent expects
+  pinentry-darwin-wrapper = pkgs.writeShellScriptBin "pinentry" ''
+    #!/usr/bin/env bash
+    # Smart pinentry selector for macOS
+    # Uses pinentry-mac for local GUI sessions (works with lazygit)
+    # Uses pinentry-tty for SSH sessions
+    
+    # Check if PINENTRY_USER_DATA contains USE_TTY=1 (set for SSH sessions)
+    case "''${PINENTRY_USER_DATA:-}" in
+      *USE_TTY=1*)
+        # pinentry-tty provides bin/pinentry
+        exec ${pkgs.pinentry-tty}/bin/pinentry "$@"
+        ;;
+    esac
+    
+    # Default: use GUI pinentry for local sessions
+    # The macOS package specifically names its binary pinentry-mac
+    exec ${pkgs.pinentry_mac}/bin/pinentry-mac "$@"
+  '';
+in {
   # Hardware token management tools
   home.packages = with pkgs; [
     pynitrokey # Nitrokey 3 management (nitropy command)
+  ] ++ lib.optionals isDarwin [
+    pinentry-darwin-wrapper
+    pinentry_mac
+    # pinentry-tty is not included here - wrapper references it directly via store path
+  ] ++ lib.optionals isLinux [
+    pinentry-curses
   ];
 
   # GPG client settings
@@ -52,7 +81,7 @@ with lib; {
     pinentry.package =
       if isLinux
       then pkgs.pinentry-curses
-      else pkgs.pinentry-tty;
+      else pinentry-darwin-wrapper;
 
     # Optimized cache settings
     defaultCacheTtl = 28800; # 8 hours
