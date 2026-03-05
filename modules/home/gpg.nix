@@ -67,11 +67,6 @@ with lib; {
       # Basic passphrase constraints
       min-passphrase-len 12
       min-passphrase-nonalpha 2
-
-      # Debug logging to diagnose SSH signing failures
-      # See: https://dev.gnupg.org/T5931 (gpg-agent SSH issues with OpenSSH 8.9+)
-      debug-level guru
-      log-file /Users/brancengregory/.gnupg/gpg-agent.log
     '';
   };
 }
