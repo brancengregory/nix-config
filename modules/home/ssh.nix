@@ -37,7 +37,9 @@ with lib; {
     '';
 
     matchBlocks = {
-      "*" = {};
+      "*" = {
+        identityAgent = "~/.gnupg/S.gpg-agent.ssh";
+      };
       "github.com" = {
         hostname = "github.com";
         user = "git";
