@@ -14,7 +14,7 @@
     ../../modules/network/netbird.nix # Netbird self-hosted server
     ../../modules/network/caddy.nix # Caddy reverse proxy
     ../../modules/security/sops.nix
-    ../../modules/security/gpg.nix
+    ../../modules/security/gpg.nix # Hardware token support
     ../../modules/security/ssh.nix
     ../../modules/virtualization # Bundle: podman, qemu
   ];
@@ -134,20 +134,10 @@
     privateKeyFile = config.sops.secrets."wireguard/capacitor/private_key".path;
   };
 
-  # Declarative GPG Key Import
-  # NOTE: Generate GPG keys first before enabling this!
-  # Run: gpg --full-generate-key on capacitor after install
-  # Then add keys to secrets.yaml and re-enable
-  # security.gpg = {
-  #   enable = true;
-  #   user = "brancengregory";
-  #   secretKeysFile = config.sops.secrets."gpg/capacitor/secret_keys".path;
-  #   publicKeysFile = config.sops.secrets."gpg/capacitor/public_keys".path;
-  #   trustLevel = 5;
-  #   enableSSH = true;
-  # };
+  # GPG hardware token support (disabled - server doesn't need user GPG)
+  # Enable if needed: security.gpg.enable = true;
 
-  # Declarative SSH Host Keys
+  # SSH host keys (server identity)
   services.openssh.hostKeysDeclarative = {
     enable = true;
     ed25519 = {
@@ -246,11 +236,8 @@
     # Porkbun API credentials
     "porkbun/credentials" = {};
 
-    # GPG keys - Uncomment after generating keys
-    # "gpg/capacitor/secret_keys" = {};
-    # "gpg/capacitor/public_keys" = {};
-
-    # SSH host keys
+    # GPG keys - NOT NEEDED: Secret keys stored on Nitrokey hardware tokens
+    # SSH host keys (server identity)
     "ssh/capacitor/host_key" = {};
     "ssh/capacitor/host_key_pub" = {};
 
@@ -293,9 +280,11 @@
     snapraid.enable = true;
     nfs = {
       enable = true;
+      # SECURITY: Using root_squash (default) to prevent remote root from having local root privileges
+      # This maps root user to nobody on the NFS server, requiring proper user ID mapping
       exports = ''
-        /mnt/storage/critical 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
-        /mnt/storage/standard 10.0.0.0/8(rw,sync,no_subtree_check,no_root_squash)
+        /mnt/storage/critical 10.0.0.0/8(rw,sync,no_subtree_check,root_squash,all_squash,anonuid=1000,anongid=100)
+        /mnt/storage/standard 10.0.0.0/8(rw,sync,no_subtree_check,root_squash,all_squash,anonuid=1000,anongid=100)
       '';
     };
     minio = {
@@ -318,7 +307,7 @@
       enable = true;
       domain = "git.brancen.world";
       httpPort = 3080;
-      sshPort = 22;
+      sshPort = 22;  # Standard Git SSH port (system SSH moved to 77)
     };
     dataDir = "/var/lib/forgejo"; # NVMe storage for fast git operations
   };

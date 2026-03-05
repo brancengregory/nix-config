@@ -14,7 +14,7 @@
     ../../modules/services # Bundle: backup, monitoring, etc.
     ../../modules/network/wireguard.nix # WireGuard hub-and-spoke VPN
     ../../modules/security/sops.nix
-    ../../modules/security/gpg.nix # Declarative GPG key import
+    ../../modules/security/gpg.nix # Hardware token support (scdaemon)
     ../../modules/security/ssh.nix # Declarative SSH host keys
     ../../modules/virtualization # Bundle: podman, qemu
     ./disks/main.nix
@@ -153,17 +153,8 @@
     presharedKeyFile = config.sops.secrets."wireguard/powerhouse/preshared_key".path;
   };
 
-  # Declarative GPG Key Import
-  security.gpg = {
-    enable = true;
-    user = "brancengregory";
-    secretKeysFile = config.sops.secrets."gpg/powerhouse/secret_keys".path;
-    publicKeysFile = config.sops.secrets."gpg/powerhouse/public_keys".path;
-    trustLevel = 5;
-    enableSSH = true;
-  };
-
-  # Declarative SSH Host Keys
+  # GPG hardware token support
+  security.gpg.enable = true;
   services.openssh.hostKeysDeclarative = {
     enable = true;
     ed25519 = {
@@ -179,11 +170,7 @@
     "wireguard/powerhouse/private_key" = {};
     "wireguard/powerhouse/preshared_key" = {};
 
-    # GPG keys
-    "gpg/powerhouse/secret_keys" = {};
-    "gpg/powerhouse/public_keys" = {};
-
-    # SSH host keys
+    # SSH host keys (server identity)
     "ssh/powerhouse/host_key" = {};
     "ssh/powerhouse/host_key_pub" = {};
   };

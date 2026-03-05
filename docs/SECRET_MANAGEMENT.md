@@ -91,9 +91,20 @@ The secret management system follows these principles:
 ## Secret Types
 
 ### 1. GPG Keys
-- **Master Key**: Single certification-only key shared across all devices
-- **Per-Device Subkeys**: Auth (SSH), Sign, and Encryption subkeys for each host
-- **Storage**: `secrets/secrets.yaml` under `gpg:` tree
+
+**⚠️ IMPORTANT: GPG Secret Keys Are NOT Stored in SOPS**
+
+GPG secret keys live exclusively on **Nitrokey 3 hardware tokens**. They are NEVER stored in SOPS or any filesystem.
+
+- **Storage**: Hardware tokens only (Nitrokey 3)
+- **Public Key**: Available in `keys/brancen-gregory-public.asc` and on keys.openpgp.org
+- **Provisioning**: Manual via `gpg --card-edit` after inserting hardware token
+- **Documentation**: See [Hardware Token Guide](./HARDWARE-KEYS.md) and [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md)
+
+**Key Information:**
+- **Fingerprint**: `0A8C406B92CEFC33A51EC4933D9E0666449B886D`
+- **Key ID**: `3D9E0666449B886D`
+- **Keyserver**: https://keys.openpgp.org
 
 ### 2. WireGuard Keys
 - **Hub (Capacitor)**: Server keys with listening port
@@ -123,13 +134,16 @@ The secret management system follows these principles:
 .
 ├── secrets/
 │   ├── secrets.yaml              # Main encrypted secrets file
-│   ├── master-public.asc         # GPG master public key (not secret)
 │   └── vm_host_key               # VM-specific SSH key (development)
+├── keys/
+│   └── brancen-gregory-public.asc # GPG public key backup (not secret)
 ├── .sops.yaml                    # SOPS configuration with age recipients
 └── scripts/
-    ├── generate-all-secrets.sh   # Generate all infrastructure secrets
+    ├── generate-all-secrets.sh   # Generate infrastructure secrets
     └── generate-host-secrets.sh  # Generate secrets for single host
 ```
+
+**Note**: GPG secret keys are NOT stored in this repository. They reside exclusively on Nitrokey 3 hardware tokens.
 
 ## Workflow
 
@@ -148,7 +162,6 @@ nix develop
 # Verify tools are available
 sops --version
 age --version
-gpg --version
 wg --version
 ```
 
@@ -172,12 +185,13 @@ export SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt
 ./scripts/generate-all-secrets.sh
 
 # This will:
-# - Generate GPG master key and subkeys
 # - Generate WireGuard keys for all hosts
 # - Generate SSH host keys
 # - Generate age keys for all hosts
 # - Generate application secrets (restic, etc.)
 # - Update .sops.yaml with new recipients
+#
+# NOTE: GPG keys are NOT generated - they are on Nitrokey hardware tokens
 ```
 
 #### 4. Review and Commit
@@ -257,10 +271,16 @@ nixos-rebuild switch --flake .#powerhouse
 
 #### Rotate GPG Subkeys
 
-```bash
-# This requires regenerating all GPG keys
-# See generate-all-secrets.sh for the process
-```
+**⚠️ Hardware Token Procedure**
+
+GPG keys are stored on Nitrokey hardware tokens. To rotate:
+
+1. Use offline master key backup to generate new subkeys
+2. Move new subkeys to Nitrokey 3 (both primary and backup tokens)
+3. Revoke old keys on keyserver
+4. Update all authorized_keys files
+
+See [Hardware Token Guide](./HARDWARE-KEYS.md) for detailed procedures.
 
 #### Rotate Age Keys
 
@@ -348,27 +368,30 @@ sops updatekeys secrets/secrets.yaml
 }
 ```
 
-#### GPG Key Import
+#### GPG Hardware Token Support
+
+**⚠️ GPG Secret Keys Are On Hardware Tokens, Not in SOPS**
 
 ```nix
 { config, ... }:
 {
   imports = [ ../../modules/security ];  # Bundle: gpg, ssh available
   
+  # Enable hardware token support (scdaemon, pcscd)
+  # Secret keys are NOT imported - they remain on Nitrokey
   security.gpg = {
-    enable = true;
-    user = "brancengregory";
-    secretKeysFile = config.sops.secrets."gpg/powerhouse/secret_keys".path;
-    publicKeysFile = config.sops.secrets."gpg/powerhouse/public_keys".path;
-    trustLevel = 5;  # Ultimate trust
-    enableSSH = true;
+    enable = true;  # Enables smart card daemon support only
   };
   
-  # Declare secrets
-  sops.secrets."gpg/powerhouse/secret_keys" = {};
-  sops.secrets."gpg/powerhouse/public_keys" = {};
+  # After deployment, provision manually:
+  # 1. Insert Nitrokey
+  # 2. gpg --card-edit -> fetch -> quit
+  # 3. gpg-connect-agent "scd serialno" "learn --force" /bye
+  # 4. Test: ssh-add -L && git commit --allow-empty -m "Test"
 }
 ```
+
+**Note**: See [Hardware Token Guide](./HARDWARE-KEYS.md) for complete provisioning procedures.
 
 #### SSH Host Keys
 
@@ -429,10 +452,15 @@ sops updatekeys secrets/secrets.yaml
    ```
 
 3. **Regular Rotation**
-   - WireGuard keys: Every 6-12 months
-   - GPG subkeys: Every 1-2 years
-   - Age keys: Every 2-3 years
-   - Application passwords: As needed
+    - WireGuard keys: Every 6-12 months
+    - GPG subkeys: Every 1-2 years (via hardware token re-flash)
+    - Age keys: Every 2-3 years
+    - Application passwords: As needed
+
+4. **Hardware Token Security**
+    - GPG keys never leave Nitrokey 3 hardware
+    - Keep backup token in secure offline location
+    - Never export or backup secret keys to files
 
 4. **Access Control**
    - Limit who can decrypt secrets.yaml
@@ -537,15 +565,36 @@ chmod u+w secrets/
 lsof secrets/secrets.yaml
 ```
 
-### GPG Import Fails
+### Hardware Token Not Working
 
+**Issue**: GPG operations fail, `gpg --card-status` shows no card
+
+**Solution**:
 ```bash
-# Check if secret file exists and is readable
-sops -d --extract '["gpg"]["powerhouse"]["secret_keys"]' secrets/secrets.yaml | head -5
+# Check if Nitrokey is detected
+gpg --card-status
 
-# Try manual import
-sops -d --extract '["gpg"]["powerhouse"]["secret_keys"]' secrets/secrets.yaml | base64 -d | gpg --import
+# If not detected, check USB connection
+lsusb | grep -i nitro
+
+# Restart scdaemon
+gpgconf --kill scdaemon
+gpg-connect-agent /bye
+
+# Fetch public key from keyserver
+gpg --card-edit
+# gpg/card> fetch
+# gpg/card> quit
+
+# Create stubs
+gpg-connect-agent "scd serialno" "learn --force" /bye
+
+# Verify
+gpg --list-secret-keys
+ssh-add -L | grep cardno
 ```
+
+See [Hardware Token Guide](./HARDWARE-KEYS.md) for complete troubleshooting.
 
 ## Migration from energize.sh
 
@@ -563,10 +612,11 @@ The old `energize.sh` script generated secrets manually on each host. The new sy
 ### Migration Steps
 
 1. **Backup Existing Keys**
-   ```bash
-   # On each host
-   tar czf ~/keys-backup.tar.gz ~/.ssh /etc/ssh ~/.gnupg
-   ```
+    ```bash
+    # On each host
+    tar czf ~/keys-backup.tar.gz ~/.ssh /etc/ssh
+    # NOTE: Do NOT backup ~/.gnupg secret keys - they are on hardware tokens
+    ```
 
 2. **Generate New Declarative Secrets**
    ```bash
@@ -587,20 +637,19 @@ The old `energize.sh` script generated secrets manually on each host. The new sy
    ```
 
 5. **Verify**
-   - Check GPG keys: `gpg --list-keys`
-   - Check WireGuard: `wg show`
-   - Check SSH: `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`
+    - Check hardware token: `gpg --card-status`
+    - Check WireGuard: `wg show`
+    - Check SSH: `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`
 
 ## See Also
 
-- [Security Guidelines](./SECURITY.md) - General security best practices
-- [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md) - Key management strategy
-- [Migration Guide](./MIGRATION.md) - System migration procedures
+- [Hardware Token Guide](./HARDWARE-KEYS.md) - Nitrokey 3 setup and daily operation
+- [GPG/SSH Strategy](./GPG-SSH-STRATEGY.md) - Hardware-first authentication workflow
+- [Deployment Guide](./DEPLOYMENT.md) - New host provisioning with hardware tokens
+- [SOPS](https://github.com/getsops/sops) - Secrets OPerationS tool
+- [Age](https://github.com/FiloSottile/age) - Modern encryption tool
 
-## References
+---
 
-- [sops](https://github.com/getsops/sops) - Secrets OPerationS
-- [age](https://age-encryption.org/) - Modern encryption tool
-- [sops-nix](https://github.com/Mic92/sops-nix) - NixOS integration
-- [WireGuard](https://www.wireguard.com/) - VPN protocol
-- [GPG](https://gnupg.org/) - GNU Privacy Guard
+*Last Updated: 2026-03-04*  
+*Hardware Token Model - No Software GPG Keys*

@@ -1,437 +1,630 @@
-# Unified GPG/SSH Strategy
+# Unified GPG/SSH Strategy (Hardware Token Edition)
 
-This document outlines the streamlined GPG/SSH configuration implemented across the nix-config ecosystem, providing secure, unified authentication and encryption for both Linux (powerhouse) and macOS (turbine) systems.
+**Hardware-backed authentication using Nitrokey 3 tokens with automatic stub management**
+
+This document outlines the hardware-first GPG/SSH configuration where all secret keys reside exclusively on Nitrokey 3 hardware tokens, and hosts use lightweight "stubs" that reference keys on the hardware.
+
+---
 
 ## Overview
 
-The strategy implements a **performance-optimized, secure approach** where:
-
-- **GPG agent serves as the central authentication hub** for both GPG operations and SSH authentication
-- **Cross-platform compatibility** ensures consistent behavior on Linux and macOS  
-- **Streamlined configuration** with essential security settings and optimized performance
-- **Unified configuration** managed through home-manager for consistency
-
-## Architecture
+### Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   GPG Client    │    │   SSH Client    │    │   Git (signed)  │
-└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
-          │                      │                      │
-          └──────────────────────┼──────────────────────┘
-                                 │
-                    ┌─────────────▼──────────────┐
-                    │        GPG Agent          │
-                    │  ┌─────────────────────┐   │
-                    │  │ GPG Authentication  │   │
-                    │  │ SSH Authentication  │   │
-                    │  │ Key Management      │   │
-                    │  │ Smart Card Support  │   │
-                    │  └─────────────────────┘   │
-                    └────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        USER APPLICATIONS                        │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────┐│
+│  │   GPG Client    │    │   SSH Client    │    │ Git (signed)││
+│  └─────────┬───────┘    └─────────┬───────┘    └──────┬──────┘│
+│            │                      │                   │       │
+│            └──────────────────────┼───────────────────┘       │
+│                                   │                           │
+│                      ┌─────────────▼──────────────┐           │
+│                      │        GPG Agent          │            │
+│                      │  ┌─────────────────────┐ │            │
+│                      │  │ Stub Management    │ │            │
+│                      │  │ SSH Auth Bridge    │ │            │
+│                      │  │ Smart Card Daemon  │ │            │
+│                      │  └─────────────────────┘ │            │
+│                      └───────────┬──────────────┘            │
+└──────────────────────────────────┼────────────────────────────┘
+                                   │
+                    ┌──────────────▼───────────────┐
+                    │      HARDWARE TOKEN          │
+                    │   ┌──────────────────────┐  │
+                    │   │ Nitrokey 3            │  │
+                    │   │ ├─ Signing Subkey    │  │
+                    │   │ ├─ Encryption Subkey │  │
+                    │   │ └─ Auth Subkey (SSH) │  │
+                    │   └──────────────────────┘  │
+                    └───────────────────────────────┘
 ```
 
-## Key Features
+### Key Principles
 
-### Streamlined Security Configuration
+1. **Hardware-First:** All secret keys live exclusively on Nitrokey 3 tokens
+2. **Stub Model:** Hosts have lightweight references (stubs), not actual keys
+3. **Automatic Discovery:** Stubs created automatically when hardware key is used
+4. **Cross-Platform:** Identical workflow on Linux (powerhouse/capacitor) and macOS (turbine)
+5. **Manual Provisioning:** No automated scripts - fully documented procedures
 
-- **Essential Algorithms**: AES256, SHA512, Ed25519 (focused on widely-used, secure algorithms)
-- **Balanced SSH Settings**: Secure but not overly restrictive configurations
-- **Optimized Cache Settings**: 8-24 hour cache TTL for good balance of security and usability
+### What Changed from Per-Host Model
 
-### Performance Optimizations
+| Aspect | Old Model | New Model |
+|--------|-----------|-----------|
+| **Key Storage** | Per-host keys in SOPS | Single hardware key pair |
+| **Secret Material** | Filesystem + SOPS | Hardware token only |
+| **Host Keys** | Different per host | Same keys everywhere |
+| **Provisioning** | Import from SOPS | Stubs from hardware |
+| **Backup Strategy** | SOPS backups | Identical backup token |
 
-- **Lazy GPG Agent Initialization**: Only starts/connects when needed
-- **Efficient Tmux Integration**: Uses session/client events instead of frequent pane switches
-- **Streamlined Environment Setup**: Reduced conditional logic and redundant checks
-- **Minimal Configuration**: Essential settings only, removing rarely-used options
+---
 
-### Cross-Platform Support
+## How Stubs Work
 
-- **Unified Pinentry**: Terminal-based pinentry-curses for consistent operation
-- **Platform-Specific Optimizations**: Tailored socket handling for Linux/macOS
-- **Consistent Shell Experience**: Same behavior across all platforms
+### What is a Stub?
 
-### Integration Features
+A **stub** is a lightweight reference file stored in `~/.gnupg/private-keys-v1.d/` that:
+- Points to a key on the hardware token (by serial number)
+- Contains key metadata (algorithm, keygrip)
+- **Does NOT contain secret key material**
 
-- **Git Signing**: Automatic commit signing with GPG
-- **SSH Authentication**: GPG keys used for SSH instead of separate SSH keys
-- **Smart Card Support**: Hardware token integration ready
-- **Agent Management**: Lazy startup and optimized TTY handling
+### Stub vs. Full Key
 
-### Optimized Tmux Configuration
-
-The strategy includes performance-optimized tmux configuration with:
-
-```nix
-programs.tmux = {
-  enable = true;
-  extraConfig = ''
-    # Streamlined environment variable passing
-    set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
-    
-    # Efficient GPG_TTY updates - only when creating sessions or attaching clients
-    set-hook -g session-created 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
-    set-hook -g client-attached 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
-  '';
-};
+**Full Key (NOT used in this model):**
+```
+~/.gnupg/private-keys-v1.d/XXXXXXX.key:
+- Secret key material (encrypted)
+- Can decrypt/sign without hardware
+- Size: ~1-2 KB
 ```
 
-This ensures:
-- Environment variables are properly inherited in new tmux panes
-- GPG_TTY is updated only when necessary (session creation/client attachment)
-- SSH authentication works consistently across all tmux sessions
-- **Performance improvement**: Eliminates expensive pane-focus-in hooks
+**Stub (what we use):**
+```
+~/.gnupg/private-keys-v1.d/XXXXXXX.key:
+- Keygrip reference
+- Hardware token serial
+- Algorithm info
+- No secret material
+- Size: ~200 bytes
+- Points to hardware for actual operations
+```
 
-## Configuration Files
+### Creating Stubs
 
-The strategy is implemented across several configuration files:
-
-- **`modules/security/default.nix`**: Main unified GPG/SSH/Agent configuration
-- **`users/brancengregory/home.nix`**: User-specific configuration and imports
-- **`modules/terminal/zsh.nix`**: Shell aliases and agent integration
-- **`modules/terminal/tmux.nix`**: Performance-optimized tmux hooks
-
-## Initial Setup
-
-### 1. Generate GPG Master Key
-
+**Automatic (Preferred):**
 ```bash
-# Generate a new GPG key with strong settings
-gpg --full-gen-key
+# 1. Insert Nitrokey
 
-# Choose:
-# (1) RSA and RSA (default) or (9) ECC and ECC
-# Key size: 4096 bits (RSA) or Curve 25519 (ECC)  
-# Valid for: 1-2 years (recommended)
-# Real name: Brancen Gregory
-# Email: brancengregory@gmail.com
+# 2. Any GPG operation creates stubs
+gpg --card-status        # View token info (creates stubs)
+ssh-add -L              # View SSH key (creates auth stub)
+git commit -m "test"     # Sign (creates signing stub)
+
+# 3. Stubs now exist
+gpg --list-secret-keys
+# Shows: 'ssb>' notation (secret subkey stub)
 ```
 
-### 2. Generate SSH Authentication Subkey
-
+**Manual (if automatic fails):**
 ```bash
-# Add SSH authentication capability to your GPG key
-gpg --edit-key brancengregory@gmail.com
+# Fetch public key from keyserver
+gpg --card-edit
+# gpg/card> fetch
+# gpg/card> quit
 
-# In GPG prompt:
-gpg> addkey
-# Choose (8) RSA (set your own capabilities)
-# Toggle off Sign and Encrypt, toggle on Authenticate
-# Or choose (10) ECC (set your own capabilities) for Ed25519
-
-gpg> save
+# Force stub creation
+gpg-connect-agent "scd serialno" "learn --force" /bye
 ```
 
-### 3. Export SSH Public Key
+---
 
+## Magic Recovery (New Machine Setup)
+
+### Overview
+
+Setting up GPG/SSH on a new machine with existing hardware keys:
+
+**Before:** Needed to import secret keys from backup/SOPS  
+**After:** Just plug in token and create stubs
+
+### Procedure
+
+**Step 1: Install System**
 ```bash
-# Export SSH public key from GPG
-gpg --export-ssh-key brancengregory@gmail.com
-
-# Add this to GitHub, GitLab, servers, etc.
+# Install NixOS or home-manager as normal
+# See docs/DEPLOYMENT.md for full procedure
 ```
 
-### 4. Configure Git Signing
-
+**Step 2: Insert Nitrokey**
 ```bash
-# Set your GPG signing key (if not using default)
-git config --global user.signingkey YOUR_GPG_KEY_ID
-
-# Verify signing works
-git commit --allow-empty -m "Test GPG signing"
-git log --show-signature -1
+# Physically insert token into USB port
+# Wait for LED to stabilize (steady light)
 ```
 
-## Tmux Integration
-
-The configuration includes performance-optimized tmux support to ensure GPG and SSH work seamlessly within tmux sessions.
-
-### Optimized Tmux Features
-
-- **Lazy GPG_TTY Updates**: Updates GPG_TTY only when creating sessions or attaching clients, not on every pane switch
-- **SSH agent socket management**: Ensures consistent SSH authentication in tmux
-- **Terminal pinentry optimization**: Configured for efficient operation in tmux sessions
-- **Performance improvement**: Eliminates frequent hook executions that could slow down tmux
-
-### Usage in Tmux
-
+**Step 3: Fetch Public Key**
 ```bash
-# Start tmux session
-tmux new-session -s work
+# Download from keyserver
+gpg --card-edit
+# gpg/card> fetch  # Automatically fetches from keys.openpgp.org
+# gpg/card> quit
 
-# SSH from within tmux (works seamlessly)
+# Alternative: Import from local copy
+gpg --import keys/brancen-gregory-public.asc
+```
+
+**Step 4: Create Stubs**
+```bash
+# Link hardware to GPG (creates stubs)
+gpg-connect-agent "scd serialno" "learn --force" /bye
+
+# Or simply use any GPG operation
+gpg --list-secret-keys  # Shows stubs created
+```
+
+**Step 5: Verify SSH**
+```bash
+# Check SSH key is available
+ssh-add -L
+
+# Expected output:
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH... cardno:000F_XXXXXXXX
+```
+
+**Step 6: Test**
+```bash
+# Test SSH authentication
 ssh git@github.com
+# Should show: Hi brancengregory! You've successfully authenticated...
 
-# Git operations work with automatic signing
-git commit -m "Update from tmux session"
-git push
-
-# If you encounter issues, manually refresh GPG state
-refresh_gpg
+# Test Git signing
+git commit --allow-empty -m "Test hardware key signing"
+git log --show-signature -1
+# Should show: Good signature from "Brancen Gregory"
 ```
 
-### Troubleshooting Tmux Issues
+### Result
 
-If you encounter pinentry or authentication issues in tmux:
+- ✅ No secret key import needed
+- ✅ No SOPS secrets for GPG
+- ✅ Stubs created automatically
+- ✅ Hardware provides all secret operations
+- ✅ Both Nitrokeys work identically
 
-```bash
-# Check GPG agent status
-gpg-status
+---
 
-# Restart GPG agent if needed  
-gpg-restart
-
-# Manually refresh GPG state in current pane
-refresh_gpg
-
-# Check SSH keys are loaded
-ssh-keys
-
-# Verify SSH socket is correct
-echo $SSH_AUTH_SOCK
-```
-
-## Daily Usage
+## Daily Workflow
 
 ### SSH Authentication
 
-With the unified strategy, SSH authentication works seamlessly:
-
+**Automatic (once stubs exist):**
 ```bash
-# SSH uses your GPG key automatically
-ssh git@github.com
+ssh user@server
+# System prompts for PIN (if cache expired)
+# LED blinks - touch token
+# Authentication complete
+```
 
-# SSH to personal servers
-ssh user@server.com
+**With Tmux:**
+```bash
+tmux new-session -s work
+ssh user@server  # Works seamlessly in tmux
+
+# If issues:
+refresh_gpg  # Updates GPG_TTY for current pane
+```
+
+### Git Commit Signing
+
+**Automatic (enabled by default):**
+```bash
+git commit -m "Update configuration"
+# Automatically signed with hardware key
+# PIN prompt if cache expired
+# Touch token when LED blinks
+```
+
+**Verify Signature:**
+```bash
+git log --show-signature
+# Shows: Good signature from "Brancen Gregory <brancengregory@gmail.com>"
 ```
 
 ### GPG Operations
 
-Standard GPG operations work as expected:
-
+**Encrypt File:**
 ```bash
-# Encrypt files
 gpg --encrypt --recipient brancengregory@gmail.com file.txt
-
-# Sign files
-gpg --sign file.txt
-
-# Decrypt/verify
-gpg --decrypt file.txt.gpg
+# PIN prompt
+# Touch token
+# Encrypted file created
 ```
 
-### Git Integration
-
-Git automatically signs commits with your GPG key:
-
+**Sign File:**
 ```bash
-# Commits are automatically signed
-git commit -m "Update configuration"
-
-# Verify signatures
-git log --show-signature
+gpg --sign file.txt
+# PIN prompt
+# Touch token
+# Signed file created
 ```
+
+---
 
 ## Key Management
 
-### Backup Strategy
+### Your Keys
 
-```bash
-# Export your master key (keep this VERY secure)
-gpg --export-secret-keys --armor brancengregory@gmail.com > private-key-backup.asc
+**Hardware Token Keys:**
+- **Fingerprint:** `0A8C406B92CEFC33A51EC4933D9E0666449B886D`
+- **Key ID:** `3D9E0666449B886D`
+- **Keyserver:** https://keys.openpgp.org
 
-# Export public key (safe to share)
-gpg --export --armor brancengregory@gmail.com > public-key.asc
-
-# Export revocation certificate
-gpg --gen-revoke brancengregory@gmail.com > revocation-cert.asc
+**Key Structure:**
+```
+Master Key (Certify only)
+├─ Signing Subkey     → Git commit signing
+├─ Encryption Subkey  → File/email encryption
+└─ Authentication Subkey → SSH authentication
 ```
 
-### Key Rotation
+### Keyserver Integration
 
-Plan to rotate keys periodically:
+**Publish Key:**
+```bash
+# If you update/extend keys
+gpg --keyserver hkps://keys.openpgp.org --send-keys 3D9E0666449B886D
+```
 
-1. **Annual Review**: Check key expiration and usage
-2. **Subkey Rotation**: Rotate subkeys more frequently than master key
-3. **Revocation**: Have revocation certificates ready for emergency use
+**Fetch on New Machine:**
+```bash
+gpg --card-edit
+# gpg/card> fetch
+# gpg/card> quit
+
+# Or directly:
+curl https://keys.openpgp.org/vks/v1/by-fingerprint/0A8C406B92CEFC33A51EC4933D9E0666449B886D | gpg --import
+```
+
+### Local Backup
+
+**Public Key in Repository:**
+```bash
+# Located at: keys/brancen-gregory-public.asc
+# Use if keyserver unavailable:
+gpg --import keys/brancen-gregory-public.asc
+```
+
+---
+
+## Hardware Token Details
+
+### Device Information
+
+**Primary Token:**
+- Model: Nitrokey 3
+- Serial: [Check with `gpg --card-status`]
+- Location: [Your secure location]
+- Usage: Daily operations
+
+**Backup Token:**
+- Model: Nitrokey 3
+- Serial: [Check with `gpg --card-status`]
+- Location: [Your backup secure location]
+- Usage: Emergency/backup (identical keys)
+
+### PIN Management
+
+**User PIN:** 6-8 digits
+- Daily operations (sign, encrypt, auth)
+- 3 attempts before temporary lock
+- Unlocked with Admin PIN
+
+**Admin PIN:** (change from default during setup!)
+- Card administration
+- Reset User PIN
+- Never for daily use
+
+**Change PINs:**
+```bash
+gpg --card-edit
+# gpg/card> admin
+# gpg/card> passwd
+# Follow prompts
+# gpg/card> quit
+```
+
+### Touch Confirmation (UIF)
+
+**User Interface Flags (UIF):**
+- Configured: All subkeys require touch
+- LED blinks when touch needed
+- Press token surface to confirm
+
+**Verify:**
+```bash
+gpg --card-edit
+# gpg/card> uif
+# Shows current UIF status
+```
+
+---
+
+## Configuration
+
+### Current Configuration Files
+
+**GPG Agent** (`modules/home/gpg.nix`):
+```nix
+services.gpg-agent = {
+  enable = true;
+  enableSshSupport = true;
+  enableScDaemon = true;  # Smart card daemon for hardware tokens
+  
+  # Cache settings
+  defaultCacheTtl = 28800;      # 8 hours
+  defaultCacheTtlSsh = 28800;   # 8 hours
+  maxCacheTtl = 86400;          # 24 hours
+  maxCacheTtlSsh = 86400;       # 24 hours
+};
+```
+
+**Git Signing** (`modules/home/programs/git.nix`):
+```nix
+signing = {
+  key = "3D9E0666449B886D";  # Hardware token subkey
+  signByDefault = true;
+};
+```
+
+**ZSH Integration** (`modules/home/terminal/zsh.nix`):
+```nix
+# Environment setup
+export GPG_TTY=$(tty)
+export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+
+# Hardware token aliases
+nitro-status = "gpg --card-status";
+nitro-fetch = "gpg --card-edit";
+nitro-learn = "gpg-connect-agent 'scd serialno' 'learn --force' /bye";
+```
+
+### Tmux Integration
+
+**Configuration** (`modules/home/terminal/tmux.nix`):
+```nix
+set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION SSH_AUTH_SOCK WINDOWID XAUTHORITY GPG_TTY"
+
+# Refresh GPG_TTY on session events
+set-hook -g session-created 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+set-hook -g client-attached 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+```
+
+---
 
 ## Troubleshooting
 
-### GPG Agent Issues
+### Hardware Token Not Detected
 
+**Symptom:** `gpg --card-status` shows "No such device"
+
+**Solutions:**
 ```bash
-# Restart GPG agent
-gpgconf --kill gpg-agent
-gpgconf --launch gpg-agent
+# Check USB
+lsusb | grep -i nitro
 
-# Check agent status
-gpg-connect-agent 'keyinfo --list' /bye
+# Check scdaemon
+gpgconf --check-programs
+ps aux | grep scdaemon
 
-# Use helpful aliases
-gpg-restart  # Restart agent
-gpg-status   # Check status
-gpg-refresh  # Refresh in tmux pane
+# Restart
+gpgconf --kill scdaemon
+gpg-connect-agent /bye
+
+# Try different port
 ```
 
-### SSH Authentication Problems
+### SSH Key Not Available
 
+**Symptom:** `ssh-add -L` doesn't show cardno key
+
+**Solutions:**
 ```bash
-# Check SSH agent socket
+# Create stubs
+gpg-connect-agent "scd serialno" "learn --force" /bye
+
+# Check GPG agent
 echo $SSH_AUTH_SOCK
-
-# List loaded SSH keys (should show GPG key)
-ssh-add -l
-
-# Force GPG agent refresh
-gpg-connect-agent updatestartuptty /bye
-
-# Use aliases for quick checks
-ssh-keys     # List SSH keys
-```
-
-### Tmux-Specific Issues
-
-**Problem**: Pinentry appears in wrong pane or doesn't appear at all
-
-```bash
-# Solution 1: Refresh GPG state in current pane
-refresh_gpg
-
-# Solution 2: Restart GPG agent completely  
-gpg-restart
-
-# Solution 3: Check GPG_TTY is set correctly
-echo $GPG_TTY
-```
-
-**Problem**: SSH authentication fails in tmux but works outside
-
-```bash
-# Check SSH socket in tmux session
-echo $SSH_AUTH_SOCK
-
-# Verify the socket file exists
-ls -la $SSH_AUTH_SOCK
-
-# If socket is missing, restart the session or refresh
-refresh_gpg
-```
-
-**Problem**: Git signing fails in tmux
-
-```bash
-# Check GPG agent can sign
-echo "test" | gpg --clearsign
-
-# Refresh GPG state if needed
-refresh_gpg
-
-# Test Git signing explicitly
-git commit --allow-empty -m "Test commit" --gpg-sign
-```
-
-### Platform-Specific Issues
-
-**Linux:**
-```bash
-# Check XDG runtime directory
-echo $XDG_RUNTIME_DIR
-
-# Verify socket exists
-ls -la $XDG_RUNTIME_DIR/gnupg/
-```
-
-**macOS:**
-```bash
-# Check GPG agent socket
 gpgconf --list-dirs agent-ssh-socket
 
-# Verify agent is running
-gpgconf --check-programs
+# Restart agent
+gpgconf --kill gpg-agent && gpgconf --launch gpg-agent
 ```
 
-## Security Considerations
+### Git Signing Fails
 
-### Best Practices
+**Symptom:** `git commit` fails with GPG error
 
-1. **Strong Passphrases**: Use long, unique passphrases for GPG keys
-2. **Limited Scope**: Use separate subkeys for different purposes
-3. **Regular Rotation**: Plan key rotation schedule
-4. **Secure Storage**: Keep master key backup in secure location
-5. **Revocation Ready**: Maintain current revocation certificates
+**Solutions:**
+```bash
+# Check signing key
+git config user.signingkey
+# Should be: 3D9E0666449B886D
+
+# Test GPG directly
+echo "test" | gpg --clearsign
+
+# Check stubs
+gpg --list-secret-keys 3D9E0666449B886D
+```
+
+### PIN Entry Issues
+
+**Symptom:** PIN dialog doesn't appear
+
+**Solutions:**
+```bash
+# Set GPG_TTY
+export GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye
+
+# Test pinentry
+echo "GETPIN" | pinentry-curses
+
+# In tmux:
+refresh_gpg
+```
+
+---
+
+## Security Model
+
+### Threat Protection
+
+**Hardware Token Provides:**
+- ✅ Physical possession requirement
+- ✅ Keys never leave hardware (even during operations)
+- ✅ Protection against key extraction attacks
+- ✅ 5th Amendment protection (can't be compelled to reveal PIN)
+- ✅ PIN + touch dual authentication
+
+**SSH Host Keys Provide:**
+- ✅ Server identity verification
+- ✅ Protection against man-in-the-middle attacks
+- ✅ Pre-distributed trust (no TOFU)
+
+**SOPS Provides:**
+- ✅ Encrypted secret distribution
+- ✅ Host-specific credentials
+- ✅ Declarative configuration
 
 ### Trust Model
-- **Web of Trust**: Participate in key signing when appropriate
-- **Key Verification**: Always verify key fingerprints out-of-band
-- **Certificate Authorities**: Consider using keyserver certificates for verification
 
-## Hardware Tokens
+```
+┌─────────────────────────────────────────┐
+│        TRUST HIERARCHY                │
+├─────────────────────────────────────────┤
+│ 1. Hardware Token (Root of Trust)      │
+│    └─ Physical possession + PIN        │
+│                                         │
+│ 2. SSH Host Keys (Server Identity)     │
+│    └─ Pre-verified in SOPS             │
+│                                         │
+│ 3. SOPS + Age (Secret Distribution)    │
+│    └─ Host-specific decryption         │
+└─────────────────────────────────────────┘
+```
 
-The configuration supports hardware tokens (YubiKey, etc.):
+---
 
-1. **Smart Card Support**: `enableScDaemon = true` in GPG agent
-2. **Key Generation**: Generate keys directly on hardware token
-3. **Backup Strategy**: Ensure backup authentication methods
+## Best Practices
 
-## Integration with Services
+### Daily Use
 
-### GitHub/GitLab
+1. **Insert token when starting work**
+2. **Remove when done** (optional but good practice)
+3. **Verify LED behavior:**
+   - Steady = ready
+   - Blinking = touch needed
+4. **Use aliases for common operations**
 
-1. Add your SSH public key to your profile
-2. Commits will be automatically signed
-3. SSH authentication works seamlessly
+### Security
 
-### Personal Servers
+1. **Never export secret keys** (they stay on hardware)
+2. **Backup token kept offline** (emergency only)
+3. **Public key published** (keyserver + repo backup)
+4. **PIN not written down** (memorize only)
+5. **Touch required** (UIF enabled for all operations)
 
-1. Add SSH public key to `~/.ssh/authorized_keys`
-2. Configure host-specific settings in SSH config
-3. Optionally use GPG for server encryption/signing
+### Maintenance
 
-## Maintenance
+1. **Monthly:** Test backup token
+2. **Quarterly:** Verify keyserver publication
+3. **Annually:** Consider subkey rotation
 
-### Regular Tasks
+---
 
-- **Weekly**: Check agent status and key usage
-- **Monthly**: Review SSH connections and Git signatures  
-- **Quarterly**: Review key expiration dates
-- **Annually**: Consider key rotation and security review
+## Migration from Old Model
 
-### Monitoring
+### For Existing Installations
 
-The configuration includes logging and monitoring capabilities:
+**If you have per-host GPG keys in SOPS:**
 
-- GPG agent logs authentication attempts
-- SSH client logs connection details
-- Git maintains signature verification history
+1. **Backup existing GPG directory:**
+   ```bash
+   cp -r ~/.gnupg ~/.gnupg.backup.$(date +%Y%m%d)
+   ```
 
-## Migration Guide
+2. **Remove old keys:**
+   ```bash
+   rm -rf ~/.gnupg/private-keys-v1.d/*
+   rm ~/.gnupg/pubring.kbx*
+   ```
 
-### From Existing SSH Keys
+3. **Provision with hardware token:**
+   ```bash
+   gpg --card-edit
+   # fetch
+   # quit
+   gpg-connect-agent "scd serialno" "learn --force" /bye
+   ```
 
-1. **Backup current SSH keys**
-2. **Generate GPG authentication subkey**
-3. **Update authorized_keys on servers**
-4. **Test SSH authentication with GPG**
-5. **Remove old SSH keys once verified**
+4. **Verify:**
+   ```bash
+   gpg --list-secret-keys  # Should show stubs
+   ssh-add -L              # Should show cardno
+   git commit --allow-empty -m "Test"
+   ```
 
-### From Existing GPG Setup
+5. **Clean SOPS:**
+   ```bash
+   # Remove GPG sections from secrets/secrets.yaml
+   # See docs/DEPLOYMENT.md
+   ```
 
-1. **Export current keys**
-2. **Apply new home-manager configuration**
-3. **Import keys to new agent**
-4. **Verify functionality**
-5. **Update any custom configurations**
+---
 
-## See Also
+## Related Documentation
 
-- [Security Guidelines](./SECURITY.md) - General security best practices for the repository
-- [Secret Management](./SECRET_MANAGEMENT.md) - Secure handling of credentials and keys
-- [Contributing](./CONTRIBUTING.md) - Development workflow and environment setup
+- **Hardware Tokens:** `docs/HARDWARE-KEYS.md` - Detailed token management
+- **Deployment:** `docs/DEPLOYMENT.md` - New machine provisioning
+- **Secret Management:** `docs/SECRET_MANAGEMENT.md` - SOPS and age keys
+- **Security:** `docs/SECURITY.md` - Threat model and practices
+- **FIDO2 (Future):** `docs/FIDO2-RESIDENT-KEYS.md` - Alternative SSH method
+- **Public Key:** `keys/brancen-gregory-public.asc` - Local backup
 
-## Further Reading
+---
 
-- [GPG Documentation](https://gnupg.org/documentation/)
-- [SSH Protocol Specification](https://tools.ietf.org/html/rfc4251)
-- [Git Signing Documentation](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work)
-- [Home Manager Manual](https://nix-community.github.io/home-manager/)
+## Quick Reference Commands
+
+```bash
+# Check token
+gpg --card-status
+
+# Create stubs
+gpg-connect-agent "scd serialno" "learn --force" /bye
+
+# List keys with stubs
+gpg --list-secret-keys
+
+# Show SSH key
+ssh-add -L | grep cardno
+
+# Fetch from keyserver
+gpg --card-edit -> fetch -> quit
+
+# Restart agent
+gpgconf --kill gpg-agent && gpgconf --launch gpg-agent
+
+# Refresh in tmux
+refresh_gpg
+
+# Hardware token aliases
+nitro-status    # gpg --card-status
+nitro-fetch     # gpg --card-edit
+nitro-learn     # Create stubs
+```
+
+---
+
+*Last Updated: 2026-03-04*  
+*Hardware Token Model - No Per-Host Keys*

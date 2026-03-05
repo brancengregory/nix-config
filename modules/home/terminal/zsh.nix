@@ -75,6 +75,15 @@
         gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
         ssh-keys = "ssh-add -l";
         gpg-refresh = "refresh_gpg";
+
+        # Hardware token (Nitrokey) aliases
+        nitro-status = "gpg --card-status";
+        nitro-fetch = "gpg --card-edit";
+        nitro-learn = "gpg-connect-agent 'scd serialno' 'learn --force' /bye";
+        nitro-keys = "gpg --list-secret-keys";
+        nitro-stubs = "ls ~/.gnupg/private-keys-v1.d/";
+        ssh-gpg-keys = "ssh-add -L | grep cardno";
+        gpg-show-card = "gpg --card-edit /bye";
       }
       // (
         if isLinux

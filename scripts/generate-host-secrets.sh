@@ -42,7 +42,7 @@ fi
 print_info "Generating secrets for host: $HOST"
 
 # Check prerequisites
-for cmd in sops age-keygen gpg wg ssh-keygen; do
+for cmd in sops age-keygen wg ssh-keygen; do
   if ! command -v "$cmd" &> /dev/null; then
     print_error "$cmd is required but not installed"
     exit 1
@@ -111,38 +111,10 @@ sops --set "[\"age\"][\"$HOST\"][\"private\"] \"$AGE_PRIV\"" "$SECRETS_FILE"
 
 print_success "Age key generated: $AGE_PUB"
 
-# Generate GPG subkeys (if master key exists)
-print_info "Generating GPG subkeys..."
-MASTER_FPR=$(sops -d --extract '["gpg"]["master"]["fingerprint"]' "$SECRETS_FILE" 2>/dev/null || echo "")
-
-if [[ -n "$MASTER_FPR" ]]; then
-  export GNUPGHOME=$(mktemp -d)
-  chmod 700 "$GNUPGHOME"
-  
-  # Import master key
-  sops -d --extract '["gpg"]["hosts"]["capacitor"]["secret_keys"]' "$SECRETS_FILE" 2>/dev/null | base64 -d | gpg --import 2>/dev/null || true
-  
-  # Add subkeys
-  gpg --quick-add-key "$MASTER_FPR" ed25519 auth 1y 2>/dev/null || true
-  gpg --quick-add-key "$MASTER_FPR" ed25519 sign 1y 2>/dev/null || true
-  gpg --quick-add-key "$MASTER_FPR" cv25519 encr 1y 2>/dev/null || true
-  
-  # Export
-  SECRET_KEYS=$(gpg --armor --export-secret-keys "$MASTER_FPR" 2>/dev/null | base64 -w0 || echo "")
-  PUBLIC_KEYS=$(gpg --armor --export "$MASTER_FPR" 2>/dev/null | base64 -w0 || echo "")
-  
-  if [[ -n "$SECRET_KEYS" ]]; then
-    sops --set "[\"gpg\"][\"hosts\"][\"$HOST\"][\"secret_keys\"] \"$SECRET_KEYS\"" "$SECRETS_FILE"
-    sops --set "[\"gpg\"][\"hosts\"][\"$HOST\"][\"public_keys\"] \"$PUBLIC_KEYS\"" "$SECRETS_FILE"
-    print_success "GPG subkeys generated"
-  else
-    print_warning "Could not generate GPG subkeys (master key may be missing)"
-  fi
-  
-  rm -rf "$GNUPGHOME"
-else
-  print_warning "No GPG master key found, skipping GPG generation"
-fi
+# NOTE: GPG keys are NOT generated here
+# Secret keys live exclusively on Nitrokey 3 hardware tokens
+# Stubs are created automatically when the token is inserted
+# See docs/HARDWARE-KEYS.md for provisioning procedure
 
 # Generate Restic password
 print_info "Generating Restic password..."

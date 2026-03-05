@@ -1,6 +1,10 @@
 # modules/home/gpg.nix
 # Home-manager GPG client configuration
 # User-level GPG settings, agent, and SSH support
+#
+# NOTE: GPG secret keys live on Nitrokey hardware tokens.
+# Stubs are created automatically when the token is first used.
+# See docs/HARDWARE-KEYS.md for details.
 {
   pkgs,
   lib,
@@ -8,6 +12,11 @@
   ...
 }:
 with lib; {
+  # Hardware token management tools
+  home.packages = with pkgs; [
+    pynitrokey  # Nitrokey 3 management (nitropy command)
+  ];
+
   # GPG client settings
   programs.gpg = {
     enable = true;

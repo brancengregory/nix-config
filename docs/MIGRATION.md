@@ -38,9 +38,11 @@ mkdir -p ~/migration-exports
 # SSH keys
 cp -r ~/.ssh ~/migration-exports/
 
-# GPG keys
-gpg --export-secret-keys --armor > ~/migration-exports/gpg-private-keys.asc
+# GPG keys - NOTE: Secret keys are on Nitrokey hardware tokens
+# Only export public keys and trust database (no private keys)
 gpg --export --armor > ~/migration-exports/gpg-public-keys.asc
+cp ~/.gnupg/trustdb.gpg ~/migration-exports/ 2>/dev/null || true
+# DO NOT export secret keys - they remain on hardware token
 
 # Browser profiles (bookmarks, extensions, etc.)
 # Firefox
@@ -316,7 +318,7 @@ sudo chown -R brancengregory:users /home/brancengregory
 restic -r gs:powerhouse-backup:/ restore latest --target /tmp/migration --include "/migration-exports"
 ```
 
-### 4.4 Restore SSH and GPG Keys
+### 4.4 Restore SSH Keys and Provision GPG
 
 ```bash
 # Restore SSH keys
@@ -326,15 +328,18 @@ cp /tmp/migration/migration-exports/.ssh/* ~/.ssh/
 chmod 600 ~/.ssh/*
 chmod 644 ~/.ssh/*.pub 2>/dev/null || true
 
-# Restore GPG keys
-gpg --import /tmp/migration/migration-exports/gpg-public-keys.asc
-gpg --import /tmp/migration/migration-exports/gpg-private-keys.asc
+# GPG: Insert Nitrokey hardware token
+# Stubs are created automatically - no key import needed
+gpg --card-edit
+# gpg/card> fetch  # Downloads public key from keyserver
+# gpg/card> quit
 
-# Trust keys (if needed)
-gpg --edit-key <KEY_ID>
-# Type: trust
-# Select trust level: 5 (ultimate)
-# Save
+# Link hardware (creates stubs)
+gpg-connect-agent "scd serialno" "learn --force" /bye
+
+# Verify
+gpg --list-secret-keys  # Should show 'ssb>' (stub notation)
+ssh-add -L | grep cardno  # Should show SSH key
 ```
 
 ### 4.5 Verify Configuration
@@ -489,7 +494,7 @@ If migration fails catastrophically:
 - [ ] Snapper snapshots working (test: `snapper create -d "test"`)
 - [ ] Home directory restored with correct permissions
 - [ ] SSH keys working (test: `ssh -T git@github.com`)
-- [ ] GPG keys restored (test: `gpg --list-secret-keys`)
+- [ ] GPG hardware token working (test: `gpg --card-status`, `ssh-add -L`)
 - [ ] Restic backup configured and tested
 - [ ] All critical applications installed and working
 - [ ] Firefox/Chrome profiles restored

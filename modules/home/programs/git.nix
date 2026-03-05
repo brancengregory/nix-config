@@ -60,7 +60,8 @@
 
     # Signing configuration
     signing = {
-      key = "16C3D5566DA9B10B";
+      # Hardware token signing key (Nitrokey GPG subkey)
+      key = "3D9E0666449B886D";
       signByDefault = true;
     };
   };
