@@ -1,5 +1,5 @@
 # UI Plugins (Lualine, Dashboard, Which-key, Devicons)
-{ ... }: {
+{...}: {
   programs.nixvim.plugins = {
     # Lualine
     lualine = {

@@ -1,5 +1,5 @@
 # Lazygit Integration (lazygit.nvim)
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.nixvim = {
     plugins.lazygit = {
       enable = true;

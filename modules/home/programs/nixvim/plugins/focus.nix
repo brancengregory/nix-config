@@ -1,5 +1,5 @@
 # Focus Mode (zen-mode) and Todo Comments
-{ ... }: {
+{...}: {
   programs.nixvim.plugins = {
     # Zen mode - distraction free editing
     zen-mode = {

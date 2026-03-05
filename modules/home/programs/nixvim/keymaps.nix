@@ -1,6 +1,6 @@
 # Nixvim Keymaps - Deduplicated and Organized
 # Note: Window navigation (Ctrl+h/j/k/l) is handled by tmux-navigator plugin
-{ ... }: {
+{...}: {
   programs.nixvim.keymaps = [
     # Core mappings
     {

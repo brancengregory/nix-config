@@ -1,5 +1,5 @@
 # Session Management (auto-session.nvim)
-{ ... }: {
+{...}: {
   programs.nixvim.plugins.auto-session = {
     enable = true;
     settings = {

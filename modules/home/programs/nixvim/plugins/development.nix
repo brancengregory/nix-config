@@ -1,5 +1,5 @@
 # Development Plugins (Rust, R, Comments)
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.nixvim = {
     plugins = {
       # Rust tools - rustaceanvim (modern standard)
@@ -48,7 +48,7 @@
           rev = "v0.99.3";
           sha256 = "sha256-oQSHHu6filJkAyH94yEvyTVuxA+5MU2dMOEAnsIjJKQ=";
         };
-        buildInputs = [ 
+        buildInputs = [
           pkgs.which
           pkgs.zip
         ];

@@ -1,5 +1,5 @@
 # Buffer Tab Line (bufferline.nvim)
-{ ... }: {
+{...}: {
   programs.nixvim.plugins.bufferline = {
     enable = true;
     settings = {
@@ -14,7 +14,7 @@
           icon = "▎";
           style = "icon";
         };
-        buffer_close_icon = "";  # No close button
+        buffer_close_icon = ""; # No close button
         modified_icon = "●";
         close_icon = "";
         left_trunc_marker = "";
@@ -41,7 +41,7 @@
         ];
         color_icons = true;
         show_buffer_icons = true;
-        show_buffer_close_icons = false;  # No x button on tabs
+        show_buffer_close_icons = false; # No x button on tabs
         show_close_icon = true;
         show_tab_indicators = true;
         show_duplicate_prefix = true;

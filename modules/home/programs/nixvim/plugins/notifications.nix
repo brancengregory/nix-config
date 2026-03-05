@@ -1,5 +1,5 @@
 # Notification Integration (nvim-notify)
-{ ... }: {
+{...}: {
   programs.nixvim.plugins.notify = {
     enable = true;
     settings = {

@@ -1,6 +1,6 @@
 # Main Nixvim Configuration Entry Point
 # Imports all modularized nixvim configurations
-{ inputs, ... }: {
+{inputs, ...}: {
   imports = [
     inputs.nixvim.homeModules.nixvim
     ./options.nix

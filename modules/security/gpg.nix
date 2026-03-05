@@ -1,11 +1,10 @@
 # modules/security/gpg.nix
 # GPG hardware token support configuration
-# 
+#
 # NOTE: This module does NOT import GPG secret keys.
 # Secret keys live exclusively on Nitrokey 3 hardware tokens.
 # Hosts use lightweight "stubs" that reference keys on hardware.
 # See docs/HARDWARE-KEYS.md and docs/GPG-SSH-STRATEGY.md
-
 {
   config,
   pkgs,
@@ -90,7 +89,7 @@ in {
           if ! ${pkgs.gnupg}/bin/gpg --homedir "$GNUPGHOME" --list-keys 2>/dev/null | grep -q "0A8C406B92CEFC33A51EC4933D9E0666449B886D"; then
             echo "Importing GPG public keys for $USER..."
             ${pkgs.gnupg}/bin/gpg --homedir "$GNUPGHOME" --batch --import "${cfg.publicKeysFile}" 2>/dev/null || true
-            
+
             # Set trust level on imported keys
             MASTER_FPR=$(${pkgs.gnupg}/bin/gpg --homedir "$GNUPGHOME" --list-keys --with-colons 2>/dev/null | grep fpr | head -1 | cut -d: -f10 || echo "")
             if [ -n "$MASTER_FPR" ]; then
@@ -116,8 +115,9 @@ in {
     # 4. Or simply uses GPG (git commit, ssh, etc.)
 
     # Documentation reference
-    warnings = optional cfg.enable 
-      "GPG secret keys are stored on hardware tokens, not imported. " +
-      "See docs/HARDWARE-KEYS.md for provisioning instructions.";
+    warnings =
+      optional cfg.enable
+      "GPG secret keys are stored on hardware tokens, not imported. "
+      + "See docs/HARDWARE-KEYS.md for provisioning instructions.";
   };
 }

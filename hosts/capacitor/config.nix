@@ -307,7 +307,7 @@
       enable = true;
       domain = "git.brancen.world";
       httpPort = 3080;
-      sshPort = 22;  # Standard Git SSH port (system SSH moved to 77)
+      sshPort = 22; # Standard Git SSH port (system SSH moved to 77)
     };
     dataDir = "/var/lib/forgejo"; # NVMe storage for fast git operations
   };

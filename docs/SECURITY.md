@@ -26,7 +26,7 @@ This document outlines security best practices and considerations for this nix-c
 - **Modern algorithms**: SHA512, AES256, strong key preferences
 - **Secure defaults**: No weak ciphers, strong S2K settings
 - **Key management**: Proper keyserver configuration
-- **Hardware token support**: Ready for YubiKey integration
+- **Hardware token support**: Nitrokey 3 hardware tokens with GPG agent integration
 
 ### User Account Security
 - **No hardcoded passwords**: Users must set passwords during setup

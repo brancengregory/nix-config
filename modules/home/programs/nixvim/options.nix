@@ -1,5 +1,5 @@
 # Nixvim Options and Settings
-{ ... }: {
+{...}: {
   programs.nixvim = {
     # Settings (from lua/config/settings.lua)
     globals = {

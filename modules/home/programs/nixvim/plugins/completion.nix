@@ -1,5 +1,5 @@
 # Completion and Snippets Configuration
-{ ... }: {
+{...}: {
   programs.nixvim.plugins = {
     # Modern completion with blink-cmp
     blink-cmp = {

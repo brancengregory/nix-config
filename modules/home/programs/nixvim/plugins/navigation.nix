@@ -1,5 +1,5 @@
 # Navigation Plugins (Telescope, Harpoon, Neo-tree)
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.nixvim.plugins = {
     # Telescope
     telescope = {

@@ -1,6 +1,6 @@
 # Floating Terminal (toggleterm.nvim)
 # Uses $SHELL from environment to inherit parent shell with Atuin integration
-{ ... }: {
+{...}: {
   programs.nixvim = {
     plugins.toggleterm = {
       enable = true;

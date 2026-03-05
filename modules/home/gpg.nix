@@ -14,7 +14,7 @@
 with lib; {
   # Hardware token management tools
   home.packages = with pkgs; [
-    pynitrokey  # Nitrokey 3 management (nitropy command)
+    pynitrokey # Nitrokey 3 management (nitropy command)
   ];
 
   # GPG client settings
