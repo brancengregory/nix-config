@@ -77,24 +77,25 @@
     lib = import ./lib {inherit inputs;};
   in {
     nixosConfigurations = {
-      powerhouse = lib.mkHost {
-        hostname = "powerhouse";
-        system = "x86_64-linux";
-        user = "brancengregory";
-        builder = nixpkgs.lib.nixosSystem;
-        homeManagerModule = home-manager.nixosModules.home-manager;
-        sopsModule = sops-nix.nixosModules.sops;
-        isDesktop = true;
-        extraModules = [
-          inputs.disko.nixosModules.disko
-        ];
-        extraHomeModules = [
-          inputs.plasma-manager.homeModules.plasma-manager
-        ];
-      };
+      # DEPRECATED: powerhouse will become basestation after orbital is stable
+      # powerhouse = lib.mkHost {
+      #   hostname = "powerhouse";
+      #   system = "x86_64-linux";
+      #   user = "brancengregory";
+      #   builder = nixpkgs.lib.nixosSystem;
+      #   homeManagerModule = home-manager.nixosModules.home-manager;
+      #   sopsModule = sops-nix.nixosModules.sops;
+      #   isDesktop = true;
+      #   extraModules = [
+      #     inputs.disko.nixosModules.disko
+      #   ];
+      #   extraHomeModules = [
+      #     inputs.plasma-manager.homeModules.plasma-manager
+      #   ];
+      # };
 
-      capacitor = lib.mkHost {
-        hostname = "capacitor";
+      orbital = lib.mkHost {
+        hostname = "orbital";
         system = "x86_64-linux";
         user = "brancengregory";
         builder = nixpkgs.lib.nixosSystem;
@@ -107,7 +108,7 @@
       };
 
       # ISO Installer configurations - kept as raw configs per scope discipline
-      capacitor-iso = nixpkgs.lib.nixosSystem {
+      orbital-iso = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {
           inherit inputs;
@@ -123,14 +124,14 @@
           "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
           inputs.sops-nix.nixosModules.sops
           inputs.disko.nixosModules.disko
-          ./hosts/capacitor/hardware.nix
-          ./hosts/capacitor/disks.nix
+          ./hosts/orbital/hardware.nix
+          ./hosts/orbital/disks.nix
           {
             # ISO-specific settings
             isoImage.squashfsCompression = "zstd -Xcompression-level 3";
 
             # Basic system settings
-            networking.hostName = "capacitor-installer";
+            networking.hostName = "orbital-installer";
             time.timeZone = "America/Chicago";
             i18n.defaultLocale = "en_US.UTF-8";
 
@@ -155,10 +156,6 @@
               settings.PermitRootLogin = "yes";
             };
 
-            # Set a temporary root password for the installer
-            # Note: Base ISO already sets initialHashedPassword = ""
-            users.users.root.initialPassword = "nixos";
-
             # Boot loader for ISO
             boot.loader.systemd-boot.enable = true;
             boot.loader.efi.canTouchEfiVariables = true;
@@ -169,65 +166,11 @@
         ];
       };
 
-      powerhouse-iso = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {
-          inherit inputs;
-          isLinux = true;
-          isDarwin = false;
-        };
-        modules = [
-          {
-            nixpkgs.overlays = [
-              (import ./overlays/ojodb.nix)
-            ];
-          }
-          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          inputs.sops-nix.nixosModules.sops
-          inputs.disko.nixosModules.disko
-          ./hosts/powerhouse/hardware.nix
-          ./hosts/powerhouse/disks/main.nix
-          {
-            # ISO-specific settings
-            isoImage.squashfsCompression = "zstd -Xcompression-level 3";
-
-            # Basic system settings
-            networking.hostName = "powerhouse-installer";
-            time.timeZone = "America/Chicago";
-            i18n.defaultLocale = "en_US.UTF-8";
-
-            # Add tools needed for installation
-            environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
-              git
-              vim
-              curl
-              wget
-              gptfdisk
-              cryptsetup
-              btrfs-progs
-              disko
-            ];
-
-            # Enable SSH in the installer
-            services.openssh = {
-              enable = true;
-              ports = [22];
-              settings.PermitRootLogin = "yes";
-            };
-
-            # Set a temporary root password for the installer
-            # Note: Base ISO already sets initialHashedPassword = ""
-            users.users.root.initialPassword = "nixos";
-
-            # Boot loader for ISO
-            boot.loader.systemd-boot.enable = true;
-            boot.loader.efi.canTouchEfiVariables = true;
-
-            # Install tools
-            programs.git.enable = true;
-          }
-        ];
-      };
+      # DEPRECATED: powerhouse will become basestation
+      # powerhouse-iso = nixpkgs.lib.nixosSystem {
+      #   system = "x86_64-linux";
+      #   ...
+      # };
     };
 
     darwinConfigurations = {
@@ -245,14 +188,15 @@
 
     # Create a VM for testing and cross-compilation targets
     packages.x86_64-linux = {
-      powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
+      # DEPRECATED: powerhouse-vm commented
+      # powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
 
-      # Capacitor system configuration
-      capacitor = self.nixosConfigurations.capacitor.config.system.build.toplevel;
+      # Orbital system configuration
+      orbital = self.nixosConfigurations.orbital.config.system.build.toplevel;
       powerhouse = self.nixosConfigurations.powerhouse.config.system.build.toplevel;
 
       # ISO Installers
-      capacitor-iso = self.nixosConfigurations.capacitor-iso.config.system.build.isoImage;
+      orbital-iso = self.nixosConfigurations.orbital-iso.config.system.build.isoImage;
       powerhouse-iso = self.nixosConfigurations.powerhouse-iso.config.system.build.isoImage;
 
       # Cross-compilation: Build darwin configs from Linux
@@ -307,24 +251,19 @@
       shellHook = ''
         echo "🚀 Cross-platform Nix development environment"
         echo ""
-        echo "🏠 Available Hosts:"
-        echo "  - powerhouse  (NixOS desktop with dual-boot)"
-        echo "  - capacitor   (NixOS homelab server)"
+        echo "🏠 Active Hosts:"
+        echo "  - orbital     (NixOS homelab server - SOLO MODE)"
         echo "  - turbine     (macOS workstation)"
         echo ""
         echo "🔨 Build Commands:"
-        echo "  - mise build-powerhouse              # Build powerhouse NixOS config"
-        echo "  - mise build-powerhouse-iso          # Build powerhouse ISO installer"
-        echo "  - mise build-capacitor               # Build capacitor NixOS config"
-        echo "  - mise build-capacitor-iso           # Build capacitor ISO installer"
+        echo "  - mise build-orbital                 # Build orbital NixOS config"
+        echo "  - mise build-orbital-iso             # Build orbital ISO installer"
         echo "  - mise build-turbine                 # Build turbine macOS config"
-        echo "  - mise build-all                     # Build all configurations"
         echo ""
         echo "✅ Validation Commands:"
         echo "  - mise check                         # Check flake syntax"
         echo "  - mise check-darwin                  # Validate macOS config"
-        echo "  - mise dry-run-powerhouse            # Dry-run powerhouse config"
-        echo "  - mise dry-run-capacitor             # Dry-run capacitor config"
+        echo "  - mise dry-run-orbital               # Dry-run orbital config"
         echo "  - mise test                          # Run all validation tests"
         echo ""
         echo "🔐 Secret Management:"
@@ -334,21 +273,20 @@
         echo "  - sops secrets/secrets.yaml          # Direct edit with sops"
         echo ""
         echo "💻 Deployment:"
-        echo "  - nixos-install --flake .#powerhouse   # Install NixOS powerhouse"
-        echo "  - nixos-install --flake .#capacitor    # Install NixOS capacitor"
+        echo "  - nixos-install --flake .#orbital    # Install NixOS orbital"
         echo ""
         echo "🛠️  Development Tools:"
         echo "  - mise format                        # Format Nix files"
         echo "  - mise dev                           # Enter development shell"
         echo "  - mise clean                         # Clean build results"
-        echo "  - mise ssh-capacitor                 # SSH into capacitor"
+        echo "  - mise ssh-orbital                   # SSH into orbital"
         echo "  - mise ssh-turbine                   # SSH into turbine"
         echo ""
         echo "📚 Documentation:"
         echo "  - mise docs-serve                    # Serve docs locally"
         echo "  - mise docs-build                    # Build documentation"
         echo "  - docs/MIGRATION.md                  # Arch → NixOS migration guide"
-        echo "  - hosts/capacitor/README.md          # Capacitor server docs"
+        echo "  - hosts/orbital/README.md            # Orbital server docs"
         echo ""
 
         # Set up environment for secret generation

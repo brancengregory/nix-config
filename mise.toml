@@ -9,13 +9,14 @@ description = "Show available mise tasks"
 run = "mise tasks"
 
 # Build commands - Individual Hosts
-[tasks.build-powerhouse]
-description = "Build powerhouse NixOS configuration"
-run = "nix build .#powerhouse"
+# DEPRECATED: powerhouse will become basestation
+# [tasks.build-powerhouse]
+# description = "Build powerhouse NixOS configuration"
+# run = "nix build .#powerhouse"
 
-[tasks.build-capacitor]
-description = "Build capacitor NixOS configuration"
-run = "nix build .#capacitor"
+[tasks.build-orbital]
+description = "Build orbital NixOS configuration"
+run = "nix build .#orbital"
 
 [tasks.build-turbine-linux]
 description = "Cross-compile turbine nix-darwin config from Linux"
@@ -35,35 +36,30 @@ description = "Apply/switch turbine configuration (build + activate)"
 run = "darwin-rebuild switch --flake .#turbine"
 
 # Build commands - ISO Installers
-[tasks.build-powerhouse-iso]
-description = "Build powerhouse ISO installer"
-run = "nix build .#powerhouse-iso"
+# DEPRECATED: powerhouse will become basestation  
+# [tasks.build-powerhouse-iso]
+# description = "Build powerhouse ISO installer"
+# run = "nix build .#powerhouse-iso"
 
-[tasks.build-capacitor-iso]
-description = "Build capacitor ISO installer"
-run = "nix build .#capacitor-iso"
+[tasks.build-orbital-iso]
+description = "Build orbital ISO installer"
+run = "nix build .#orbital-iso"
 
 # Build commands - VMs (for testing)
-[tasks.build-powerhouse-vm]
-description = "Build powerhouse NixOS VM for testing"
-run = "nix build .#powerhouse-vm"
+# DEPRECATED: powerhouse will become basestation
+# [tasks.build-powerhouse-vm]
+# description = "Build powerhouse NixOS VM for testing"
+# run = "nix build .#powerhouse-vm"
 
 # Validation / Dry-run
-[tasks.check]
-description = "Check flake syntax and validate"
-run = "nix flake check"
+# DEPRECATED: powerhouse tasks
+# [tasks.dry-run-powerhouse]
+# description = "Dry-run powerhouse config (no build)"
+# run = "nixos-rebuild dry-build --flake .#powerhouse"
 
-[tasks.check-darwin-linux]
-description = "Validate nix-darwin config from Linux (cross-compile check)"
-run = "nix build .#turbine-check"
-
-[tasks.dry-run-powerhouse]
-description = "Dry-run powerhouse config (no build)"
-run = "nixos-rebuild dry-build --flake .#powerhouse"
-
-[tasks.dry-run-capacitor]
-description = "Dry-run capacitor config (no build)"
-run = "nixos-rebuild dry-build --flake .#capacitor"
+[tasks.dry-run-orbital]
+description = "Dry-run orbital config (no build)"
+run = "nixos-rebuild dry-build --flake .#orbital"
 
 # Development
 [tasks.dev]
@@ -76,8 +72,8 @@ run = "nix develop"
 
 # Build all (comprehensive)
 [tasks.build-all]
-description = "Build all configurations (comprehensive)"
-depends = ["build-powerhouse", "build-capacitor", "build-turbine-linux"]
+description = "Build all active configurations"
+depends = ["build-orbital", "build-turbine-linux"]
 run = "echo 'All configurations built successfully!'"
 
 # Testing - runs checks in parallel
@@ -135,9 +131,9 @@ description = "Clean documentation build"
 run = "rm -rf docs/book"
 
 # Host-specific helpers
-[tasks.ssh-capacitor]
-description = "SSH into capacitor"
-run = "ssh -p 77 capacitor"
+[tasks.ssh-orbital]
+description = "SSH into orbital"
+run = "ssh -p 77 orbital"
 
 [tasks.ssh-turbine]
 description = "SSH into turbine"
@@ -157,17 +153,14 @@ echo "Flake outputs:"
 nix flake metadata 2>/dev/null | head -20 || echo "Run 'nix flake metadata' for details"
 echo ""
 echo "=== Available Hosts ==="
-echo "- powerhouse (NixOS desktop)"
-echo "- capacitor (NixOS server)"
-echo "- turbine (macOS)"
+echo "- orbital (NixOS server - SOLO MODE)"
+echo "- turbine (macOS workstation)"
 echo ""
 echo "=== ISO Installers ==="
-echo "- mise build-powerhouse-iso"
-echo "- mise build-capacitor-iso"
+echo "- mise build-orbital-iso"
 echo ""
 echo "=== Build Commands ==="
-echo "- mise build-powerhouse"
-echo "- mise build-capacitor"
+echo "- mise build-orbital"
 echo "- mise build-turbine"
 echo "- mise build-all"
 '''
