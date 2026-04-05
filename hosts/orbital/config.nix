@@ -31,19 +31,19 @@
   # LUKS Vault Drives - Unlock at boot with password
   # These preserve existing encrypted drives from Arch Linux setup
   boot.initrd.luks.devices = {
-    # Vault 1 (sda) - 19TB
+    # Vault 1 (sda) - 11TB
     crypt_vault1 = {
-      device = "/dev/disk/by-uuid/de63d2dc-d155-4020-9897-f8328bdf9ede";
+      device = "/dev/disk/by-uuid/a8f9df1c-f7f2-49ad-985c-6f5b7117ebac";
       allowDiscards = true;
     };
     # Vault 2 (sdb) - 11TB
     crypt_vault2 = {
-      device = "/dev/disk/by-uuid/a8f9df1c-f7f2-49ad-985c-6f5b7117ebac";
+      device = "/dev/disk/by-uuid/7e9cf71f-8db6-466a-b6de-757c7bc9baef";
       allowDiscards = true;
     };
-    # Vault 3 (sdc) - 11TB (parity)
+    # Vault 3 (sdc) - 19TB (parity)
     crypt_vault3 = {
-      device = "/dev/disk/by-uuid/7e9cf71f-8db6-466a-b6de-757c7bc9baef";
+      device = "/dev/disk/by-uuid/de63d2dc-d155-4020-9897-f8328bdf9ede";
       allowDiscards = true;
     };
   };

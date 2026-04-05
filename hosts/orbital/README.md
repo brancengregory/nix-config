@@ -11,17 +11,17 @@ Homelab server configuration for orbital (formerly Arch Linux server, migrated f
 - **Network:** Realtek 2.5GbE
 - **Storage:**
   - nvme0n1: 1TB NVMe (boot, LUKS encrypted)
-  - sda: 19TB HDD (vault1, LUKS encrypted)
+  - sda: 11TB HDD (vault1, LUKS encrypted)
   - sdb: 11TB HDD (vault2, LUKS encrypted)
-  - sdc: 11TB HDD (vault3, parity for SnapRAID)
+  - sdc: 19TB HDD (vault3, parity for SnapRAID)
 
 ## Storage Architecture
 
 ### LUKS-encrypted Vaults
 
-- **vault1 (sda):** 19TB - critical, standard, ephemeral
+- **vault1 (sda):** 11TB - critical, standard, ephemeral
 - **vault2 (sdb):** 11TB - critical, standard, ephemeral
-- **vault3 (sdc):** 11TB - SnapRAID parity
+- **vault3 (sdc):** 19TB - SnapRAID parity
 
 ### MergerFS Pools
 

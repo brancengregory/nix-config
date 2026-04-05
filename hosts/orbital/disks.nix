@@ -81,14 +81,14 @@
   # The UUIDs are preserved from the current Arch setup
 
   # Vault 1 (sda) - 19TB
-  # LUKS UUID: de63d2dc-d155-4020-9897-f8328bdf9ede
-  # Btrfs UUID: d8a71f33-6597-429b-81e8-29705484dea4
-
-  # Vault 2 (sdb) - 11TB
   # LUKS UUID: a8f9df1c-f7f2-49ad-985c-6f5b7117ebac
   # Btrfs UUID: 4d7b8196-0473-4463-8cff-fe8f7852e6c2
 
-  # Vault 3 (sdc) - 11TB (parity)
+  # Vault 2 (sdb) - 11TB
   # LUKS UUID: 7e9cf71f-8db6-466a-b6de-757c7bc9baef
   # Btrfs UUID: 5c239a40-e1f1-462b-b1bb-3d5921b5c65c
+
+  # Vault 3 (sdc) - 11TB (parity)
+  # LUKS UUID: de63d2dc-d155-4020-9897-f8328bdf9ede
+  # Btrfs UUID: d8a71f33-6597-429b-81e8-29705484dea4
 }
