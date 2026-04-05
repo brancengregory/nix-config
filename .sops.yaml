@@ -16,7 +16,7 @@ keys:
   - &user_core age1lehvxg7l88c565huaqnk32shnn39k90ujmm58hew4rvugfwmhv2q22qle9
   
   # Host Keys - Currently Active
-  # NOTE: orbital will be added during installation via ssh-to-age
+  - &host_orbital age1l6ek4fn0ldjr93qcdujgk6asrrxwg8lxy82el74kdea94zau2sxqgczhw2
   
   # DEPRECATED: Will re-add after migration
   # - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
