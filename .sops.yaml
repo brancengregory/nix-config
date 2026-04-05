@@ -16,7 +16,7 @@ keys:
   - &user_core age1lehvxg7l88c565huaqnk32shnn39k90ujmm58hew4rvugfwmhv2q22qle9
   
   # Host Keys - Currently Active
-  - &host_orbital age1l6ek4fn0ldjr93qcdujgk6asrrxwg8lxy82el74kdea94zau2sxqgczhw2
+  - &host_orbital age1agdnpmkaxsj0tc8cjuu03m9rswvy08lwyqk0jnela8hwa394l9as739aha
   
   # DEPRECATED: Will re-add after migration
   # - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
@@ -32,13 +32,13 @@ creation_rules:
     key_groups:
       - age:
         - *user_core
+        - *host_orbital
         # DEPRECATED: Will re-add after migration
         # - *host_powerhouse
         # - *host_turbine
         # - *host_capacitor
         # - *host_battery
         # - *host_vm
-        # NOTE: &host_orbital will be added after installation
 
   # Optional: Restricted secrets (e.g., only specific hosts)
   # - path_regex: secrets/powerhouse/.*$
