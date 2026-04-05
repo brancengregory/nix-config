@@ -180,7 +180,7 @@
 
   # Caddy Reverse Proxy with Wildcard SSL (uses DNS-01 challenge via Porkbun)
   services.caddy-proxy = {
-    enable = true;
+    enable = false;
     domain = "brancen.world";
     porkbunCredentialsFile = config.sops.secrets."porkbun/credentials".path;
 
