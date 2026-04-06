@@ -164,6 +164,7 @@
       adminPasswordHashFile = config.sops.secrets."netbird/admin-password-hash".path;
       postgresPasswordFile = config.sops.secrets."netbird/postgres-password".path;
       turnPasswordFile = config.sops.secrets."netbird/turn-password".path;
+      encryptionKeyFile = config.sops.secrets."netbird/encryption-key".path;
     };
   };
 
@@ -231,6 +232,7 @@
     "netbird/admin-password-hash" = {};
     "netbird/postgres-password" = {};
     "netbird/turn-password" = {};
+    "netbird/encryption-key" = {};
 
     # Porkbun API credentials
     "porkbun/credentials" = {};

@@ -90,6 +90,11 @@ in {
         type = types.path;
         description = "Path to TURN server password file";
       };
+
+      encryptionKeyFile = mkOption {
+        type = types.path;
+        description = "Path to datastore encryption key file";
+      };
     };
   };
 
@@ -167,6 +172,7 @@ in {
         "${cfg.secrets.postgresPasswordFile}:/run/secrets/netbird-postgres-password:ro"
         "${cfg.secrets.turnPasswordFile}:/run/secrets/netbird-turn-password:ro"
         "${cfg.secrets.jwtSecretFile}:/run/secrets/netbird-jwt-secret:ro"
+        "${cfg.secrets.encryptionKeyFile}:/run/secrets/netbird-encryption-key:ro"
         "${pkgs.writeTextFile {
           name = "management.json";
           text = builtins.toJSON {
@@ -198,7 +204,7 @@ in {
               Password = "";
             };
             Datadir = "/var/lib/netbird";
-            DataStoreEncryptionKey = "";
+            DataStoreEncryptionKey = "$ENCRYPTION_KEY";
             HttpConfig = {
               Address = "0.0.0.0:33073";
               AuthIssuer = "https://netbird.brancen.world";
@@ -233,7 +239,7 @@ in {
       entrypoint = "/bin/sh";
       cmd = [
         "-c"
-        "export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password) && export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password) && export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret) && exec /go/bin/netbird-mgmt management --config=/etc/netbird/management.json"
+        "export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password) && export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password) && export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret) && export ENCRYPTION_KEY=$(cat /run/secrets/netbird-encryption-key) && exec /go/bin/netbird-mgmt management --config=/etc/netbird/management.json"
       ];
       extraOptions = [
         "--add-host=host.containers.internal:host-gateway"
