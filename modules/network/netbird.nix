@@ -128,7 +128,7 @@ in {
       ports = ["127.0.0.1:${toString cfg.postgresPort}:5432"];
       volumes = [
         "${dataDir}/postgres:/var/lib/postgresql/data"
-        "${config.sops.secrets."netbird-postgres-password".path}:/run/secrets/netbird-postgres-password:ro"
+        "${cfg.secrets.postgresPasswordFile}:/run/secrets/netbird-postgres-password:ro"
       ];
       environment = {
         POSTGRES_DB = "netbird";
