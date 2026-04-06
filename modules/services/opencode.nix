@@ -60,7 +60,7 @@ in {
     # OpenCode server systemd service
     systemd.services.opencode-server = {
       description = "OpenCode server - remote coding agent backend";
-      after = ["network.target" "sops-nix.service" "home-manager-${cfg.user}.service"];
+      after = ["network.target" "sops-nix.service" "home-manager-${cfg.user}.service" "systemd-tmpfiles-setup.service"];
       requires = ["sops-nix.service"];
       wantedBy = ["multi-user.target"];
 
@@ -76,8 +76,6 @@ in {
         # Security hardening
         NoNewPrivileges = true;
         ProtectSystem = "strict";
-        ProtectHome = "read-only";
-        ReadWritePaths = [cfg.workingDir "/home/${cfg.user}/.local/share/opencode" "/home/${cfg.user}/.config/opencode"];
       };
 
       environment = {
