@@ -164,6 +164,7 @@ in {
       autoStart = true;
       volumes = [
         "${dataDir}/management:/var/lib/netbird"
+        "${cfg.secrets.postgresPasswordFile}:/run/secrets/netbird-postgres-password:ro"
         "${cfg.secrets.turnPasswordFile}:/run/secrets/netbird-turn-password:ro"
         "${cfg.secrets.jwtSecretFile}:/run/secrets/netbird-jwt-secret:ro"
         "${pkgs.writeTextFile {
@@ -232,7 +233,7 @@ in {
       entrypoint = "/bin/sh";
       cmd = [
         "-c"
-        "export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password) && export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password) && export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret) && exec /usr/local/bin/netbird-mgmt management --config=/etc/netbird/management.json"
+        "export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password) && export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password) && export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret) && exec /go/bin/netbird-mgmt management --config=/etc/netbird/management.json"
       ];
       extraOptions = [
         "--add-host=host.containers.internal:host-gateway"
@@ -276,7 +277,7 @@ in {
       entrypoint = "/bin/sh";
       cmd = [
         "-c"
-        "export NB_AUTH_SECRET=$(cat /run/secrets/netbird-turn-password) && exec /usr/local/bin/netbird-relay relay"
+        "export NB_AUTH_SECRET=$(cat /run/secrets/netbird-turn-password) && exec /go/bin/netbird-relay"
       ];
     };
 
