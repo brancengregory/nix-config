@@ -162,10 +162,6 @@ in {
     virtualisation.oci-containers.containers.netbird-management = {
       image = "netbirdio/management:latest";
       autoStart = true;
-      ports = [
-        "127.0.0.1:${toString cfg.managementPort}:33073"
-        "127.0.0.1:${toString cfg.dashboardPort}:80"
-      ];
       volumes = [
         "${dataDir}/management:/var/lib/netbird"
         "${cfg.secrets.turnPasswordFile}:/run/secrets/netbird-turn-password:ro"
@@ -233,15 +229,10 @@ in {
         NETBIRD_MGMT_API_AUTH_SUPPORTED_TYPES = "oidc";
         NETBIRD_MGMT_IDP_SIGN_KEY_REFRESH = "false";
       };
+      entrypoint = "/bin/sh";
       cmd = [
-        "/bin/sh"
         "-c"
-        ''
-          export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password)
-          export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password)
-          export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret)
-          exec /usr/local/bin/netbird-mgmt management --config=/etc/netbird/management.json
-        ''
+        "export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password) && export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password) && export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret) && exec /usr/local/bin/netbird-mgmt management --config=/etc/netbird/management.json"
       ];
       extraOptions = [
         "--add-host=host.containers.internal:host-gateway"
@@ -282,13 +273,10 @@ in {
         NB_LISTEN_ADDRESS = ":${toString cfg.turnPort}";
         NB_EXPOSED_ADDRESS = "turn:netbird.brancen.world:${toString cfg.turnPort}";
       };
+      entrypoint = "/bin/sh";
       cmd = [
-        "/bin/sh"
         "-c"
-        ''
-          export NB_AUTH_SECRET=$(cat /run/secrets/netbird-turn-password)
-          exec /usr/local/bin/netbird-relay relay
-        ''
+        "export NB_AUTH_SECRET=$(cat /run/secrets/netbird-turn-password) && exec /usr/local/bin/netbird-relay relay"
       ];
     };
 
