@@ -63,6 +63,11 @@
       url = "github:aodhanhayter/opencode-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # NixOS Hardware - Framework laptop support
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+    };
   };
 
   outputs = {
@@ -104,6 +109,60 @@
         isDesktop = false;
         extraModules = [
           inputs.disko.nixosModules.disko
+        ];
+      };
+
+      # Framework 16 Laptop - AMD Ryzen AI 300 Series
+      # Bootstrap config: no sops initially, add after age key generation
+      voyager = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {
+          inherit inputs;
+          isLinux = true;
+          isDarwin = false;
+          isDesktop = true;
+        };
+        modules = [
+          # Core configuration
+          ./hosts/voyager/config.nix
+          ./hosts/voyager/hardware.nix
+          ./hosts/voyager/disks.nix
+
+          # Overlays
+          {
+            nixpkgs.overlays = [
+              (import ./overlays/ojodb.nix)
+            ];
+          }
+
+          # Framework 16 hardware support
+          inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
+
+          # Disk partitioning
+          inputs.disko.nixosModules.disko
+
+          # Home Manager
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "backup";
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+              isLinux = true;
+              isDarwin = false;
+              isDesktop = true;
+            };
+            home-manager.users.brancengregory = {
+              imports = [
+                ./users/brancengregory/home.nix
+                inputs.plasma-manager.homeModules.plasma-manager
+              ];
+            };
+          }
+
+          # Stylix
+          inputs.stylix.nixosModules.stylix
         ];
       };
 
@@ -193,11 +252,12 @@
 
       # Orbital system configuration
       orbital = self.nixosConfigurations.orbital.config.system.build.toplevel;
-      powerhouse = self.nixosConfigurations.powerhouse.config.system.build.toplevel;
+
+      # Framework 16 Laptop
+      voyager = self.nixosConfigurations.voyager.config.system.build.toplevel;
 
       # ISO Installers
       orbital-iso = self.nixosConfigurations.orbital-iso.config.system.build.isoImage;
-      powerhouse-iso = self.nixosConfigurations.powerhouse-iso.config.system.build.isoImage;
 
       # Cross-compilation: Build darwin configs from Linux
       turbine-darwin = self.darwinConfigurations.turbine.system;
@@ -253,11 +313,13 @@
         echo ""
         echo "🏠 Active Hosts:"
         echo "  - orbital     (NixOS homelab server - SOLO MODE)"
+        echo "  - voyager     (Framework 16 Laptop - AMD Ryzen AI 300)"
         echo "  - turbine     (macOS workstation)"
         echo ""
         echo "🔨 Build Commands:"
         echo "  - mise build-orbital                 # Build orbital NixOS config"
         echo "  - mise build-orbital-iso             # Build orbital ISO installer"
+        echo "  - mise build-voyager                 # Build voyager NixOS config"
         echo "  - mise build-turbine                 # Build turbine macOS config"
         echo ""
         echo "✅ Validation Commands:"
@@ -274,6 +336,7 @@
         echo ""
         echo "💻 Deployment:"
         echo "  - nixos-install --flake .#orbital    # Install NixOS orbital"
+        echo "  - nixos-install --flake .#voyager    # Install NixOS voyager"
         echo ""
         echo "🛠️  Development Tools:"
         echo "  - mise format                        # Format Nix files"
@@ -287,6 +350,7 @@
         echo "  - mise docs-build                    # Build documentation"
         echo "  - docs/MIGRATION.md                  # Arch → NixOS migration guide"
         echo "  - hosts/orbital/README.md            # Orbital server docs"
+        echo "  - hosts/voyager/README.md            # Voyager laptop docs"
         echo ""
 
         # Set up environment for secret generation
