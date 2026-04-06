@@ -16,7 +16,7 @@ keys:
   - &user_core age1lehvxg7l88c565huaqnk32shnn39k90ujmm58hew4rvugfwmhv2q22qle9
   
   # Host Keys - Currently Active
-  - &host_orbital age1agdnpmkaxsj0tc8cjuu03m9rswvy08lwyqk0jnela8hwa394l9as739aha
+  - &host_orbital age12tr2xc5eurtqlkn6dxvu46dy8jpsy93r473we6vgv8pem643yysshhsf7y
   
   # DEPRECATED: Will re-add after migration
   # - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
