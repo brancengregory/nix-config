@@ -1,5 +1,5 @@
 # Framework 16 Laptop - AMD Ryzen AI 300 Series
-# Bootstrap configuration - no sops initially
+# SOPS-enabled configuration
 {
   config,
   pkgs,
@@ -12,6 +12,9 @@
     # Common NixOS configuration
     ../../modules/os/common.nix
     ../../modules/os/nixos.nix
+
+    # Security and secrets
+    ../../modules/security/sops.nix
 
     # Desktop environment
     ../../modules/desktop
@@ -128,12 +131,8 @@
     };
   };
 
-  # No declarative host keys - using nix-anywhere generated keys
-  # After installation, extract SSH host key and generate age key
-
-  # Disable sops initially - will be enabled after bootstrap
-  # sops.defaultSopsFile = ../../secrets/secrets.yaml;
-  # sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  # SOPS secrets management is enabled via ../../modules/security/sops.nix
+  # The age key is derived from the SSH host key at /etc/ssh/ssh_host_ed25519_key
 
   # Enable flakes
   nix.settings.experimental-features = ["nix-command" "flakes"];

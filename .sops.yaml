@@ -17,6 +17,7 @@ keys:
   
   # Host Keys - Currently Active
   - &host_orbital age12tr2xc5eurtqlkn6dxvu46dy8jpsy93r473we6vgv8pem643yysshhsf7y
+  - &host_voyager age16trf363vyuvfmf3fpgre3rpe02cr0qz9gzxzzu5zga8xu6e0ydlsayllxn
   
   # DEPRECATED: Will re-add after migration
   # - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
@@ -33,6 +34,7 @@ creation_rules:
       - age:
         - *user_core
         - *host_orbital
+        - *host_voyager
         # DEPRECATED: Will re-add after migration
         # - *host_powerhouse
         # - *host_turbine
