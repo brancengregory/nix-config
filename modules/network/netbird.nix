@@ -128,15 +128,13 @@ in {
       ports = ["127.0.0.1:${toString cfg.postgresPort}:5432"];
       volumes = [
         "${dataDir}/postgres:/var/lib/postgresql/data"
+        "${config.sops.secrets."netbird-postgres-password".path}:/run/secrets/netbird-postgres-password:ro"
       ];
       environment = {
         POSTGRES_DB = "netbird";
         POSTGRES_USER = "netbird";
         POSTGRES_PASSWORD_FILE = "/run/secrets/netbird-postgres-password";
       };
-      extraOptions = [
-        "--secret=netbird-postgres-password,type=mount,target=/run/secrets/netbird-postgres-password,uid=70,gid=70,mode=0400"
-      ];
     };
 
     # Redis Quadlet
