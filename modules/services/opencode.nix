@@ -50,15 +50,18 @@ in {
     # Ensure opencode is available system-wide
     environment.systemPackages = [opencodePackage];
 
-    # Create working directory
+    # Create working directory and required config directories
     systemd.tmpfiles.rules = [
       "d ${cfg.workingDir} 0755 ${cfg.user} users -"
+      "d /home/${cfg.user}/.local/share/opencode 0755 ${cfg.user} users -"
+      "d /home/${cfg.user}/.config/opencode 0755 ${cfg.user} users -"
     ];
 
     # OpenCode server systemd service
     systemd.services.opencode-server = {
       description = "OpenCode server - remote coding agent backend";
-      after = ["network.target"];
+      after = ["network.target" "sops-nix.service" "home-manager-${cfg.user}.service"];
+      requires = ["sops-nix.service"];
       wantedBy = ["multi-user.target"];
 
       serviceConfig = {

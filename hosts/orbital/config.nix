@@ -353,5 +353,11 @@
   virtualization.hypervisor.enable = false; # Server doesn't run VMs
   virtualization.guest.enable = false; # Not a VM
 
+  # Ensure home-manager waits for sops-nix to provide secrets
+  systemd.services.home-manager-brancengregory = {
+    after = ["sops-nix.service"];
+    requires = ["sops-nix.service"];
+  };
+
   system.stateVersion = "25.11";
 }
