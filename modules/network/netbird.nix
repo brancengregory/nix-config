@@ -188,7 +188,7 @@ in {
                 }
               ];
               CredentialsTTL = "12h";
-              Secret = {};
+              Secret = "";
               TimeBasedCredentials = false;
             };
             Signal = {
