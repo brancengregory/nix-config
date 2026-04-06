@@ -127,18 +127,4 @@
 
     initrd.kernelModules = ["dm-snapshot"];
   };
-
-  # Swap configuration
-  swapDevices = [
-    {
-      device = "/.swap/swapfile";
-      priority = 10;
-    }
-  ];
-
-  # Ensure swap is created after filesystems are mounted
-  systemd.services.create-swapfile = {
-    serviceConfig.Type = "oneshot";
-    wantedBy = ["swap-.swapfile.swap"];
-  };
 }

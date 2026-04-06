@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, config, ...}: {
   # --- Localization ---
 
   time.timeZone = "America/Chicago";
@@ -9,13 +9,13 @@
 
   # --- Networking ---
 
-  # Use networkd, disabling conflicting services like dhcpcd
-  networking.useNetworkd = true;
+  # Default to networkd for servers, but allow hosts to override (e.g., for NetworkManager)
+  networking.useNetworkd = lib.mkDefault true;
 
-  # Using systemd-networkd for networking
-  systemd.network.enable = true;
+  # Enable systemd-networkd only when useNetworkd is true
+  systemd.network.enable = lib.mkDefault config.networking.useNetworkd;
 
-  # Using systemd-resolved for DNS
+  # Using systemd-resolved for DNS (works with both networkd and NetworkManager)
   services.resolved.enable = true;
 
   # Using avahi for local network discovery (AirPla, Chromecast, etc.)
