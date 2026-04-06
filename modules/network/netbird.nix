@@ -168,6 +168,8 @@ in {
       ];
       volumes = [
         "${dataDir}/management:/var/lib/netbird"
+        "${cfg.secrets.turnPasswordFile}:/run/secrets/netbird-turn-password:ro"
+        "${cfg.secrets.jwtSecretFile}:/run/secrets/netbird-jwt-secret:ro"
         "${pkgs.writeTextFile {
           name = "management.json";
           text = builtins.toJSON {
@@ -204,7 +206,7 @@ in {
               Address = "0.0.0.0:33073";
               AuthIssuer = "https://netbird.brancen.world";
               AuthAudience = "netbird";
-              AuthKeysLocation = "";
+              AuthKeysLocation = "$JWT_SECRET";
               AuthUserIDClaim = "";
               CertFile = "";
               KeyFile = "";
@@ -228,14 +230,20 @@ in {
         NETBIRD_MGMT_API_AUTH_USER_ID_CLAIM = "";
         NETBIRD_MGMT_API_AUTH_AUDIENCE = "netbird";
         NETBIRD_MGMT_API_AUTH_ISSUER = "https://netbird.brancen.world";
-        NETBIRD_MGMT_API_AUTH_KEYS_LOCATION = "";
         NETBIRD_MGMT_API_AUTH_SUPPORTED_TYPES = "oidc";
         NETBIRD_MGMT_IDP_SIGN_KEY_REFRESH = "false";
       };
+      cmd = [
+        "/bin/sh"
+        "-c"
+        ''
+          export POSTGRES_PASSWORD=$(cat /run/secrets/netbird-postgres-password)
+          export TURN_PASSWORD=$(cat /run/secrets/netbird-turn-password)
+          export JWT_SECRET=$(cat /run/secrets/netbird-jwt-secret)
+          exec /usr/local/bin/netbird-mgmt management --config=/etc/netbird/management.json
+        ''
+      ];
       extraOptions = [
-        "--secret=netbird-postgres-password,type=env,target=POSTGRES_PASSWORD"
-        "--secret=netbird-turn-password,type=env,target=TURN_PASSWORD"
-        "--secret=netbird-jwt-secret,type=env,target=NETBIRD_MGMT_API_AUTH_KEYS_LOCATION"
         "--add-host=host.containers.internal:host-gateway"
         "--network=host"
       ];
@@ -265,14 +273,22 @@ in {
         "5349:5349/udp"
         "10000:10000/udp"
       ];
+      volumes = [
+        "${dataDir}/relay:/var/lib/netbird"
+        "${cfg.secrets.turnPasswordFile}:/run/secrets/netbird-turn-password:ro"
+      ];
       environment = {
         NB_LOG_LEVEL = "info";
         NB_LISTEN_ADDRESS = ":${toString cfg.turnPort}";
         NB_EXPOSED_ADDRESS = "turn:netbird.brancen.world:${toString cfg.turnPort}";
-        NB_AUTH_SECRET = "$TURN_PASSWORD";
       };
-      extraOptions = [
-        "--secret=netbird-turn-password,type=env,target=TURN_PASSWORD"
+      cmd = [
+        "/bin/sh"
+        "-c"
+        ''
+          export NB_AUTH_SECRET=$(cat /run/secrets/netbird-turn-password)
+          exec /usr/local/bin/netbird-relay relay
+        ''
       ];
     };
 
