@@ -80,7 +80,7 @@ in {
     dns = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = "DNS servers for the VPN (defaults to hub IP if not set)";
+      description = "DNS servers for the VPN (empty to use system default)";
     };
 
     privateKeyFile = mkOption {
@@ -94,11 +94,6 @@ in {
       description = "Path to the preshared key file for extra security (optional)";
     };
 
-    enableDnsServer = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable dnsmasq DNS server on this node (typically the hub)";
-    };
   };
 
   config = mkIf cfg.enable {
@@ -116,10 +111,7 @@ in {
     # WireGuard interface using wg-quick
     networking.wg-quick.interfaces.${cfg.interface} = {
       address = ["${thisNode.ip}/24"];
-      dns =
-        if cfg.dns != []
-        then cfg.dns
-        else optional isHub hubNode.ip;
+      dns = cfg.dns;
 
       listenPort = mkIf isHub cfg.port;
       privateKeyFile = cfg.privateKeyFile;
@@ -164,19 +156,5 @@ in {
       requires = ["sops-nix.service"];
     };
 
-    # Optional DNS server (typically on hub)
-    services.dnsmasq = mkIf (isHub && cfg.enableDnsServer) {
-      enable = true;
-      settings = {
-        interface = cfg.interface;
-        listen-address = thisNode.ip;
-        address =
-          mapAttrsToList (
-            name: node: "/${name}.vpn/${node.ip}"
-          )
-          cfg.nodes;
-        server = ["1.1.1.1" "8.8.8.8"];
-      };
-    };
   };
 }

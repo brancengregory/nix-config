@@ -130,7 +130,6 @@
       };
     };
     port = 51820;
-    enableDnsServer = true;
     privateKeyFile = config.sops.secrets."wireguard/capacitor/private_key".path;
   };
 
