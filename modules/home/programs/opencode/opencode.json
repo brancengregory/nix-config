@@ -1,56 +1,120 @@
 {
-	"$schema": "https://opencode.ai/config.json",
-	"default_agent": "plan",
-	"permission": {
-		"*": "ask",
-		"read": "allow",
-		"bash": {
-			"*": "ask",
-			"git status*": "allow",
-			"git log*": "allow",
-			"git diff*": "allow",
-			"git branch*": "allow",
-			"git add*": "allow",
-			"brew *": "allow",
-			"paru *": "allow",
-			"cargo *": "allow",
-			"Rscript *": "allow",
-			"R *": "allow",
-			"grep *": "allow",
-			"ls *": "allow",
-			"cat *": "allow",
-			"head *": "allow",
-			"tail *": "allow",
-			"echo *": "allow",
-			"which *": "allow",
-			"rm *": "deny",
-			"sudo *": "deny",
-			"chmod *": "ask",
-			"chown *": "ask"
-		},
-		"edit": {
-			"*": "allow",
-			"*.env": "ask",
-			"*.env.*": "ask",
-			".env*": "ask",
-			"Cargo.toml": "ask",
-			"Cargo.lock": "deny",
-			"renv.lock": "deny",
-			".Rprofile": "ask",
-			"DESCRIPTION": "ask",
-			"NAMESPACE": "ask"
-		},
-		"external_directory": {
-			"~/code/**": "allow",
-			"*": "ask"
-		},
-		"webfetch": "ask",
-		"websearch": "allow",
-		"codesearch": "allow",
-		"glob": "allow",
-		"grep": "allow",
-		"list": "allow",
-		"todowrite": "ask",
-		"todoread": "allow"
-	}
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "plan",
+  "logLevel": "INFO",
+  "mode": {
+    "build": {
+      "permission": {
+        "read": "allow",
+        "edit": {
+          "*": "allow",
+          "*.env": "ask",
+          "*.env.*": "ask",
+          ".env*": "ask",
+          "Cargo.toml": "ask",
+          "Cargo.lock": "deny",
+          "renv.lock": "deny",
+          ".Rprofile": "ask",
+          "DESCRIPTION": "ask",
+          "NAMESPACE": "ask"
+        },
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": {
+          "*": "ask",
+          "git status*": "allow",
+          "git log*": "allow",
+          "git diff*": "allow",
+          "git branch*": "allow",
+          "git add*": "allow",
+          "brew *": "allow",
+          "paru *": "allow",
+          "cargo *": "allow",
+          "Rscript *": "allow",
+          "R *": "allow",
+          "grep *": "allow",
+          "ls *": "allow",
+          "cat *": "allow",
+          "head *": "allow",
+          "tail *": "allow",
+          "echo *": "allow",
+          "which *": "allow",
+          "rm *": "deny",
+          "sudo *": "deny",
+          "chmod *": "ask",
+          "chown *": "ask"
+        },
+        "external_directory": {
+          "~/code/**": "allow",
+          "*": "ask"
+        },
+        "todowrite": "ask",
+        "question": "allow",
+        "webfetch": "ask",
+        "websearch": "allow",
+        "codesearch": "allow"
+      }
+    },
+    "plan": {
+      "permission": {
+        "read": "allow",
+        "edit": {
+          "*": "allow",
+          "*.env": "ask",
+          "*.env.*": "ask",
+          ".env*": "ask",
+          "Cargo.toml": "ask",
+          "Cargo.lock": "deny",
+          "renv.lock": "deny",
+          ".Rprofile": "ask",
+          "DESCRIPTION": "ask",
+          "NAMESPACE": "ask"
+        },
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": {
+          "*": "ask",
+          "git status*": "allow",
+          "git log*": "allow",
+          "git diff*": "allow",
+          "git branch*": "allow",
+          "git add*": "allow",
+          "brew *": "allow",
+          "paru *": "allow",
+          "cargo *": "allow",
+          "Rscript *": "allow",
+          "R *": "allow",
+          "grep *": "allow",
+          "ls *": "allow",
+          "cat *": "allow",
+          "head *": "allow",
+          "tail *": "allow",
+          "echo *": "allow",
+          "which *": "allow",
+          "rm *": "deny",
+          "sudo *": "deny",
+          "chmod *": "ask",
+          "chown *": "ask"
+        },
+        "external_directory": {
+          "~/code/**": "allow",
+          "*": "ask"
+        },
+        "todowrite": "ask",
+        "question": "allow",
+        "webfetch": "ask",
+        "websearch": "allow",
+        "codesearch": "allow"
+      }
+    }
+  },
+  "command": {
+    "cc": {
+      "template": "You are a helpful coding assistant. Please help with the following task:",
+      "description": "General coding assistance",
+      "agent": "build"
+    }
+  }
 }
