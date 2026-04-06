@@ -113,11 +113,5 @@ in {
     # 2. Runs: gpg --card-edit -> fetch -> quit
     # 3. Or runs: gpg-connect-agent "scd serialno" "learn --force" /bye
     # 4. Or simply uses GPG (git commit, ssh, etc.)
-
-    # Documentation reference
-    warnings =
-      optional cfg.enable
-      "GPG secret keys are stored on hardware tokens, not imported. "
-      + "See docs/HARDWARE-KEYS.md for provisioning instructions.";
   };
 }

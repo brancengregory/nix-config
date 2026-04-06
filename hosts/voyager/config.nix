@@ -15,12 +15,22 @@
 
     # Security and secrets
     ../../modules/security/sops.nix
+    ../../modules/security/gpg.nix
 
     # Desktop environment
     ../../modules/desktop
 
     # Hardware support
     ../../modules/hardware
+
+    # Virtualization (Podman + QEMU/KVM)
+    ../../modules/virtualization
+
+    # Theming
+    ../../modules/themes
+
+    # Services
+    ../../modules/services
   ];
 
   # Hostname
@@ -94,7 +104,7 @@
       "networkmanager"
       "video"
       "audio"
-      "docker"
+      "libvirtd"
     ];
   };
 
@@ -134,12 +144,25 @@
   # SOPS secrets management is enabled via ../../modules/security/sops.nix
   # The age key is derived from the SSH host key at /etc/ssh/ssh_host_ed25519_key
 
+  # GPG hardware token support (Nitrokey)
+  security.gpg.enable = true;
+
+  # Podman container engine (Docker replacement)
+  virtualization.podman.enable = true;
+
+  # QEMU/KVM hypervisor for running VMs
+  virtualization.hypervisor.enable = true;
+
+  # Stylix unified theming (Tokyo Night dark theme)
+  themes.stylix.enable = true;
+
+  # Node exporter for system metrics (lightweight)
+  services.monitoring.enable = true;
+  services.monitoring.exporters.enable = true;
+
   # Enable flakes
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # Note: Garbage collection is configured in modules/os/nixos.nix
   # Using default of 14 days there, can override if needed
-
-  # Enable Docker (user is in docker group)
-  virtualisation.docker.enable = true;
 }
