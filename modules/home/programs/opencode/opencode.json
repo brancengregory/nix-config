@@ -1,6 +1,5 @@
 {
 	"$schema": "https://opencode.ai/config.json",
-	"default_agent": "plan",
 	"permission": {
 		"*": "ask",
 		"read": "allow",
@@ -28,18 +27,7 @@
 			"chmod *": "ask",
 			"chown *": "ask"
 		},
-		"edit": {
-			"*": "allow",
-			"*.env": "ask",
-			"*.env.*": "ask",
-			".env*": "ask",
-			"Cargo.toml": "ask",
-			"Cargo.lock": "deny",
-			"renv.lock": "deny",
-			".Rprofile": "ask",
-			"DESCRIPTION": "ask",
-			"NAMESPACE": "ask"
-		},
+		"edit": "ask",
 		"external_directory": {
 			"~/code/**": "allow",
 			"*": "ask"
