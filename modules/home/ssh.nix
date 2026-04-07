@@ -4,9 +4,16 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }:
 with lib; {
+  sops.secrets.ssh_authorized_key = {};
+
+  home.file.".ssh/authorized_keys" = {
+    source = config.sops.secrets.ssh_authorized_key.path;
+  };
+
   # Install SSH client
   home.packages = with pkgs; [
     openssh

@@ -39,6 +39,10 @@
       else "/Users/brancengregory/.config/sops/age/keys.txt";
 
     secrets = {
+      ssh_authorized_key = {
+        mode = "0600";
+      };
+
       # Database credentials
       pgpass = {
         path = "${config.home.homeDirectory}/.pgpass";
