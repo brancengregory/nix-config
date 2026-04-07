@@ -2,34 +2,28 @@
 
 A set of configs for my machines using the **Pure Module Pattern**:
 
-- **powerhouse** (desktop) - NixOS with Plasma, NVIDIA, Pro Audio
-- **capacitor** (server) - NixOS headless server with monitoring stack
-- **battery** (future) - NixOS
+- **orbital** (server) - NixOS homelab server
+- **voyager** (laptop) - Framework 16 with AMD Ryzen AI 300
+- **powerhouse** (desktop) - NixOS with Plasma, NVIDIA, Pro Audio (deprecated)
+- **capacitor** (server) - NixOS headless server (deprecated)
 
 ## Features
 
 - **Pure Module Architecture**: 20+ modules using `mkEnableOption` - import to make available, enable to activate
 - **Bundle-Based Organization**: Clean imports via `modules/desktop`, `modules/hardware`, `modules/services`
 - **Declarative API**: Hosts declare capabilities via `desktop.plasma.enable = true`, not file imports
-- **Cross-platform**: Supports both NixOS and macOS with shared configurations
 - **Home Manager integration**: User-specific configs with modular component imports
-- **Unified GPG/SSH**: Integrated authentication and encryption strategy
-- **Homebrew support** (macOS): GUI applications and Mac-specific software
-- **Cross-compilation**: Build and validate nix-darwin configs from Linux
-- **ISO Installers**: Custom NixOS installer ISOs with pre-configured flakes
+- **Unified GPG/SSH**: Integrated authentication and encryption strategy with Nitrokey hardware tokens
+- **SOPS-nix**: Declarative secret management with age encryption
+- **nix-anywhere**: Remote deployment to bare metal
 
 ## Documentation
 
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - How to deploy NixOS with nix-anywhere
 - **[Complete Documentation](docs/)** - Full documentation site with detailed guides
-- **[Migration Guide](docs/MIGRATION.md)** - Complete Arch Linux to NixOS migration guide with Windows dual-boot
-- **[Secret Management](docs/SECRET_MANAGEMENT.md)** - Ultra-secure, declarative secret management with sops and age
-- **[GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md)** - Unified authentication and encryption across all systems
-- **[Homebrew Integration](docs/HOMEBREW.md)** - Managing GUI apps and Mac-specific software
-- **[Cross-Platform Development](docs/CROSS_COMPILATION.md)** - Building nix-darwin configs from Linux
-- **[GitHub Copilot Agent](docs/COPILOT_AGENT.md)** - Development environment for Copilot coding agent
-- **[Restic Backup Configuration](docs/RESTIC.md)** - Secure, declarative backups with Restic
+- **[Secret Management](docs/SECRET_MANAGEMENT.md)** - Declarative secret management with sops and age
+- **[GPG/SSH Strategy](docs/GPG-SSH-STRATEGY.md)** - Unified authentication and encryption with hardware tokens
 - **[Module Architecture](docs/MODULES.md)** - Understanding the modular system
-- **[Current Setup Status](SETUP_STATUS.md)** - Current configuration status and checklist
 
 ## Repository Structure
 
@@ -209,8 +203,8 @@ mise help
 
 ```bash
 # Build NixOS configurations
-mise build-powerhouse
-mise build-capacitor
+mise build-orbital
+mise build-voyager
 
 # Validate configs
 mise check
@@ -218,9 +212,8 @@ mise check
 # Build all configurations
 mise build-all
 
-# Build ISO installers
-mise build-powerhouse-iso
-mise build-capacitor-iso
+# Deploy (via nix-anywhere)
+nixos-anywhere --flake .#<hostname> root@<target-ip>
 ```
 
 ## Design Philosophy

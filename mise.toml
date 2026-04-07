@@ -18,21 +18,9 @@ run = "mise tasks"
 description = "Build orbital NixOS configuration"
 run = "nix build .#orbital"
 
-# Build commands - ISO Installers
-# DEPRECATED: powerhouse will become basestation  
-# [tasks.build-powerhouse-iso]
-# description = "Build powerhouse ISO installer"
-# run = "nix build .#powerhouse-iso"
-
-[tasks.build-orbital-iso]
-description = "Build orbital ISO installer"
-run = "nix build .#orbital-iso"
-
-# Build commands - VMs (for testing)
-# DEPRECATED: powerhouse will become basestation
-# [tasks.build-powerhouse-vm]
-# description = "Build powerhouse NixOS VM for testing"
-# run = "nix build .#powerhouse-vm"
+[tasks.build-voyager]
+description = "Build voyager NixOS configuration"
+run = "nix build .#voyager"
 
 # Validation / Dry-run
 # DEPRECATED: powerhouse tasks
@@ -92,10 +80,6 @@ run = "nix develop -c sops secrets/secrets.yaml"
 description = "Update SOPS keys for all recipients"
 run = "nix develop -c sops updatekeys secrets/secrets.yaml"
 
-[tasks.secrets-generate]
-description = "Generate all infrastructure secrets"
-run = "./scripts/generate-all-secrets.sh"
-
 # Documentation
 [tasks.docs-init]
 description = "Initialize mdBook documentation"
@@ -131,13 +115,12 @@ echo "=== Nix Config Repository ==="
 echo "Flake outputs:"
 nix flake metadata 2>/dev/null | head -20 || echo "Run 'nix flake metadata' for details"
 echo ""
-        echo "=== Available Hosts ==="
-        echo "- orbital (NixOS server - SOLO MODE)"
-        echo ""
-        echo "=== ISO Installers ==="
-        echo "- mise build-orbital-iso"
-        echo ""
-        echo "=== Build Commands ==="
-        echo "- mise build-orbital"
-        echo "- mise build-all"
+echo "=== Available Hosts ==="
+echo "- orbital (NixOS server)"
+echo "- voyager (Framework 16 Laptop)"
+echo ""
+echo "=== Build Commands ==="
+echo "- mise build-orbital"
+echo "- mise build-voyager"
+echo "- mise build-all"
 '''

@@ -93,7 +93,6 @@ in {
       default = null;
       description = "Path to the preshared key file for extra security (optional)";
     };
-
   };
 
   config = mkIf cfg.enable {
@@ -155,6 +154,5 @@ in {
       after = ["sops-nix.service"];
       requires = ["sops-nix.service"];
     };
-
   };
 }

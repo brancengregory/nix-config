@@ -61,7 +61,7 @@
   networking = {
     # Use NetworkManager for easy WiFi management (laptop)
     networkmanager.enable = true;
-    
+
     # Disable systemd-networkd to avoid conflicts with NetworkManager
     useNetworkd = false;
 

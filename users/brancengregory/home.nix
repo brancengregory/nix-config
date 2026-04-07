@@ -3,32 +3,27 @@
   inputs,
   config,
   lib,
-  isLinux,
-  isDarwin,
   isDesktop,
   ...
 }: {
-  imports =
-    [
-      ../../modules/home/fonts.nix
-      ../../modules/home/gpg.nix
-      ../../modules/home/ssh.nix
-      ../../modules/home/terminal/zsh.nix
-      ../../modules/home/terminal/starship.nix
-      ../../modules/home/terminal/tmux.nix
-      ../../modules/home/programs/atuin.nix
-      ../../modules/home/programs/nixvim
-      ../../modules/home/programs/git.nix
-      ../../modules/home/programs/r.nix
-      ../../modules/home/programs/direnv.nix
-      ../../modules/home/programs/ghostty.nix
-      ../../modules/home/programs/sesh.nix
-      ../../modules/home/programs/opencode.nix
-      inputs.sops-nix.homeManagerModules.sops
-    ]
-    ++ (lib.optionals (isLinux && isDesktop) [
-      ../../modules/home/desktop/plasma.nix
-    ]);
+  imports = [
+    ../../modules/home/fonts.nix
+    ../../modules/home/gpg.nix
+    ../../modules/home/ssh.nix
+    ../../modules/home/terminal/zsh.nix
+    ../../modules/home/terminal/starship.nix
+    ../../modules/home/terminal/tmux.nix
+    ../../modules/home/programs/atuin.nix
+    ../../modules/home/programs/nixvim
+    ../../modules/home/programs/git.nix
+    ../../modules/home/programs/r.nix
+    ../../modules/home/programs/direnv.nix
+    ../../modules/home/programs/ghostty.nix
+    ../../modules/home/programs/sesh.nix
+    ../../modules/home/programs/opencode.nix
+    inputs.sops-nix.homeManagerModules.sops
+    # NOTE: plasma-manager is now imported at system level via desktop.plasma module
+  ];
 
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
@@ -62,92 +57,75 @@
   programs.home-manager.enable = true;
 
   home.username = "brancengregory";
-  home.homeDirectory =
-    if isLinux
-    then "/home/brancengregory"
-    else if isDarwin
-    then "/Users/brancengregory"
-    else throw "Unsupported OS for this home-manager configuration";
+  home.homeDirectory = "/home/brancengregory";
 
   # Base packages for all hosts
   home.packages =
-    (
-      with pkgs; [
-        age
-        alejandra
-        bat
-        delta
-        devenv
-        eza
-        fd
-        glow
-        gnupg
-        htop
-        hwatch
-        jaq
-        jnv
-        just
-        ollama
-        libpq
-        lazygit
-        nh
-        nmap
-        sops
-        ssh-to-age
-        openssh
-        procs
-        yazi
-        duckdb
-        postgresql
-        sqlite
-        arrow-cpp
-        ripgrep
-        scc
-        sesh
-        sshs
-        tealdeer
-        google-cloud-sdk
-      ]
-    )
-    # Linux-specific packages
-    ++ (with pkgs;
-      lib.optionals isLinux [
-        pinentry-curses
-        sudo
-        rsync
-        restic
-      ])
-    # Desktop-specific packages (Linux only)
-    ++ (with pkgs;
-      lib.optionals (isLinux && isDesktop) [
-        inputs.plasma-manager.packages.${pkgs.stdenv.hostPlatform.system}.rc2nix
-        ghostty
-        slack
-        discord
-        zoom-us
-        positron-bin
-        rstudio
-        rustup
-        snapper-gui
-        keymapp
-      ]);
+    (with pkgs; [
+      age
+      alejandra
+      bat
+      delta
+      devenv
+      eza
+      fd
+      glow
+      gnupg
+      htop
+      hwatch
+      jaq
+      jnv
+      just
+      ollama
+      libpq
+      lazygit
+      nh
+      nmap
+      sops
+      ssh-to-age
+      openssh
+      procs
+      yazi
+      duckdb
+      postgresql
+      sqlite
+      arrow-cpp
+      ripgrep
+      scc
+      sesh
+      sshs
+      tealdeer
+      google-cloud-sdk
 
-  xdg.mimeApps =
-    if (isLinux && isDesktop)
-    then {
-      enable = true;
-      defaultApplications = {
-        "text/html" = "google-chrome.desktop";
-        "x-scheme-handler/http" = "google-chrome.desktop";
-        "x-scheme-handler/https" = "google-chrome.desktop";
-        "x-scheme-handler/about" = "google-chrome.desktop";
-        "x-scheme-handler/unknown" = "google-chrome.desktop";
-      };
-    }
-    else {};
+      # Linux-specific packages (always included since we only use NixOS)
+      pinentry-curses
+      sudo
+      rsync
+      restic
+    ])
+    # Desktop-specific packages
+    ++ lib.optionals isDesktop (with pkgs; [
+      ghostty
+      slack
+      discord
+      zoom-us
+      positron-bin
+      rstudio
+      rustup
+      snapper-gui
+      keymapp
+    ]);
 
-  # Enable Plasma desktop settings on Linux desktops (includes dark mode)
-  home.desktop.plasma.enable = isLinux && isDesktop;
+  xdg.mimeApps = lib.mkIf isDesktop {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "google-chrome.desktop";
+      "x-scheme-handler/http" = "google-chrome.desktop";
+      "x-scheme-handler/https" = "google-chrome.desktop";
+      "x-scheme-handler/about" = "google-chrome.desktop";
+      "x-scheme-handler/unknown" = "google-chrome.desktop";
+    };
+  };
 
   home.stateVersion = "25.11";
 

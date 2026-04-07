@@ -19,16 +19,14 @@ in {
     extraOverlays ? [], # Host-specific overlays
     extraHomeModules ? [], # Extra modules to import in home-manager
   }: let
-    # Automagic Platform Detection
-    isDarwin = lib.strings.hasSuffix "darwin" system;
-    isLinux = lib.strings.hasSuffix "linux" system;
+    # Platform detection (Darwin support removed - NixOS only)
     stylixModule = getStylixModule system;
   in
     builder {
       inherit system;
 
       specialArgs = {
-        inherit inputs isDarwin isLinux isDesktop;
+        inherit inputs isDesktop;
       };
 
       modules =
@@ -55,7 +53,7 @@ in {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = {inherit inputs isDarwin isLinux isDesktop;};
+            home-manager.extraSpecialArgs = {inherit inputs isDesktop;};
 
             # Enforced Convention with extra modules
             home-manager.users.${user} = {

@@ -1,7 +1,5 @@
 {
   pkgs,
-  isLinux,
-  isDarwin,
   ...
 }: {
   home.packages = with pkgs; [
@@ -48,54 +46,44 @@
     ];
 
     # Shell aliases
-    shellAliases =
-      {
-        cl = "clear";
-        v = "nvim";
-        cd = "z";
-        "/" = "cd /";
-        "~" = "cd ~";
-        ".." = "cd ..";
-        "..." = "cd ../..";
-        reload = "source ~/.zshrc";
-        l = "ls";
-        ls = "eza -al --git --icons=always";
-        cat = "bat";
-        diff = "delta";
-        tre = "eza --tree --level=3 --icons --git-ignore";
-        r = "radian";
-        s = "sesh cn .";
-        h = "sesh cn home";
-        md = "glow";
-        g = "lazygit";
-        ai = "opencode";
+    shellAliases = {
+      cl = "clear";
+      v = "nvim";
+      cd = "z";
+      "/" = "cd /";
+      "~" = "cd ~";
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      reload = "source ~/.zshrc";
+      l = "ls";
+      ls = "eza -al --git --icons=always";
+      cat = "bat";
+      diff = "delta";
+      tre = "eza --tree --level=3 --icons --git-ignore";
+      r = "radian";
+      s = "sesh cn .";
+      h = "sesh cn home";
+      md = "glow";
+      g = "lazygit";
+      ai = "opencode";
+      open = "xdg-open";
+      ports = "ss -tuln";
 
-        # GPG/SSH troubleshooting aliases
-        gpg-restart = "gpgconf --kill gpg-agent && gpgconf --launch gpg-agent";
-        gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
-        ssh-keys = "ssh-add -l";
-        gpg-refresh = "refresh_gpg";
+      # GPG/SSH troubleshooting aliases
+      gpg-restart = "gpgconf --kill gpg-agent && gpgconf --launch gpg-agent";
+      gpg-status = "gpg-connect-agent 'keyinfo --list' /bye";
+      ssh-keys = "ssh-add -l";
+      gpg-refresh = "refresh_gpg";
 
-        # Hardware token (Nitrokey) aliases
-        nitro-status = "gpg --card-status";
-        nitro-fetch = "gpg --card-edit";
-        nitro-learn = "gpg-connect-agent 'scd serialno' 'learn --force' /bye";
-        nitro-keys = "gpg --list-secret-keys";
-        nitro-stubs = "ls ~/.gnupg/private-keys-v1.d/";
-        ssh-gpg-keys = "ssh-add -L | grep cardno";
-        gpg-show-card = "gpg --card-edit /bye";
-      }
-      // (
-        if isLinux
-        then {
-          open = "xdg-open";
-          ports = "ss -tuln";
-        }
-        else {
-          # macOS uses native open command
-          ports = "netstat -anv | grep -E 'LISTEN|Proto'";
-        }
-      );
+      # Hardware token (Nitrokey) aliases
+      nitro-status = "gpg --card-status";
+      nitro-fetch = "gpg --card-edit";
+      nitro-learn = "gpg-connect-agent 'scd serialno' 'learn --force' /bye";
+      nitro-keys = "gpg --list-secret-keys";
+      nitro-stubs = "ls ~/.gnupg/private-keys-v1.d/";
+      ssh-gpg-keys = "ssh-add -L | grep cardno";
+      gpg-show-card = "gpg --card-edit /bye";
+    };
 
     # History configuration
     history = {
@@ -115,16 +103,8 @@
         source "$HOME/.config/zsh/secrets.zsh"
       fi
 
-      # Platform-specific paths
-      ${
-        if isLinux
-        then ''
-          path+=("$HOME/.cargo/bin" "$HOME/go/bin")
-        ''
-        else ''
-          path+=("$HOME/.cargo/bin" "$HOME/go/bin")
-        ''
-      }
+      # Add paths
+      path+=("$HOME/.cargo/bin" "$HOME/go/bin")
 
       # Autocompletion
       autoload -Uz compinit && compinit
@@ -176,27 +156,15 @@
         export GPG_TTY=$(tty)
       fi
 
-      # Platform-specific configuration
-      ${
-        if isLinux
-        then ''
-          # Linux: Use GPG agent for SSH authentication
-          export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+      # Use GPG agent for SSH authentication
+      export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 
-          # Tmux-specific improvements
-          if [ -n "$TMUX" ]; then
-            stty sane
-          fi
+      # Tmux-specific improvements
+      if [ -n "$TMUX" ]; then
+        stty sane
+      fi
 
-          export PROJ_DATA=/usr/share/proj
-        ''
-        else ''
-          # macOS: Use GPG agent for SSH authentication
-          export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-          # Ensure GPG agent is running (lazy start)
-          gpgconf --launch gpg-agent 2>/dev/null || true
-        ''
-      }
+      export PROJ_DATA=/usr/share/proj
 
       # Notify gpg-agent of current TTY and environment
       # This must happen after PINENTRY_USER_DATA and GPG_TTY are set
@@ -224,15 +192,6 @@
       # Conda initialization (if available)
       [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
       export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
-
-      # Platform-specific Homebrew settings
-      ${
-        if isDarwin
-        then ''
-          export HOMEBREW_NO_INSTALL_CLEANUP=1
-        ''
-        else ""
-      }
     '';
 
     # Additional PATH entries

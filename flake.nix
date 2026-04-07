@@ -112,8 +112,6 @@
         system = "x86_64-linux";
         specialArgs = {
           inherit inputs;
-          isLinux = true;
-          isDarwin = false;
           isDesktop = true;
         };
         modules = [
@@ -143,14 +141,12 @@
             home-manager.backupFileExtension = "backup";
             home-manager.extraSpecialArgs = {
               inherit inputs;
-              isLinux = true;
-              isDarwin = false;
               isDesktop = true;
             };
             home-manager.users.brancengregory = {
               imports = [
                 ./users/brancengregory/home.nix
-                inputs.plasma-manager.homeModules.plasma-manager
+                # NOTE: plasma-manager is now imported at system level via desktop.plasma module
               ];
             };
           }
@@ -160,70 +156,8 @@
         ];
       };
 
-      # ISO Installer configurations - kept as raw configs per scope discipline
-      orbital-iso = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {
-          inherit inputs;
-          isLinux = true;
-          isDarwin = false;
-        };
-        modules = [
-          {
-            nixpkgs.overlays = [
-              (import ./overlays/ojodb.nix)
-            ];
-          }
-          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          inputs.sops-nix.nixosModules.sops
-          inputs.disko.nixosModules.disko
-          ./hosts/orbital/hardware.nix
-          ./hosts/orbital/disks.nix
-          {
-            # ISO-specific settings
-            isoImage.squashfsCompression = "zstd -Xcompression-level 3";
-
-            # Basic system settings
-            networking.hostName = "orbital-installer";
-            time.timeZone = "America/Chicago";
-            i18n.defaultLocale = "en_US.UTF-8";
-
-            # Add tools needed for installation
-            environment.systemPackages = with nixpkgs.legacyPackages.x86_64-linux; [
-              git
-              vim
-              curl
-              wget
-              gptfdisk
-              cryptsetup
-              btrfs-progs
-              mergerfs
-              snapraid
-              disko
-            ];
-
-            # Enable SSH in the installer
-            services.openssh = {
-              enable = true;
-              ports = [77];
-              settings.PermitRootLogin = "yes";
-            };
-
-            # Boot loader for ISO
-            boot.loader.systemd-boot.enable = true;
-            boot.loader.efi.canTouchEfiVariables = true;
-
-            # Install tools
-            programs.git.enable = true;
-          }
-        ];
-      };
-
-      # DEPRECATED: powerhouse will become basestation
-      # powerhouse-iso = nixpkgs.lib.nixosSystem {
-      #   system = "x86_64-linux";
-      #   ...
-      # };
+      # NOTE: ISO configurations removed in favor of standard NixOS ISO + nix-anywhere
+      # See docs/DEPLOYMENT.md for current workflow
     };
 
     # Darwin configurations - currently none active
@@ -240,8 +174,8 @@
       # Framework 16 Laptop
       voyager = self.nixosConfigurations.voyager.config.system.build.toplevel;
 
-      # ISO Installers
-      orbital-iso = self.nixosConfigurations.orbital-iso.config.system.build.isoImage;
+      # NOTE: ISO installers removed - use standard NixOS ISO + nix-anywhere
+      # See docs/DEPLOYMENT.md for deployment workflow
     };
 
     # Darwin packages - currently none active
@@ -282,32 +216,29 @@
       ];
 
       shellHook = ''
-        echo "🚀 Cross-platform Nix development environment"
+        echo "🚀 Nix development environment"
         echo ""
         echo "🏠 Active Hosts:"
-        echo "  - orbital     (NixOS homelab server - SOLO MODE)"
-        echo "  - voyager     (Framework 16 Laptop - AMD Ryzen AI 300)"
+        echo "  - orbital     (NixOS homelab server)"
+        echo "  - voyager     (Framework 16 Laptop)"
         echo ""
         echo "🔨 Build Commands:"
         echo "  - mise build-orbital                 # Build orbital NixOS config"
-        echo "  - mise build-orbital-iso             # Build orbital ISO installer"
         echo "  - mise build-voyager                 # Build voyager NixOS config"
         echo ""
         echo "✅ Validation Commands:"
         echo "  - mise check                         # Check flake syntax"
-        echo "  - mise check-darwin                  # Validate macOS config"
         echo "  - mise dry-run-orbital               # Dry-run orbital config"
         echo "  - mise test                          # Run all validation tests"
         echo ""
         echo "🔐 Secret Management:"
         echo "  - mise secrets-edit                  # Edit encrypted secrets"
         echo "  - mise secrets-update-keys           # Update SOPS keys for all hosts"
-        echo "  - mise secrets-generate              # Generate all infrastructure secrets"
         echo "  - sops secrets/secrets.yaml          # Direct edit with sops"
         echo ""
-        echo "💻 Deployment:"
-        echo "  - nixos-install --flake .#orbital    # Install NixOS orbital"
-        echo "  - nixos-install --flake .#voyager    # Install NixOS voyager"
+        echo "💻 Deployment (via nix-anywhere):"
+        echo "  - docs/DEPLOYMENT.md                 # Full deployment guide"
+        echo "  - nixos-anywhere --flake .#<host>    # Remote install"
         echo ""
         echo "🛠️  Development Tools:"
         echo "  - mise format                        # Format Nix files"
@@ -318,16 +249,12 @@
         echo "📚 Documentation:"
         echo "  - mise docs-serve                    # Serve docs locally"
         echo "  - mise docs-build                    # Build documentation"
-        echo "  - docs/MIGRATION.md                  # Arch → NixOS migration guide"
         echo "  - hosts/orbital/README.md            # Orbital server docs"
         echo "  - hosts/voyager/README.md            # Voyager laptop docs"
         echo ""
 
-        # Set up environment for secret generation
+        # Set up environment for sops
         export SOPS_AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
-
-        # Ensure scripts are executable
-        chmod +x ./scripts/*.sh 2>/dev/null || true
 
         # Check for age key
         if [ ! -f "$SOPS_AGE_KEY_FILE" ]; then

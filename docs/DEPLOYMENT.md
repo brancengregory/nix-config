@@ -1,707 +1,280 @@
 # Deployment Guide
 
-**Complete procedures for deploying new hosts with hardware key authentication**
+**Deploying NixOS hosts using nix-anywhere and hardware tokens**
 
-This guide covers the staged deployment model for new NixOS and macOS hosts using hardware tokens for authentication.
+This guide covers the actual workflow used for deploying NixOS hosts, which differs significantly from the old pre-staged approach.
 
 ---
 
 ## Overview
 
-### Deployment Model
+### Actual Deployment Model
 
-We use a **staged pre-generation** approach to solve the bootstrap paradox:
+1. **Boot target machine** with standard NixOS ISO (from nixos.org)
+2. **Run nix-anywhere** to remotely install the system
+3. **SSH host key generated** automatically by nix-anywhere
+4. **Convert SSH key to age** using ssh-to-age for sops-nix
+5. **Provision GPG/SSH** by physically inserting Nitrokey
 
-1. **Weeks Before:** Generate age keys, store in Bitwarden, add to `.sops.yaml`
-2. **Build Time:** Inject age key into ISO/installer
-3. **Deploy:** System boots with SOPS access
-4. **Post-Deploy:** Manual GPG provisioning with hardware token
+### Key Differences from Old Approach
 
-### Security Principles
-
-- **Manual Provisioning:** No automated scripts - fully documented manual steps
-- **Hardware Token First:** All user auth flows through Nitrokey
-- **Staged Secrets:** Pre-stage credentials in Bitwarden for deployment
-- **Defense in Depth:** SSH host keys protect against server impersonation
+| Aspect | Old (Documented) | Actual (Current) |
+|--------|------------------|------------------|
+| ISO | Custom-built with pre-staged keys | Standard NixOS ISO |
+| Keys | Pre-generated, stored in Bitwarden | Generated during install by nix-anywhere |
+| Age keys | Pre-staged | Derived from SSH host keys via ssh-to-age |
+| Provisioning | Scripted | Manual with hardware token |
 
 ---
 
-## Pre-Deployment Phase (Weeks Before)
+## Prerequisites
 
-### Step 1: Generate Age Keys
-
-**Environment:** Secure air-gapped machine (or Tails)
+### On Your Workstation (where you run the commands)
 
 ```bash
-# Generate age keypair for new host
-nix run nixpkgs#age -- -o battery-age.key
+# Install nix-anywhere
+nix profile install nixpkgs#nixos-anywhere
 
-# Output shows:
-# Public key: age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3
-# Private key saved to: battery-age.key
+# Ensure you have ssh-to-age
+nix profile install nixpkgs#ssh-to-age
+
+# Have your Nitrokey ready for post-install provisioning
 ```
 
-**Record in Documentation:**
-- Hostname: `battery`
-- Public Key: `age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3`
-- Generated: `2026-03-04`
+### Target Machine
 
-### Step 2: Store in Bitwarden
+- Bootable from USB
+- Network connectivity
+- Physical access for Nitrokey insertion (post-install)
 
-**Item Type:** Secure Note  
-**Name:** `Pre-staged Age Key - battery`
+---
 
-**Fields:**
-```
-Hostname: battery
-Public Key: age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3
-Private Key: [copy entire contents of battery-age.key]
-Status: Pre-staged
-Created: 2026-03-04
-Notes: For NixOS deployment. Keep until deployment confirmed.
-```
+## Deployment Steps
 
-**Security Note:** Private key is temporarily in Bitwarden only for deployment. Once deployed, it lives exclusively on the target host.
+### Step 1: Boot Target with NixOS ISO
 
-### Step 3: Add to .sops.yaml
+1. Download standard NixOS ISO from https://nixos.org/download
+2. Write to USB: `dd if=nixos.iso of=/dev/sdX bs=4M status=progress`
+3. Boot target machine from USB
+4. Note the IP address (displayed on boot or via `ip addr`)
+
+### Step 2: Prepare SSH Access
+
+From the NixOS live environment on the target:
 
 ```bash
-# Edit .sops.yaml
-vim .sops.yaml
+# Set a temporary password for root
+passwd
+# Enter a temporary password
+
+# Get the IP address
+ip addr show
 ```
 
-**Add to recipients:**
+From your workstation:
+
+```bash
+# Copy your SSH key to the target for nix-anywhere
+ssh-copy-id -o StrictHostKeyChecking=no root@<target-ip>
+
+# Test connection
+ssh root@<target-ip>
+```
+
+### Step 3: Run nix-anywhere
+
+From your workstation:
+
+```bash
+cd /path/to/nix-config
+
+# Install to target
+nixos-anywhere --flake .#<hostname> root@<target-ip>
+
+# Example:
+# nixos-anywhere --flake .#voyager root@192.168.1.100
+```
+
+**What nix-anywhere does:**
+- Partitions disk (via disko configuration)
+- Installs NixOS with your flake configuration
+- Generates SSH host keys
+- Sets up basic system
+
+### Step 4: Extract SSH Host Key for SOPS
+
+After nix-anywhere completes, the target has generated SSH host keys. You need to extract the public key and convert it to age format:
+
+```bash
+# From your workstation, SSH into the new host
+ssh root@<target-ip>
+
+# On the target, show the SSH host public key
+cat /etc/ssh/ssh_host_ed25519_key.pub
+# Copy this key (starts with ssh-ed25519 AA...)
+```
+
+Back on your workstation:
+
+```bash
+# Convert SSH key to age format
+ssh-to-age -i <path-to-ssh-key> -o <hostname>-age.key
+
+# Get the public key
+age-keygen -y <hostname>-age.key
+# Copy this public key
+```
+
+### Step 5: Update .sops.yaml
+
+Add the new host's age public key to `.sops.yaml`:
+
 ```yaml
+keys:
+  # ... existing keys ...
+  - &host_<hostname> <age-public-key-from-above>
+
 creation_rules:
-  - path_regex: secrets/[^/]+\.yaml$
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:
-          # ... existing recipients ...
-          - age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3  # battery
+        - *user_core
+        # ... other hosts ...
+        - *host_<hostname>
 ```
 
-**Commit:**
-```bash
-git add .sops.yaml
-git commit -m "Add battery age key for deployment"
-```
+### Step 6: Add Host to secrets.yaml
 
-### Step 4: Re-encrypt Secrets
+Now you can add secrets for this host that it can decrypt:
 
 ```bash
-# Re-encrypt all secrets with new recipient
-sops updatekeys secrets/secrets.yaml
-
-# If you have other secret files
-sops updatekeys secrets/netbird-secrets.yaml
-
-# Commit
-```
-bash
-git add secrets/*.yaml
-git commit -m "Re-encrypt secrets for battery host"
-```
-
-### Step 5: Generate Host Secrets
-
-**SSH Host Keys:**
-```bash
-# Generate for battery
-ssh-keygen -t ed25519 -f /tmp/battery-ssh-host -N ""
-# Produces: /tmp/battery-ssh-host (private) and /tmp/battery-ssh-host.pub (public)
-```
-
-**WireGuard Keys:**
-```bash
-# Generate WireGuard keypair
-wg genkey | tee /tmp/battery-wg-private | wg pubkey > /tmp/battery-wg-public
-```
-
-**Age Key:** Already generated above
-
-### Step 6: Update Secrets Template
-
-Edit `secrets/secrets.template.yaml`:
-
-```yaml
-ssh:
-    battery:
-        host_key: |      # Content of /tmp/battery-ssh-host
-          -----BEGIN OPENSSH PRIVATE KEY-----
-          ...
-        host_key_pub: |  # Content of /tmp/battery-ssh-host.pub
-          ssh-ed25519 AAAAC3...
-
-wireguard:
-    battery:
-        private_key: |   # Content of /tmp/battery-wg-private
-        public_key: |    # Content of /tmp/battery-wg-public
-        ip: 10.0.0.6     # Assign next available IP
-        is_server: false
-
-age:
-    battery:
-        public: age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3
-        private: |       # Content of battery-age.key
-          # created: 2026-03-04
-          # public key: age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3
-          AGE-SECRET-KEY-...
-```
-
-### Step 7: Encrypt and Commit
-
-```bash
-# Copy template to actual secrets file (if new)
-cp secrets/secrets.template.yaml secrets/secrets.yaml
-
-# Or update existing
+# Edit secrets with sops
 sops secrets/secrets.yaml
 
-# Edit and save (opens editor)
-
-# Verify encryption
-sops -d secrets/secrets.yaml | grep battery
-
-# Commit
-git add secrets/
-git commit -m "Add battery host secrets (SSH, WireGuard, age)"
+# Add new host entries under appropriate sections, e.g.:
+# wireguard:
+#   <hostname>:
+#     private_key: <generate with: wg genkey>
+#     public_key: <echo <private> | wg pubkey>
+#     ip: 10.0.0.X
+# ssh:
+#   <hostname>:
+#     host_key: |
+#       <paste from /etc/ssh/ssh_host_ed25519_key on target>
+#     host_key_pub: |
+#       <paste from /etc/ssh/ssh_host_ed25519_key.pub on target>
 ```
 
----
-
-## Build Phase (Days Before)
-
-### Step 1: Retrieve Age Key
+### Step 7: Rebuild with Secrets
 
 ```bash
-# From Bitwarden, copy the private key for battery
-# Save to temporary location (secure)
-echo "AGE-SECRET-KEY-..." > /tmp/battery-age-key
+# On target, rebuild to get secrets
+nixos-rebuild switch --flake .#<hostname>
 ```
 
-### Step 2: Build NixOS Installer ISO
+### Step 8: Provision GPG/SSH with Nitrokey
 
-**For new NixOS host:**
+Physically insert your Nitrokey into the target machine:
 
 ```bash
-# Build ISO with pre-injected age key
-nix build .#nixosConfigurations.battery-iso.config.system.build.isoImage \
-  --override-input age-key /tmp/battery-age-key
-```
+# On the target, as your user (not root)
+su - brancengregory
 
-**ISO Configuration Requirements:**
-- Include age private key in `/var/lib/sops/age/` or similar
-- Enable sops-nix with proper key path
-- Include basic network configuration
-
-**Example ISO Configuration (`hosts/battery/iso.nix`):**
-```nix
-{ config, pkgs, ... }: {
-  # Import base ISO configuration
-  imports = [
-    <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix>
-  ];
-  
-  # SOPS configuration for ISO
-  sops = {
-    defaultSopsFile = ../../secrets/secrets.yaml;
-    age.keyFile = "/var/lib/sops/age/battery.txt";
-    
-    secrets = {
-      # Only essential secrets for installation
-      "wireguard/battery/private_key" = {};
-      "ssh/battery/host_key" = {};
-    };
-  };
-  
-  # Pre-stage age key
-  system.activationScripts.stage-age-key = {
-    text = ''
-      mkdir -p /var/lib/sops/age
-      install -m 600 ${config.sops.secrets."age/battery/private".path} /var/lib/sops/age/battery.txt
-    '';
-  };
-}
-```
-
-### Step 3: Build and Verify
-
-```bash
-# Build ISO
-nix build .#battery-iso
-
-# Verify contents (mount ISO and check)
-# Ensure age key is present
-# Ensure sops can decrypt
-```
-
-### Step 4: Create Boot Media
-
-```bash
-# Write ISO to USB
-sudo dd if=result/iso/nixos-*.iso of=/dev/sdX bs=4M status=progress
-
-# Or use modern tools
-sudo nix run nixpkgs#disko -- --mode disko hosts/battery/disk-config.nix
-```
-
----
-
-## Deployment Day
-
-### Step 1: Physical Installation
-
-**Hardware Setup:**
-```bash
-# 1. Connect hardware
-# - Ethernet cable (for network access)
-# - USB drive with ISO
-# - Keyboard/monitor (for initial setup)
-
-# 2. Power on and boot from USB
-# - Enter BIOS/UEFI boot menu
-# - Select USB drive
-
-# 3. Boot into NixOS installer
-```
-
-### Step 2: Network Verification
-
-**Check connectivity:**
-```bash
-# In installer shell
-ping 1.1.1.1
-ip addr show
-
-# Should get IP via DHCP or static config
-```
-
-### Step 3: Run Installation
-
-**Standard NixOS install:**
-```bash
-# Partition (if using disko)
-disko --mode disko /iso/hosts/battery/disk-config.nix
-
-# Or manual partitioning
-fdisk /dev/nvme0n1
-mkfs.ext4 /dev/nvme0n1p1
-mount /dev/nvme0n1p1 /mnt
-
-# Generate config
-nixos-generate-config --root /mnt
-
-# Copy configuration
-mkdir -p /mnt/etc/nixos
-# Copy your flake to /mnt/etc/nixos/
-
-# Install
-nixos-install --flake /mnt/etc/nixos#battery
-
-# Reboot
-reboot
-```
-
-### Step 4: Post-Boot Verification
-
-**System boots successfully:**
-```bash
-# 1. Check system is running
-systemctl status
-
-# 2. Verify SOPS is working
-sops -d /var/run/secrets/secrets.yaml | head
-
-# 3. Check WireGuard connection
-wg show
-ping 10.0.0.1  # Should reach capacitor
-
-# 4. Verify SSH host keys
-ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub
-# Should match what was in SOPS
-```
-
----
-
-## Post-Deployment Phase
-
-### Step 1: Hardware Token Provisioning
-
-**This is the critical step that enables GPG/SSH auth:**
-
-```bash
-# 1. Insert Nitrokey into new host
-
-# 2. Fetch public key from keyserver
+# Fetch your public key from the keyserver
 gpg --card-edit
 # gpg/card> fetch
 # gpg/card> quit
 
-# 3. Create stubs by linking hardware
+# Create stubs linking hardware to GPG
 gpg-connect-agent "scd serialno" "learn --force" /bye
 
-# 4. Verify stubs created
-gpg --list-secret-keys
-# Should show 'ssb>' notation for subkeys
+# Verify SSH key is available
+ssh-add -L | grep cardno
 
-# 5. Verify SSH key available
-ssh-add -L | grep "cardno"
-# Should show: ssh-ed25519 AAAAC3... cardno:000F_XXXXXXXX
+# Test Git
+ssh git@github.com
 ```
 
-### Step 2: Git Signing Verification
+---
+
+## Post-Deployment Verification
+
+### Check sops-nix is working
 
 ```bash
-# Configure git (if not in home-manager yet)
-git config --global user.name "Brancen Gregory"
-git config --global user.email "brancengregory@gmail.com"
-git config --global user.signingkey 3D9E0666449B886D
+# On target
+systemctl status sops-nix
 
-# Test signing
+# Check secrets are decrypted
+ls -la /run/secrets/
+```
+
+### Verify SSH host key
+
+```bash
+# Check host key matches what you recorded
+ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub
+```
+
+### Test hardware token
+
+```bash
+# Sign a test commit
 git init /tmp/test-repo
 cd /tmp/test-repo
-echo "test" > test.txt
-git add .
-git commit -m "Test hardware key signing"
-
-# Verify signature
-git log --show-signature -1
-# Should show: Good signature from "Brancen Gregory"
+git commit --allow-empty -m "Test hardware key signing"
+git log --show-signature
 ```
-
-### Step 3: SSH Authentication Verification
-
-```bash
-# Test GitHub SSH
-ssh git@github.com
-
-# Expected output:
-# Hi brancengregory! You've successfully authenticated...
-
-# Test with touch confirmation
-# LED should blink, press token, auth succeeds
-```
-
-### Step 4: Access from Other Hosts
-
-**From powerhouse:**
-```bash
-# SSH to new host
-ssh brancengregory@battery.local
-
-# Or via WireGuard IP
-ssh brancengregory@10.0.0.6
-
-# Should authenticate with hardware token
-```
-
----
-
-## Post-Deployment Cleanup
-
-### Update Bitwarden
-
-```bash
-# Mark deployment complete
-# In Bitwarden item "Pre-staged Age Key - battery":
-# - Change Status from "Pre-staged" to "Deployed"
-# - Add note: "System operational since 2026-03-04"
-# - Private key now lives ONLY on battery host
-```
-
-### Update Documentation
-
-```bash
-# Add battery to infrastructure docs
-# Update network diagrams
-# Record serial numbers, IPs, etc.
-```
-
-### Verification Checklist
-
-- [ ] System boots without USB
-- [ ] SOPS decrypts secrets correctly
-- [ ] WireGuard connects to mesh
-- [ ] SSH host key matches SOPS
-- [ ] Hardware token creates stubs
-- [ ] Git signing works
-- [ ] SSH to GitHub works
-- [ ] SSH from other hosts works
-- [ ] Bitwarden marked as deployed
-
----
-
-## macOS Deployment (Turbine-style)
-
-### Differences from NixOS
-
-1. **No ISO:** Manual Nix installation
-2. **Home-manager only:** No system-level config
-3. **Age key generation on-device:** Can't pre-inject
-
-### Procedure
-
-**Step 1: Install Nix**
-```bash
-# Install Nix package manager
-sh <(curl -L https://nixos.org/nix/install)
-
-# Enable flakes
-mkdir -p ~/.config/nix
-experimental-features = nix-command flakes
-EOF
-```
-
-**Step 2: Generate Age Key**
-```bash
-# On the new Mac
-nix run nixpkgs#age -- -o ~/new-mac-age.key
-
-# Record public key
-age-keygen -y ~/new-mac-age.key
-```
-
-**Step 3: Add to .sops.yaml**
-```bash
-# On secure build machine
-# Add new public key to .sops.yaml
-# Re-encrypt secrets
-# Push to git
-```
-
-**Step 4: Clone and Build**
-```bash
-# On new Mac
-git clone https://github.com/brancengregory/nix-config.git
-cd nix-config
-
-# Copy age key to expected location
-mkdir -p ~/.config/sops/age
-cp ~/new-mac-age.key ~/.config/sops/age/keys.txt
-
-# Build home-manager
-nix run home-manager -- switch --flake .#brancengregory
-```
-
-**Step 5: Hardware Token Provisioning**
-```bash
-# Same as NixOS:
-gpg --card-edit
-# fetch
-# quit
-
-gpg-connect-agent "scd serialno" "learn --force" /bye
-
-# Verify
-ssh-add -L
-git commit --allow-empty -m "Test"
-```
-
----
-
-## Emergency Procedures
-
-### Deployment Failure
-
-**Scenario:** Installation fails, need to retry
-
-```bash
-# 1. Retrieve age key from Bitwarden again
-# 2. Debug ISO (mount and check)
-# 3. Fix issues
-# 4. Rebuild ISO with same age key
-# 5. Retry deployment
-
-# Key remains in Bitwarden until successful deployment
-```
-
-### Wrong Age Key
-
-**Scenario:** Wrong key injected, can't decrypt SOPS
-
-```bash
-# 1. Verify correct key in Bitwarden
-# 2. Check .sops.yaml has correct public key
-# 3. Rebuild ISO with correct key
-# 4. If system already installed, can add correct key:
-#    - Manually copy to /var/lib/sops/age/
-#    - Re-run sops-nix activation
-```
-
-### Hardware Token Not Available
-
-**Scenario:** Need to deploy but forgot Nitrokey
-
-**Options:**
-1. **Defer GPG provisioning:** Deploy without GPG, provision later when token available
-2. **Emergency access:** Use existing authorized_keys (if configured in SOPS)
-3. **Abort and retry:** Wait until token available (recommended)
-
-```bash
-# Without hardware token, you can still:
-# - SSH if authorized_keys is pre-configured
-# - Access system via console
-# - Provision GPG later: gpg --card-edit → fetch → learn
-```
-
----
-
-## Security Considerations
-
-### Age Key Handling
-
-**DO:**
-- Generate on air-gapped machine
-- Store temporarily in Bitwarden
-- Delete from build machine after ISO creation
-- Mark Bitwarden entry as "Deployed" after success
-
-**DON'T:**
-- Store age key in git (ever)
-- Generate on build machine with network access
-- Leave Bitwarden entry as "Pre-staged" indefinitely
-- Share age private key
-
-### ISO Security
-
-**ISO contains:**
-- Age private key (encrypted at rest)
-- Basic network config
-- SOPS with encrypted secrets
-
-**Risks:**
-- USB drive could be lost
-- ISO could be copied
-
-**Mitigation:**
-- Use USB drive only for this deployment
-- Destroy after successful install
-- Age key is useless without SOPS secrets
-- SOPS secrets are encrypted
-
-### Post-Deployment
-
-**Critical:**
-- Verify hardware token provisioning works
-- Remove any emergency access after token works
-- Update all documentation
-- Verify backup procedures
 
 ---
 
 ## Troubleshooting
 
-### SOPS Won't Decrypt
+### nix-anywhere fails
 
-**Symptom:** `sops -d` fails with age key error
+- Ensure target has internet access
+- Check SSH connectivity: `ssh root@<target-ip>`
+- Verify flake evaluates: `nix flake check .#<hostname>`
 
-**Solutions:**
-```bash
-# 1. Check age key exists
-ls /var/lib/sops/age/
-cat /var/lib/sops/age/battery.txt
+### SSH key not found after install
 
-# 2. Verify key matches .sops.yaml
-age-keygen -y /var/lib/sops/age/battery.txt
-# Compare to .sops.yaml
+- SSH keys are generated during first boot, not in the installer
+- Wait for first boot to complete before extracting keys
 
-# 3. Check file permissions
-chmod 600 /var/lib/sops/age/battery.txt
+### sops-nix fails to decrypt
 
-# 4. Manual test
-sops -d --age $(age-keygen -y /var/lib/sops/age/battery.txt) secrets/secrets.yaml
-```
+- Verify `.sops.yaml` has the correct age public key
+- Check the age key was derived correctly from SSH host key
+- Run `sops updatekeys secrets/secrets.yaml` after adding new recipient
 
-### WireGuard Won't Connect
+### Nitrokey not detected
 
-**Symptom:** No VPN connectivity
-
-**Solutions:**
-```bash
-# 1. Check keys are correct
-wg showconf wg0
-
-# 2. Verify with capacitor
-curl https://capacitor.local:51820/health
-
-# 3. Check firewall
-sudo iptables -L | grep 51820
-```
-
-### Hardware Token Not Creating Stubs
-
-**Symptom:** `gpg --list-secret-keys` shows no stubs
-
-**Solutions:**
-```bash
-# 1. Verify token detected
-gpg --card-status
-
-# 2. Fetch public key first
-gpg --card-edit
-# fetch
-# quit
-
-# 3. Force stub creation
-gpg-connect-agent "scd serialno" "learn --force" /bye
-
-# 4. Check scdaemon
-gpgconf --check-programs
-```
+- Check USB connection: `lsusb | grep -i nitro`
+- Restart scdaemon: `gpgconf --kill scdaemon`
+- Verify with: `gpg --card-status`
 
 ---
 
-## Quick Reference
-
-### Pre-Deployment Commands
+## Reference Commands
 
 ```bash
-# Generate age key
-nix run nixpkgs#age -- -o HOSTNAME-age.key
+# Generate WireGuard keys
+wg genkey | tee private.key | wg pubkey > public.key
 
-# Store in Bitwarden (manual)
-# Add to .sops.yaml (manual)
+# Convert SSH to age
+ssh-to-age -i /etc/ssh/ssh_host_ed25519_key.pub
 
-# Re-encrypt
+# Get age public key from private key
+age-keygen -y key.txt
+
+# Edit secrets
+sops secrets/secrets.yaml
+
+# Update keys after .sops.yaml changes
 sops updatekeys secrets/secrets.yaml
 ```
 
-### Build Commands
-
-```bash
-# Build ISO
-nix build .#nixosConfigurations.HOSTNAME-iso.config.system.build.isoImage
-
-# Write to USB
-sudo dd if=result/iso/*.iso of=/dev/sdX bs=4M status=progress
-```
-
-### Post-Deployment Commands
-
-```bash
-# Hardware token provisioning
-gpg --card-edit
-# fetch
-# quit
-
-gpg-connect-agent "scd serialno" "learn --force" /bye
-
-# Verify
-ssh-add -L
-gpg --list-secret-keys
-git commit --allow-empty -m "Test"
-```
-
 ---
 
-## Related Documentation
-
-- **Hardware Tokens:** `docs/HARDWARE-KEYS.md` - Daily operation
-- **GPG/SSH Strategy:** `docs/GPG-SSH-STRATEGY.md` - Complete workflow
-- **Secret Management:** `docs/SECRET_MANAGEMENT.md` - SOPS details
-- **Security Guidelines:** `docs/SECURITY.md` - Threat model
-- **Public Key:** `keys/brancen-gregory-public.asc` - Local backup
-
----
-
-*Last Updated: 2026-03-04*
+*Last Updated: 2026-04-06*  
+*Workflow: nix-anywhere + hardware token*
