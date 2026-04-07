@@ -138,12 +138,6 @@
         fi
       }
 
-      # Handle corrupt history file
-      if ! fc -l 1 >/dev/null 2>&1 && [ -f ~/.zshistory ] && [ -s ~/.zshistory ]; then
-        mv ~/.zshistory ~/.zshistory.bad.$(date +%s)
-        touch ~/.zshistory
-      fi
-
       # Yazi wrapper function
       function f() {
       	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
