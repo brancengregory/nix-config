@@ -140,10 +140,6 @@
         ip = "10.0.0.2";
         publicKey = "xsNOf2S+gjNralEsOAJbkHcslpHQ8fBsjD/OxWWLV2g=";
       };
-      turbine = {
-        ip = "10.0.0.3";
-        publicKey = "QsnC5kPNXU/9WITRJEqW6RXMG1FpnwuYVixwCtLPeBU=";
-      };
       battery = {
         ip = "10.0.0.4";
         publicKey = "avw08hoEMczOTsmsGIC89iMtw4s9/tbhRsSXUf+Ruxg=";

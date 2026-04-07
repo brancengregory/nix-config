@@ -45,10 +45,10 @@ FIDO2 Resident Keys (also called "discoverable credentials") are SSH keys stored
 
 ❌ **Inappropriate Scenarios:**
 
-1. **Laptop (turbine) Daily Use**
-   - Laptop is frequently in BFU (Before First Unlock) state
-   - Resident keys are useless when device is powered off
-   - GPG-based is superior for daily workstation use
+1. **Workstation Daily Use**
+    - Workstations are frequently in BFU (Before First Unlock) state
+    - Resident keys are useless when device is powered off
+    - GPG-based is superior for daily workstation use
 
 2. **When GPG Already Configured**
    - Don't duplicate functionality
@@ -324,7 +324,7 @@ ssh capacitor
 
 ```bash
 # Previously generated key on your Nitrokey
-# Stored as resident: ssh:turbine-emergency
+# Stored as resident: ssh:emergency-access
 
 # On friend's machine (trusted!):
 ssh-add -K

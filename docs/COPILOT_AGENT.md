@@ -28,7 +28,6 @@ nix build .#<package>   # Build specific packages or configurations
 mise help               # Show all available development commands
 mise check              # Check flake syntax (alias for nix flake check)
 mise check-darwin       # Validate nix-darwin config (fast validation)
-mise build-turbine      # Cross-compile full nix-darwin config from Linux
 mise build-powerhouse   # Build powerhouse NixOS configuration
 mise build-capacitor    # Build capacitor NixOS configuration
 mise format             # Format Nix files using alejandra
@@ -126,7 +125,7 @@ The typical development workflow with the Copilot agent:
 2. **Make changes** to Nix files
 3. **Format code**: `mise format`
 4. **Test changes**: `mise test` or specific validation commands
-5. **Build configurations**: `mise build-turbine` or `mise build-powerhouse`
+5. **Build configurations**: `mise build-powerhouse`
 
 ## Cross-Platform Support
 

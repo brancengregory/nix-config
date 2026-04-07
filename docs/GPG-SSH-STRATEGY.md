@@ -45,7 +45,7 @@ This document outlines the hardware-first GPG/SSH configuration where all secret
 1. **Hardware-First:** All secret keys live exclusively on Nitrokey 3 tokens
 2. **Stub Model:** Hosts have lightweight references (stubs), not actual keys
 3. **Automatic Discovery:** Stubs created automatically when hardware key is used
-4. **Cross-Platform:** Identical workflow on Linux (powerhouse/capacitor) and macOS (turbine)
+4. **Cross-Platform:** Identical workflow on Linux hosts
 5. **Manual Provisioning:** No automated scripts - fully documented procedures
 
 ### What Changed from Per-Host Model

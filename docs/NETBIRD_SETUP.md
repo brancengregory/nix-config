@@ -217,7 +217,7 @@ Remember: Open WebUI is now on port 8080 (not 3000). Access via:
 - Verify all services work via Caddy
 
 ### Phase 2: Add Spoke Nodes
-On each spoke node (powerhouse, turbine, battery):
+On each spoke node (powerhouse, battery):
 
 ```bash
 # Install netbird client

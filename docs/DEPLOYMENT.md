@@ -384,7 +384,7 @@ ssh git@github.com
 
 ### Step 4: Access from Other Hosts
 
-**From powerhouse or turbine:**
+**From powerhouse:**
 ```bash
 # SSH to new host
 ssh brancengregory@battery.local

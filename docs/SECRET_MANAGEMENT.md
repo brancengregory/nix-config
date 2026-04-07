@@ -407,7 +407,7 @@ sops updatekeys secrets/secrets.yaml
       publicKeyFile = config.sops.secrets."ssh/powerhouse/host_key_pub".path;
     };
     extraAuthorizedKeys = [
-      "ssh-ed25519 AAAAC3... brancengregory@turbine"
+      # Add additional authorized keys here
     ];
   };
   
@@ -511,7 +511,7 @@ sops -d secrets/secrets.yaml
 
 # 2. Rotate WireGuard keys for all peers
 #    (since PSK is compromised)
-for host in powerhouse turbine capacitor battery; do
+for host in powerhouse capacitor battery; do
   if [ "$host" != "compromised-host" ]; then
     NEW_PSK=$(wg genpsk)
     sops --set '["wireguard"]["'$host'"]["preshared_key"] "'$NEW_PSK'"' secrets/secrets.yaml
@@ -520,7 +520,7 @@ done
 
 # 3. Commit and deploy everywhere
 git commit -am "security: rotate keys after compromise"
-for host in powerhouse turbine capacitor battery; do
+for host in powerhouse capacitor battery; do
   nixos-rebuild switch --flake .#$host &
 done
 wait

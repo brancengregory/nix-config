@@ -226,18 +226,8 @@
       # };
     };
 
-    darwinConfigurations = {
-      turbine = lib.mkHost {
-        hostname = "turbine";
-        system = "x86_64-darwin";
-        user = "brancengregory";
-        builder = nix-darwin.lib.darwinSystem;
-        homeManagerModule = home-manager.darwinModules.home-manager;
-        sopsModule = sops-nix.darwinModules.sops;
-        isDesktop = true;
-        extraModules = [];
-      };
-    };
+    # Darwin configurations - currently none active
+    darwinConfigurations = {};
 
     # Create a VM for testing and cross-compilation targets
     packages.x86_64-linux = {
@@ -252,21 +242,10 @@
 
       # ISO Installers
       orbital-iso = self.nixosConfigurations.orbital-iso.config.system.build.isoImage;
-
-      # Cross-compilation: Build darwin configs from Linux
-      turbine-darwin = self.darwinConfigurations.turbine.system;
-
-      # Validation: Check darwin configs without building
-      turbine-check = self.darwinConfigurations.turbine.config.system.build.toplevel;
     };
 
-    # Enable cross-compilation for darwin packages on Linux
-    packages.x86_64-darwin = {
-      turbine-darwin = self.darwinConfigurations.turbine.system;
-
-      # Cross-compile: Build NixOS VM from Darwin
-      powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
-    };
+    # Darwin packages - currently none active
+    packages.x86_64-darwin = {};
 
     # Development shells for cross-platform work
     devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
@@ -308,13 +287,11 @@
         echo "🏠 Active Hosts:"
         echo "  - orbital     (NixOS homelab server - SOLO MODE)"
         echo "  - voyager     (Framework 16 Laptop - AMD Ryzen AI 300)"
-        echo "  - turbine     (macOS workstation)"
         echo ""
         echo "🔨 Build Commands:"
         echo "  - mise build-orbital                 # Build orbital NixOS config"
         echo "  - mise build-orbital-iso             # Build orbital ISO installer"
         echo "  - mise build-voyager                 # Build voyager NixOS config"
-        echo "  - mise build-turbine                 # Build turbine macOS config"
         echo ""
         echo "✅ Validation Commands:"
         echo "  - mise check                         # Check flake syntax"
@@ -337,7 +314,6 @@
         echo "  - mise dev                           # Enter development shell"
         echo "  - mise clean                         # Clean build results"
         echo "  - mise ssh-orbital                   # SSH into orbital"
-        echo "  - mise ssh-turbine                   # SSH into turbine"
         echo ""
         echo "📚 Documentation:"
         echo "  - mise docs-serve                    # Serve docs locally"

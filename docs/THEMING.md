@@ -1,6 +1,6 @@
 # Unified Theming with Stylix
 
-This repository uses **Stylix** to provide a unified, system-wide aesthetic across both NixOS (`powerhouse`) and macOS (`turbine`).
+This repository uses **Stylix** to provide a unified, system-wide aesthetic across NixOS hosts.
 
 ## Overview
 

@@ -18,23 +18,6 @@ run = "mise tasks"
 description = "Build orbital NixOS configuration"
 run = "nix build .#orbital"
 
-[tasks.build-turbine-linux]
-description = "Cross-compile turbine nix-darwin config from Linux"
-run = "nix build .#turbine-darwin"
-
-# Darwin native commands (for working ON turbine/macos)
-[tasks.check-turbine]
-description = "Check turbine config locally (validation only)"
-run = "darwin-rebuild check --flake .#turbine"
-
-[tasks.build-turbine-local]
-description = "Build turbine config locally (build only, no activate)"
-run = "darwin-rebuild build --flake .#turbine"
-
-[tasks.apply-turbine]
-description = "Apply/switch turbine configuration (build + activate)"
-run = "darwin-rebuild switch --flake .#turbine"
-
 # Build commands - ISO Installers
 # DEPRECATED: powerhouse will become basestation  
 # [tasks.build-powerhouse-iso]
@@ -73,13 +56,13 @@ run = "nix develop"
 # Build all (comprehensive)
 [tasks.build-all]
 description = "Build all active configurations"
-depends = ["build-orbital", "build-turbine-linux"]
+depends = ["build-orbital"]
 run = "echo 'All configurations built successfully!'"
 
 # Testing - runs checks in parallel
 [tasks.test]
 description = "Run all validation tests"
-depends = ["check", "check-darwin-linux"]
+depends = ["check"]
 run = "echo 'All tests passed'"
 
 # Maintenance
@@ -135,10 +118,6 @@ run = "rm -rf docs/book"
 description = "SSH into orbital"
 run = "ssh -p 77 orbital"
 
-[tasks.ssh-turbine]
-description = "SSH into turbine"
-run = "ssh turbine"
-
 # Git helpers
 [tasks.git-status]
 description = "Show git status with Nix additions"
@@ -152,15 +131,13 @@ echo "=== Nix Config Repository ==="
 echo "Flake outputs:"
 nix flake metadata 2>/dev/null | head -20 || echo "Run 'nix flake metadata' for details"
 echo ""
-echo "=== Available Hosts ==="
-echo "- orbital (NixOS server - SOLO MODE)"
-echo "- turbine (macOS workstation)"
-echo ""
-echo "=== ISO Installers ==="
-echo "- mise build-orbital-iso"
-echo ""
-echo "=== Build Commands ==="
-echo "- mise build-orbital"
-echo "- mise build-turbine"
-echo "- mise build-all"
+        echo "=== Available Hosts ==="
+        echo "- orbital (NixOS server - SOLO MODE)"
+        echo ""
+        echo "=== ISO Installers ==="
+        echo "- mise build-orbital-iso"
+        echo ""
+        echo "=== Build Commands ==="
+        echo "- mise build-orbital"
+        echo "- mise build-all"
 '''

@@ -4,7 +4,6 @@ A set of configs for my machines using the **Pure Module Pattern**:
 
 - **powerhouse** (desktop) - NixOS with Plasma, NVIDIA, Pro Audio
 - **capacitor** (server) - NixOS headless server with monitoring stack
-- **turbine** (laptop) - macOS with nix-darwin (Intel)
 - **battery** (future) - NixOS
 
 ## Features
@@ -38,8 +37,7 @@ A set of configs for my machines using the **Pure Module Pattern**:
 ├── docs/               # Documentation
 ├── hosts/              # Host-specific configurations
 │   ├── capacitor/      # NixOS homelab server
-│   ├── powerhouse/     # NixOS desktop
-│   └── turbine/        # macOS laptop
+│   └── powerhouse/     # NixOS desktop
 ├── lib/                # Shared library functions (mkHost abstraction)
 ├── modules/            # Modular components (20+ Pure Modules)
 │   ├── desktop/        # Desktop environments bundle (plasma, sddm)
@@ -214,11 +212,8 @@ mise help
 mise build-powerhouse
 mise build-capacitor
 
-# Cross-compile nix-darwin config from Linux
-mise build-turbine
-
-# Validate nix-darwin config (faster)
-mise check-darwin
+# Validate configs
+mise check
 
 # Build all configurations
 mise build-all

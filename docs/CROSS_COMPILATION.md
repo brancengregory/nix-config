@@ -1,18 +1,22 @@
 # Cross-Platform Development
 
-This flake supports building and validating nix-darwin configurations from Linux systems.
+This flake previously supported building and validating nix-darwin configurations from Linux systems.
 
-## Features
+## Status
+
+Darwin/macOS support is currently not active. This documentation is preserved for reference when macOS support is needed in the future.
+
+## Historical Features
 
 ### Cross-Compilation
 Build nix-darwin configurations on Linux without requiring a macOS system:
 
 ```bash
 # Build the full darwin configuration from Linux
-nix build .#turbine-darwin
+nix build .#<hostname>-darwin
 
 # Or use the convenience command
-mise build-turbine
+mise build-darwin
 
 # The result will be in ./result/
 ```
@@ -22,7 +26,7 @@ Validate nix-darwin configurations without performing a full build:
 
 ```bash
 # Check if the darwin configuration is valid
-nix build .#turbine-check
+nix build .#<hostname>-check
 
 # Or use the convenience command
 mise check-darwin
@@ -84,7 +88,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v27
       - name: Build darwin config natively
-        run: mise build-turbine
+        run: mise build-darwin
 ```
 
 3. **Local cross-compilation** (current setup):
@@ -96,7 +100,7 @@ For development and testing, you can use the cross-compilation support directly:
 mise check-darwin
 
 # Full cross-compilation (may be slower without remote builder)
-mise build-turbine
+mise build-darwin
 ```
 
 ### Performance Tips
@@ -129,7 +133,7 @@ If you encounter issues with cross-compilation:
 
 3. **Use verbose output for debugging**:
    ```bash
-   nix build .#turbine-darwin --verbose
+   nix build .#<hostname>-darwin --verbose
    ```
 
 ## Use Cases
@@ -146,7 +150,7 @@ In continuous integration, you can validate both NixOS and nix-darwin configurat
   run: mise check-darwin
 
 - name: Cross-compile darwin configuration
-  run: mise build-turbine
+  run: mise build-darwin
 ```
 
 ### Development Workflow
@@ -154,7 +158,7 @@ When developing on Linux but targeting macOS:
 
 1. **Edit configurations** in your preferred Linux environment
 2. **Validate syntax** with `mise check-darwin`
-3. **Cross-compile** with `mise build-turbine` to catch platform-specific issues
+3. **Cross-compile** with `mise build-darwin` to catch platform-specific issues
 4. **Deploy** the configuration on actual macOS hardware when ready
 
 ## Requirements
@@ -175,7 +179,7 @@ If cross-compilation fails:
 Cross-compilation can be resource-intensive:
 - Use `nix build --max-jobs auto` to utilize all CPU cores
 - Consider using a remote darwin builder for better performance
-- The validation target (`turbine-check`) is much faster than full builds
+- The validation target (`<hostname>-check`) is much faster than full builds
 
 ## Remote Builders
 

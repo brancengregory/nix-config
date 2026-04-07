@@ -61,7 +61,7 @@ If you already have Homebrew installations:
 
 1. **Inventory existing apps**: Run `brew list` and `brew list --cask`
 2. **Add to nix-darwin**: Add the applications you want to keep to the appropriate lists
-3. **Apply configuration**: Run `darwin-rebuild switch --flake .#turbine`
+3. **Apply configuration**: Run `darwin-rebuild switch --flake .#<hostname>`
 4. **Cleanup**: The `cleanup = "zap"` setting will remove unmanaged packages
 
 ## Applying Changes
@@ -69,7 +69,7 @@ If you already have Homebrew installations:
 After modifying the configuration:
 
 ```bash
-darwin-rebuild switch --flake .#turbine
+darwin-rebuild switch --flake .#<hostname>
 ```
 
 This will:

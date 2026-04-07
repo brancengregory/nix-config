@@ -24,7 +24,7 @@ SOPS_CONFIG="${REPO_ROOT}/.sops.yaml"
 # NOTE: MASTER_KEY_FILE removed - GPG keys are on hardware tokens only
 
 # List of all hosts in the infrastructure
-HOSTS=("powerhouse" "turbine" "capacitor")
+HOSTS=("powerhouse" "capacitor")
 
 # Function to print colored output
 print_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
@@ -103,7 +103,7 @@ generate_wireguard_keys() {
   
   # Generate client keys
   IP=2
-  for HOST in powerhouse turbine battery; do
+  for HOST in powerhouse battery; do
     print_info "Generating keys for $HOST..."
     
     PRIV=$(wg genkey)
