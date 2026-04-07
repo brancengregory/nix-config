@@ -22,6 +22,12 @@ in {
       default = 1;
       description = "Number of virtual desktops";
     };
+
+    scale = mkOption {
+      type = types.float;
+      default = 1.0;
+      description = "Display scaling factor for HiDPI screens";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -129,6 +135,8 @@ in {
               translucencyEnabled = false;
               backgroundcontrastEnabled = false;
             };
+            kdeglobals.KScreen.ScaleFactor = cfg.scale;
+            kwinrc.Xwayland.Scale = cfg.scale;
           };
         };
       }

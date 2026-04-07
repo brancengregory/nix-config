@@ -38,6 +38,7 @@
 
   # Enable Plasma desktop environment
   desktop.plasma.enable = true;
+  desktop.plasma.scale = 1.5;
   desktop.sddm.enable = true;
 
   # System state version
