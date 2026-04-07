@@ -119,10 +119,10 @@
       ${
         if isLinux
         then ''
-          path+=('/home/brancengregory/.cargo/bin' '/home/brancengregory/go/bin')
+          path+=("$HOME/.cargo/bin" "$HOME/go/bin")
         ''
         else ''
-          path+=('/Users/brancengregory/.cargo/bin' '/Users/brancengregory/go/bin')
+          path+=("$HOME/.cargo/bin" "$HOME/go/bin")
         ''
       }
 

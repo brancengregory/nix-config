@@ -33,13 +33,11 @@
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
-    age.keyFile =
-      if isLinux
-      then "/home/brancengregory/.config/sops/age/keys.txt"
-      else "/Users/brancengregory/.config/sops/age/keys.txt";
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
     secrets = {
       ssh_authorized_key = {
+        path = "${config.home.homeDirectory}/.ssh/authorized_keys";
         mode = "0600";
       };
 

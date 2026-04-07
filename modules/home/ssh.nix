@@ -8,11 +8,9 @@
   ...
 }:
 with lib; {
+  # sops-nix manages the ssh_authorized_key secret
+  # It will be placed at the configured path at activation time
   sops.secrets.ssh_authorized_key = {};
-
-  home.file.".ssh/authorized_keys" = {
-    source = config.sops.secrets.ssh_authorized_key.path;
-  };
 
   # Install SSH client
   home.packages = with pkgs; [

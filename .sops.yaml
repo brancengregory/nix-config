@@ -18,13 +18,6 @@ keys:
   # Host Keys - Currently Active
   - &host_orbital age12tr2xc5eurtqlkn6dxvu46dy8jpsy93r473we6vgv8pem643yysshhsf7y
   - &host_voyager age16trf363vyuvfmf3fpgre3rpe02cr0qz9gzxzzu5zga8xu6e0ydlsayllxn
-  
-  # DEPRECATED: Will re-add after migration
-  # - &host_powerhouse age1ntqkell77ru2zv87yfyheprw00zxwdy4au6ev3frmc7qq9tmm4zqjdy8ty
-  # - &host_turbine age1kh6w6v9zu6ahrddlsl47rypr7wtlht94hj6h2p9sqnavpujsvaqs2ghtve
-  # - &host_capacitor age1ca3nyr5m5musmwafqcel0t89ugupvwmmkamrlnpsnp6dpc8d6y2q09mv8k
-  # - &host_battery age1y03d2fe2vpej9ewd44uj7qvt7g9zekydj2rts0urjdyv7vpf6saq7kfvx3
-  # - &host_vm age1dr3ecjsnv5azmeq63764md7ag04kuyyzc8w8yx60u4v5dfndxpasyrnp4t
 
 creation_rules:
   # Default rule for all secrets
@@ -35,12 +28,6 @@ creation_rules:
         - *user_core
         - *host_orbital
         - *host_voyager
-        # DEPRECATED: Will re-add after migration
-        # - *host_powerhouse
-        # - *host_turbine
-        # - *host_capacitor
-        # - *host_battery
-        # - *host_vm
 
   # Optional: Restricted secrets (e.g., only specific hosts)
   # - path_regex: secrets/powerhouse/.*$
