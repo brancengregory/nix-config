@@ -12,9 +12,10 @@
 with lib; let
   cfg = config.services.opencode-server;
   # Only define package on Linux (NixOS)
+  # Use opencode from nixpkgs-unstable for latest version (NixOS only)
   opencodePackage =
     if pkgs.stdenv.hostPlatform.system == "x86_64-linux" || pkgs.stdenv.hostPlatform.system == "aarch64-linux"
-    then inputs.opencode-flake.packages.${pkgs.stdenv.hostPlatform.system}.default
+    then inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.opencode
     else null;
 in {
   options.services.opencode-server = {

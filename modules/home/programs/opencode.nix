@@ -11,7 +11,8 @@
   ...
 }: let
   opencodeConfigDir = "${config.xdg.configHome}/opencode";
-  opencodePackage = inputs.opencode-flake.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  # Use opencode from nixpkgs-unstable for latest version
+  opencodePackage = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.opencode;
 in {
   options.programs.opencode-config = {
     enable = lib.mkEnableOption "OpenCode AI coding agent with declarative config";

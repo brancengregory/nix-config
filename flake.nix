@@ -58,12 +58,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # OpenCode - AI coding agent
-    opencode-flake = {
-      url = "github:aodhanhayter/opencode-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # NixOS Hardware - Framework laptop support
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
