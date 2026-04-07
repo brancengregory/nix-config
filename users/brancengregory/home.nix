@@ -142,6 +142,9 @@
     }
     else {};
 
+  # Enable Plasma desktop settings on Linux desktops (includes dark mode)
+  home.desktop.plasma.enable = isLinux && isDesktop;
+
   home.stateVersion = "25.11";
 
   # OpenCode AI coding agent with declarative config
