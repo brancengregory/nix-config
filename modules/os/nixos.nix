@@ -12,6 +12,9 @@
   # --- Shell ---
   programs.zsh.enable = true;
 
+  # --- NixOS CLI ---
+  programs.nixos-cli.enable = true;
+
   # --- Networking ---
 
   # Default to networkd for servers, but allow hosts to override (e.g., for NetworkManager)

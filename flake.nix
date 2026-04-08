@@ -66,7 +66,7 @@
     # NixOS CLI - Interactive NixOS management tool
     nixos-cli = {
       url = "github:nix-community/nixos-cli";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
 
