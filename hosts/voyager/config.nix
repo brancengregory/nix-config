@@ -166,4 +166,22 @@
 
   # Note: Garbage collection is configured in modules/os/nixos.nix
   # Using default of 14 days there, can override if needed
+
+  # Framework 16 touchpad configuration
+  home-manager.sharedModules = [
+    {
+      programs.plasma.input.touchpads = [
+        {
+          # Framework 16 touchpad (PIXA3854)
+          name = "PIXA3854:00 093A:0274 Touchpad";
+          vendorId = "093a";
+          productId = "0274";
+          rightClickMethod = "twoFingers";
+          tapToClick = false;
+          pointerSpeed = 0.3;
+          disableWhileTyping = true;
+        }
+      ];
+    }
+  ];
 }
