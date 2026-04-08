@@ -114,6 +114,7 @@
       rustup
       snapper-gui
       keymapp
+      wl-clipboard
     ]);
 
   xdg.mimeApps = lib.mkIf isDesktop {
