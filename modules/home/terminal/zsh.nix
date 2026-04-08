@@ -106,9 +106,6 @@
       # Add paths
       path+=("$HOME/.cargo/bin" "$HOME/go/bin")
 
-      # Autocompletion
-      autoload -Uz compinit && compinit
-
       # Custom function for reading files
       c() {
         if [[ "$1" == *.md ]]; then
@@ -162,6 +159,8 @@
       # Tmux-specific improvements
       if [ -n "$TMUX" ]; then
         stty sane
+        # Ensure tmux uses consistent TERM value
+        export TERM=tmux-256color
       fi
 
       export PROJ_DATA=/usr/share/proj

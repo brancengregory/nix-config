@@ -12,6 +12,7 @@
     clipboard-write = allow
     clipboard-trim-trailing-spaces = true
     keybind = shift+enter=text:\n
-    term = xterm-256color
+    term = tmux-256color
+    shell-integration = none
   '';
 }
