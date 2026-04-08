@@ -107,6 +107,6 @@
 
   # --- Default Browser ---
   environment.variables = {
-    BROWSER = "google-chrome";
+    BROWSER = "google-chrome-stable";
   };
 }
