@@ -52,6 +52,9 @@
          # Optimized GPG_TTY update - only when needed, not on every pane switch
          set-hook -g session-created 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
          set-hook -g client-attached 'run-shell "export GPG_TTY=$(tty) && gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true"'
+
+         # Enable clipboard integration via OSC 52
+         set -g set-clipboard on
     '';
   };
 }
