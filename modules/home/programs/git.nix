@@ -1,8 +1,26 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     git
-    lazygit
   ];
+
+  programs.lazygit = {
+    enable = true;
+
+    settings = {
+      git = {
+        # Disable auto-fetch to avoid frequent remote operations that trigger
+        # GPG authentication with the nitrokey hardware token
+        autoFetch = false;
+
+        # Keep auto-refresh enabled (default) so file changes are still detected
+        autoRefresh = true;
+
+        # Prevent automatic fast-forwarding of branches after fetch.
+        # Avoids unexpected remote operations that could require authentication.
+        autoForwardBranches = "none";
+      };
+    };
+  };
 
   programs.gh = {
     enable = true;
