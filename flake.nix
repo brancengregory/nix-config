@@ -62,6 +62,12 @@
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
     };
+
+    # NixOS CLI - Interactive NixOS management tool
+    nixos-cli = {
+      url = "github:nix-community/nixos-cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -71,6 +77,7 @@
     home-manager,
     sops-nix,
     disko,
+    nixos-cli,
     ...
   } @ inputs: let
     lib = import ./lib {inherit inputs;};
@@ -103,6 +110,7 @@
         isDesktop = false;
         extraModules = [
           inputs.disko.nixosModules.disko
+          inputs.nixos-cli.nixosModules.nixos-cli
         ];
       };
 
@@ -132,6 +140,9 @@
 
           # Disk partitioning
           inputs.disko.nixosModules.disko
+
+          # NixOS CLI
+          inputs.nixos-cli.nixosModules.nixos-cli
 
           # Home Manager
           home-manager.nixosModules.home-manager
