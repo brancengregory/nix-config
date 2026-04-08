@@ -10,6 +10,9 @@
       git_protocol = "ssh";
       editor = "nvim";
     };
+    gitCredentialHelper = {
+      enable = true;
+    };
   };
 
   programs.git = {
