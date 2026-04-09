@@ -16,7 +16,6 @@
     ../../modules/home/programs/atuin.nix
     ../../modules/home/programs/nixvim
     ../../modules/home/programs/git.nix
-    ../../modules/home/programs/r.nix
     ../../modules/home/programs/direnv.nix
     ../../modules/home/programs/ghostty.nix
     ../../modules/home/programs/sesh.nix
@@ -108,8 +107,6 @@
       slack
       discord
       zoom-us
-      positron-bin
-      rstudio
       rustup
       snapper-gui
       keymapp

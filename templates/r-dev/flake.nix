@@ -3,7 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
     ojodb = {
       url = "github:openjusticeok/ojodb";
       flake = false;
@@ -19,6 +22,7 @@
           # R packages to include
           rPackages = with pkgs.rPackages; [
             # Core tidyverse
+            tidyverse
             dplyr
             ggplot2
             tidyr
@@ -31,20 +35,43 @@
 
             # Development tools
             devtools
+            renv
             usethis
             testthat
             roxygen2
             pkgdown
             knitr
             rmarkdown
+            config
+            logger
+            here
+            languageserver
 
             # Data tools
             arrow
             duckdb
             DBI
+            RPostgres
+            odbc
             
             # Cloud storage
             googleCloudStorageR
+
+            # Documentation
+            gt
+
+            # Web/API
+            httr2
+            jsonlite
+
+            # Utilities
+            rlang
+            glue
+            janitor
+
+            # Pipeline
+            targets
+            tarchetypes
 
             # Ojodb - installed from source
             (pkgs.rPackages.buildRPackage {
@@ -74,6 +101,19 @@
           R = pkgs.rWrapper.override {
             packages = rPackages;
           };
+          
+          # Wrap RStudio with packages
+          rstudio-wrapped = pkgs.rstudioWrapper.override {
+            packages = rPackages;
+          };
+          
+          # For Positron, we need to set R_LIBS_SITE
+          rLibsPath = pkgs.lib.makeLibraryPath rPackages;
+          positron-launcher = pkgs.writeShellScriptBin "positron" ''
+            export R_LIBS_SITE="${rLibsPath}"
+            export PATH="${R}/bin:$PATH"
+            exec ${pkgs.positron-bin}/bin/positron "$@"
+          '';
         in
         {
           # Development shell
@@ -82,24 +122,36 @@
 
             buildInputs = [
               R
+              pkgs.radian
               pkgs.air-formatter
               pkgs.jarl
               pkgs.quarto
+              positron-launcher
+              rstudio-wrapped
             ];
 
             shellHook = ''
+              export PATH="${R}/bin:$PATH"
+              export R_LIBS_SITE="${rLibsPath}"
+              
               echo "🚀 R Development Environment"
               echo ""
               echo "Available tools:"
               echo "  - R (with tidyverse, devtools, ojodb, etc.)"
+              echo "  - radian (enhanced R REPL)"
               echo "  - air (R formatter)"
               echo "  - jarl (R linter)"
               echo "  - quarto"
+              echo "  - positron (R IDE)"
+              echo "  - rstudio (R IDE)"
               echo ""
               echo "Quick start:"
               echo "  R                    # Start R console"
+              echo "  radian               # Enhanced R REPL"
               echo "  air format .         # Format R code"
               echo "  jarl .               # Lint R code"
+              echo "  positron             # Launch Positron IDE"
+              echo "  rstudio              # Launch RStudio IDE"
               echo ""
             '';
           };

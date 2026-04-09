@@ -283,6 +283,12 @@
     devShells.x86_64-linux.r-dev = let
       pkgs = import inputs.nixpkgs-unstable {
         system = "x86_64-linux";
+        config = {
+          allowUnfree = true;
+          permittedInsecurePackages = [
+            "electron-38.8.4"
+          ];
+        };
       };
       rPackages = with pkgs.rPackages; [
         # Core tidyverse
@@ -309,10 +315,26 @@
         })
       ];
       R = pkgs.rWrapper.override { packages = rPackages; };
+      
+      # Wrap RStudio with packages
+      rstudio-wrapped = pkgs.rstudioWrapper.override {
+        packages = rPackages;
+      };
+      
+      # For Positron, we need to set R_LIBS_SITE
+      rLibsPath = pkgs.lib.makeLibraryPath rPackages;
+      positron-launcher = pkgs.writeShellScriptBin "positron" ''
+        export R_LIBS_SITE="${rLibsPath}"
+        export PATH="${R}/bin:$PATH"
+        exec ${pkgs.positron-bin}/bin/positron "$@"
+      '';
     in pkgs.mkShell {
       name = "r-dev";
-      buildInputs = [ R pkgs.air-formatter pkgs.jarl pkgs.quarto ];
+      buildInputs = [ R pkgs.air-formatter pkgs.jarl pkgs.quarto positron-launcher rstudio-wrapped ];
       shellHook = ''
+        export PATH="${R}/bin:$PATH"
+        export R_LIBS_SITE="${rLibsPath}"
+        
         echo "🚀 R Development Environment"
         echo ""
         echo "Available tools:"
@@ -320,11 +342,15 @@
         echo "  - air (R formatter)"
         echo "  - jarl (R linter)"
         echo "  - quarto"
+        echo "  - positron (R IDE)"
+        echo "  - rstudio (R IDE)"
         echo ""
         echo "Quick start:"
         echo "  R                    # Start R console"
         echo "  air format .         # Format R code"
         echo "  jarl .               # Lint R code"
+        echo "  positron             # Launch Positron IDE"
+        echo "  rstudio              # Launch RStudio IDE"
         echo ""
       '';
     };
