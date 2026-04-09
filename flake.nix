@@ -302,5 +302,13 @@
       x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
       x86_64-darwin = nixpkgs.legacyPackages.x86_64-darwin.alejandra;
     };
+
+    # Templates for development environments
+    templates = {
+      r-dev = {
+        path = ./templates/r-dev;
+        description = "R development environment with air formatter, jarl linter, and ojodb";
+      };
+    };
   };
 }
