@@ -15,6 +15,30 @@
   # --- NixOS CLI ---
   programs.nixos-cli.enable = true;
 
+  # --- Flake Registry ---
+  nix.registry = {
+    # Your personal config - use string path to avoid pure eval issues
+    nix-config.to = {
+      type = "path";
+      path = "/home/brancengregory/code/brancengregory/nix-config";
+    };
+
+    # Short names for nixpkgs
+    stable.to = {
+      type = "github";
+      owner = "NixOS";
+      repo = "nixpkgs";
+      ref = "nixos-25.11";
+    };
+
+    unstable.to = {
+      type = "github";
+      owner = "NixOS";
+      repo = "nixpkgs";
+      ref = "nixos-unstable";
+    };
+  };
+
   # --- Networking ---
 
   # Default to networkd for servers, but allow hosts to override (e.g., for NetworkManager)
