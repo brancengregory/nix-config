@@ -55,6 +55,13 @@
 
   programs.home-manager.enable = true;
 
+  # NH (Nix Helper) - configured via Home Manager for better flake support
+  programs.nh = {
+    enable = true;
+    osFlake = "/home/brancengregory/code/brancengregory/nix-config";
+    # Note: Using nix.gc.automatic instead of nh clean to avoid conflicts
+  };
+
   home.username = "brancengregory";
   home.homeDirectory = "/home/brancengregory";
 
@@ -77,7 +84,6 @@
       just
       ollama
       libpq
-      nh
       nmap
       sops
       ssh-to-age

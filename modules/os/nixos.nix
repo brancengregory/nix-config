@@ -12,9 +12,6 @@
   # --- Shell ---
   programs.zsh.enable = true;
 
-  # --- NixOS CLI ---
-  programs.nixos-cli.enable = true;
-
   # --- Flake Registry ---
   nix.registry = {
     # Your personal config - use string path to avoid pure eval issues
