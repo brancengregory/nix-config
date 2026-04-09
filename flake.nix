@@ -279,6 +279,56 @@
       '';
     };
 
+    # R Development Environment - accessible via 'nix develop nix-config#r-dev' or 'nix run nix-config#r-dev'
+    devShells.x86_64-linux.r-dev = let
+      pkgs = import inputs.nixpkgs-unstable {
+        system = "x86_64-linux";
+      };
+      rPackages = with pkgs.rPackages; [
+        # Core tidyverse
+        dplyr ggplot2 tidyr readr purrr tibble stringr forcats lubridate
+        # Development tools
+        devtools usethis testthat roxygen2 pkgdown knitr rmarkdown
+        # Data tools
+        arrow duckdb DBI
+        # Cloud storage
+        googleCloudStorageR
+        # Ojodb
+        (pkgs.rPackages.buildRPackage {
+          name = "ojodb";
+          src = pkgs.fetchFromGitHub {
+            owner = "openjusticeok";
+            repo = "ojodb";
+            rev = "3334765296ef5f054849b14db264463a7272441e";
+            sha256 = "sha256-Sa5XjUTYmfV2lTjx8ajLYvvHBaBFQjwRihtQPLJ7f44=";
+          };
+          propagatedBuildInputs = with pkgs.rPackages; [
+            DBI RPostgres dplyr dbplyr ggplot2 pool rlang stringr purrr
+            tidyr janitor lubridate hms fs glue
+          ];
+        })
+      ];
+      R = pkgs.rWrapper.override { packages = rPackages; };
+    in pkgs.mkShell {
+      name = "r-dev";
+      buildInputs = [ R pkgs.air-formatter pkgs.jarl pkgs.quarto ];
+      shellHook = ''
+        echo "🚀 R Development Environment"
+        echo ""
+        echo "Available tools:"
+        echo "  - R (with tidyverse, devtools, ojodb, etc.)"
+        echo "  - air (R formatter)"
+        echo "  - jarl (R linter)"
+        echo "  - quarto"
+        echo ""
+        echo "Quick start:"
+        echo "  R                    # Start R console"
+        echo "  air format .         # Format R code"
+        echo "  jarl .               # Lint R code"
+        echo ""
+      '';
+    };
+
     devShells.x86_64-darwin.default = nixpkgs.legacyPackages.x86_64-darwin.mkShell {
       buildInputs = with nixpkgs.legacyPackages.x86_64-darwin; [
         nix-output-monitor
