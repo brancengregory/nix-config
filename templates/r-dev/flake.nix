@@ -17,8 +17,17 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
 
-      perSystem = { config, self', inputs', pkgs, system, ... }:
+      perSystem = { config, self', inputs', system, ... }:
         let
+          pkgs = import nixpkgs {
+            inherit system;
+            config = {
+              permittedInsecurePackages = [
+                "electron-38.8.4"
+              ];
+            };
+          };
+
           # R packages to include
           rPackages = with pkgs.rPackages; [
             # Core tidyverse
@@ -42,7 +51,7 @@
             pkgdown
             knitr
             rmarkdown
-            config
+            pkgs.rPackages.config
             logger
             here
             languageserver
@@ -107,13 +116,8 @@
             packages = rPackages;
           };
           
-          # For Positron, we need to set R_LIBS_SITE
+          # R library path for tools that need it
           rLibsPath = pkgs.lib.makeLibraryPath rPackages;
-          positron-launcher = pkgs.writeShellScriptBin "positron" ''
-            export R_LIBS_SITE="${rLibsPath}"
-            export PATH="${R}/bin:$PATH"
-            exec ${pkgs.positron-bin}/bin/positron "$@"
-          '';
         in
         {
           # Development shell
@@ -126,7 +130,6 @@
               pkgs.air-formatter
               pkgs.jarl
               pkgs.quarto
-              positron-launcher
               rstudio-wrapped
             ];
 
@@ -142,7 +145,6 @@
               echo "  - air (R formatter)"
               echo "  - jarl (R linter)"
               echo "  - quarto"
-              echo "  - positron (R IDE)"
               echo "  - rstudio (R IDE)"
               echo ""
               echo "Quick start:"
@@ -150,7 +152,6 @@
               echo "  radian               # Enhanced R REPL"
               echo "  air format .         # Format R code"
               echo "  jarl .               # Lint R code"
-              echo "  positron             # Launch Positron IDE"
               echo "  rstudio              # Launch RStudio IDE"
               echo ""
             '';
