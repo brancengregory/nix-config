@@ -130,6 +130,58 @@
     };
   };
 
+  # XDG user directories - override defaults with lowercase paths
+  xdg.userDirs = {
+    enable = true;
+    createDirectories = false; # We manage directory creation manually below
+    desktop = "${config.home.homeDirectory}/desktop";
+    documents = "${config.home.homeDirectory}/documents";
+    download = "${config.home.homeDirectory}/downloads";
+    pictures = "${config.home.homeDirectory}/media/pictures";
+    music = "${config.home.homeDirectory}/media/music";
+    videos = "${config.home.homeDirectory}/media/videos";
+    # Disable unused standard directories
+    publicShare = null;
+    templates = null;
+  };
+
+  # Create directory structure
+  # Always created (all hosts)
+  home.file."code/.keep" = {
+    enable = true;
+    text = "";
+  };
+  home.file."downloads/.keep" = {
+    enable = true;
+    text = "";
+  };
+
+  # Desktop-only directories
+  home.file."desktop/.keep" = {
+    enable = isDesktop;
+    text = "";
+  };
+  home.file."documents/.keep" = {
+    enable = isDesktop;
+    text = "";
+  };
+  home.file."media/pictures/screenshots/.keep" = {
+    enable = isDesktop;
+    text = "";
+  };
+  home.file."media/music/bitwig/.keep" = {
+    enable = isDesktop;
+    text = "";
+  };
+  home.file."media/music/exports/.keep" = {
+    enable = isDesktop;
+    text = "";
+  };
+  home.file."media/videos/screencasts/.keep" = {
+    enable = isDesktop;
+    text = "";
+  };
+
   home.stateVersion = "25.11";
 
   # OpenCode AI coding agent with declarative config
