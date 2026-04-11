@@ -5,9 +5,9 @@
   ...
 }:
 with lib; let
-  cfg = config.media.audio;
+  cfg = config.modules.media.audio;
 in {
-  options.media.audio = {
+  options.modules.media.audio = {
     enable = mkEnableOption "PipeWire audio subsystem";
 
     lowLatency = mkEnableOption "low-latency audio with Zen kernel (WARNING: changes kernel)";

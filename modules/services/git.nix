@@ -6,9 +6,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.git-server;
+  cfg = config.modules.services.git-server;
 in {
-  options.services.git-server = {
+  options.modules.services.git-server = {
     enable = mkEnableOption "Git server (Forgejo)";
 
     forgejo = {

@@ -7,9 +7,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.openssh.hostKeysDeclarative;
+  cfg = config.modules.services.openssh.hostKeysDeclarative;
 in {
-  options.services.openssh.hostKeysDeclarative = {
+  options.modules.services.openssh.hostKeysDeclarative = {
     enable = mkEnableOption "declarative SSH host key management";
 
     ed25519 = {

@@ -4,9 +4,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.monitoring;
+  cfg = config.modules.services.monitoring;
 in {
-  options.services.monitoring = {
+  options.modules.services.monitoring = {
     enable = mkEnableOption "system monitoring stack (Prometheus/Grafana)";
 
     exporters = {

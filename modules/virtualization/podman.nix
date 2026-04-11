@@ -5,9 +5,9 @@
   ...
 }:
 with lib; let
-  cfg = config.virtualization.podman;
+  cfg = config.modules.virtualization.podman;
 in {
-  options.virtualization.podman = {
+  options.modules.virtualization.podman = {
     enable = mkEnableOption "Podman container engine (Docker replacement)";
 
     dockerCompat = mkOption {

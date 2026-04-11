@@ -8,7 +8,7 @@
   ...
 }:
 with lib; let
-  cfg = config.networking.wireguard-mesh;
+  cfg = config.modules.networking.wireguard-mesh;
 
   getNodeConfig = nodeName: {
     ip = cfg.nodes.${nodeName}.ip or "10.0.0.1";
@@ -21,7 +21,7 @@ with lib; let
   hubNode = getNodeConfig cfg.hubNodeName;
   isHub = thisNode.isServer;
 in {
-  options.networking.wireguard-mesh = {
+  options.modules.networking.wireguard-mesh = {
     enable = mkEnableOption "WireGuard mesh VPN (hub-and-spoke or full mesh)";
 
     interface = mkOption {

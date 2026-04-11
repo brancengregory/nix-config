@@ -4,9 +4,9 @@
   ...
 }:
 with lib; let
-  cfg = config.desktop.sddm;
+  cfg = config.modules.desktop.sddm;
 in {
-  options.desktop.sddm = {
+  options.modules.desktop.sddm = {
     enable = mkEnableOption "SDDM display manager";
 
     theme = mkOption {

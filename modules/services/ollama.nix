@@ -6,9 +6,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.ollama-server;
+  cfg = config.modules.services.ollama-server;
 in {
-  options.services.ollama-server = {
+  options.modules.services.ollama-server = {
     enable = mkEnableOption "Ollama LLM server";
 
     acceleration = mkOption {

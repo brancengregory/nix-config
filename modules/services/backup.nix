@@ -5,9 +5,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.backup;
+  cfg = config.modules.services.backup;
 in {
-  options.services.backup = {
+  options.modules.services.backup = {
     enable = mkEnableOption "Restic backup service";
 
     repository = mkOption {

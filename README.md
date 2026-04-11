@@ -9,7 +9,7 @@ A set of configs for my machines using the **Pure Module Pattern**:
 
 - **Pure Module Architecture**: 20+ modules using `mkEnableOption` - import to make available, enable to activate
 - **Bundle-Based Organization**: Clean imports via `modules/desktop`, `modules/hardware`, `modules/services`
-- **Declarative API**: Hosts declare capabilities via `desktop.plasma.enable = true`, not file imports
+- **Declarative API**: Hosts declare capabilities via `modules.desktop.plasma.enable = true`, not file imports
 - **Home Manager integration**: User-specific configs with modular component imports
 - **Unified GPG/SSH**: Integrated authentication and encryption strategy with Nitrokey hardware tokens
 - **SOPS-nix**: Declarative secret management with age encryption
@@ -65,8 +65,8 @@ imports = [
 ];
 
 # Explicitly choose what to enable
-desktop.plasma.enable = true;
-desktop.sddm.enable = true;
+modules.desktop.plasma.enable = true;
+modules.desktop.sddm.enable = true;
 
 # Other options available but inactive:
 # desktop.sddm.enable = false;  # Implicit - not enabled
@@ -77,44 +77,44 @@ desktop.sddm.enable = true;
 **Desktop/Workstation (powerhouse):**
 ```nix
 # Desktop Environment
-desktop.plasma.enable = true;
-desktop.sddm.enable = true;
-themes.stylix.enable = true;
+modules.desktop.plasma.enable = true;
+modules.desktop.sddm.enable = true;
+modules.themes.stylix.enable = true;
 
 # Hardware
 modules.hardware.nvidia.enable = true;
 modules.hardware.bluetooth.enable = true;
-media.audio.enable = true;
-media.audio.lowLatency = true;
+modules.media.audio.enable = true;
+modules.media.audio.lowLatency = true;
 
 # Services
-services.backup.enable = true;
-services.monitoring.enable = true;
-services.monitoring.exporters.enable = true;
+modules.services.backup.enable = true;
+modules.services.monitoring.enable = true;
+modules.services.monitoring.exporters.enable = true;
 
 # Virtualization
-virtualization.podman.enable = true;
-virtualization.hypervisor.enable = true;  # Run VMs
+modules.virtualization.podman.enable = true;
+modules.virtualization.hypervisor.enable = true;  # Run VMs
 ```
 
 **Server (capacitor):**
 ```nix
 # No desktop environment - headless server
-# services.backup.enable = true;  # Already enabled via service config
-services.monitoring.enable = true;
-services.monitoring.server.enable = true;  # Full Prometheus/Grafana
+# modules.services.backup.enable = true;  # Already enabled via service config
+modules.services.monitoring.enable = true;
+modules.services.monitoring.server.enable = true;  # Full Prometheus/Grafana
 
 # Virtualization for containers only
-virtualization.podman.enable = true;
-virtualization.hypervisor.enable = false;  # Don't run VMs on server
+modules.virtualization.podman.enable = true;
+modules.virtualization.hypervisor.enable = false;  # Don't run VMs on server
 ```
 
 ### Available Module Bundles
 
 **Desktop Bundle** (`modules/desktop/`):
-- `desktop.plasma.enable` - KDE Plasma 6 desktop
-- `desktop.sddm.enable` - SDDM display manager
-- `desktop.sddm.theme` - Optional theme
+- `modules.desktop.plasma.enable` - KDE Plasma 6 desktop
+- `modules.desktop.sddm.enable` - SDDM display manager
+- `modules.desktop.sddm.theme` - Optional theme
 
 **Hardware Bundle** (`modules/hardware/`):
 - `modules.hardware.nvidia.enable` - NVIDIA GPU drivers
@@ -123,22 +123,22 @@ virtualization.hypervisor.enable = false;  # Don't run VMs on server
 - `modules.hardware.bluetooth.powerOnBoot` - Auto-power behavior
 
 **Media Bundle** (`modules/media/`):
-- `media.audio.enable` - PipeWire audio stack
-- `media.audio.lowLatency` - Zen kernel for pro audio (⚠️ changes kernel)
-- `media.audio.proAudio` - JACK support, Bitwig Studio
+- `modules.media.audio.enable` - PipeWire audio stack
+- `modules.media.audio.lowLatency` - Zen kernel for pro audio (⚠️ changes kernel)
+- `modules.media.audio.proAudio` - JACK support, Bitwig Studio
 
 **Services Bundle** (`modules/services/`):
-- `services.backup.enable` - Restic backup
-- `services.monitoring.enable` - Prometheus/Grafana stack
-- `services.monitoring.exporters.enable` - Lightweight node exporters
-- `services.monitoring.server.enable` - Heavy monitoring server
+- `modules.services.backup.enable` - Restic backup
+- `modules.services.monitoring.enable` - Prometheus/Grafana stack
+- `modules.services.monitoring.exporters.enable` - Lightweight node exporters
+- `modules.services.monitoring.server.enable` - Heavy monitoring server
 - Plus: download, git, media, ollama, opencode, storage
 
 **Virtualization Bundle** (`modules/virtualization/`):
-- `virtualization.podman.enable` - Container engine
-- `virtualization.podman.dockerCompat` - Docker alias
-- `virtualization.hypervisor.enable` - Run VMs (libvirtd, virt-manager)
-- `virtualization.guest.enable` - QEMU guest agent (when this IS a VM)
+- `modules.virtualization.podman.enable` - Container engine
+- `modules.virtualization.podman.dockerCompat` - Docker alias
+- `modules.virtualization.hypervisor.enable` - Run VMs (libvirtd, virt-manager)
+- `modules.virtualization.guest.enable` - QEMU guest agent (when this IS a VM)
 
 ### Adding a New Host
 
@@ -168,12 +168,12 @@ Then in `hosts/my-new-host/config.nix`:
     ../../modules/hardware
     ../../modules/services
   ];
-  
+
   # Declare capabilities
-  desktop.plasma.enable = true;
+  modules.desktop.plasma.enable = true;
   modules.hardware.nvidia.enable = true;
-  services.backup.enable = true;
-  
+  modules.services.backup.enable = true;
+
   system.stateVersion = "25.11";
 }
 ```

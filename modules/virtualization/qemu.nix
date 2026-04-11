@@ -5,9 +5,9 @@
   ...
 }:
 with lib; let
-  cfg = config.virtualization;
+  cfg = config.modules.virtualization;
 in {
-  options.virtualization = {
+  options.modules.virtualization = {
     hypervisor = {
       enable = mkEnableOption "QEMU/KVM hypervisor (for running VMs on this host)";
 

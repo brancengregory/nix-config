@@ -8,10 +8,10 @@
   ...
 }:
 with lib; let
-  cfg = config.services.netbird-server;
+  cfg = config.modules.services.netbird-server;
   dataDir = "/var/lib/netbird";
 in {
-  options.services.netbird-server = {
+  options.modules.services.netbird-server = {
     enable = mkEnableOption "Netbird self-hosted management server";
 
     domain = mkOption {

@@ -5,9 +5,9 @@
   ...
 }:
 with lib; let
-  cfg = config.themes.stylix;
+  cfg = config.modules.themes.stylix;
 in {
-  options.themes.stylix = {
+  options.modules.themes.stylix = {
     enable = mkEnableOption "Stylix unified theming system";
 
     image = mkOption {

@@ -12,9 +12,9 @@
   ...
 }:
 with lib; let
-  cfg = config.security.gpg;
+  cfg = config.modules.security.gpg;
 in {
-  options.security.gpg = {
+  options.modules.security.gpg = {
     enable = mkEnableOption "GPG hardware token support";
 
     user = mkOption {

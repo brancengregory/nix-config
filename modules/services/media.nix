@@ -6,9 +6,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.media;
+  cfg = config.modules.services.media;
 in {
-  options.services.media = {
+  options.modules.services.media = {
     enable = mkEnableOption "Media server stack (Jellyfin, Sonarr, Radarr, Lidarr, Readarr, Prowlarr)";
 
     jellyfin = {

@@ -106,7 +106,7 @@
 
   # WireGuard Hub Configuration
   # NOTE: Currently solo mode - peers will be added when voyager/basestation are ready
-  networking.wireguard-mesh = {
+  modules.networking.wireguard-mesh = {
     enable = true;
     nodeName = "orbital";
     hubNodeName = "orbital";
@@ -139,7 +139,7 @@
   # Enable if needed: security.gpg.enable = true;
 
   # SSH host keys (server identity)
-  services.openssh.hostKeysDeclarative = {
+  modules.services.openssh.hostKeysDeclarative = {
     enable = true;
     ed25519 = {
       privateKeyFile = config.sops.secrets."ssh/orbital/host_key".path;
@@ -148,7 +148,7 @@
   };
 
   # Netbird Self-Hosted Configuration
-  services.netbird-server = {
+  modules.services.netbird-server = {
     enable = true;
     domain = "netbird.brancen.world";
     managementPort = 33073;
@@ -171,7 +171,7 @@
   };
 
   # OpenCode server
-  services.opencode-server = {
+  modules.services.opencode-server = {
     enable = true;
     port = 8081;
     workingDir = "/home/brancengregory/code";
@@ -179,7 +179,7 @@
   };
 
   # Caddy Reverse Proxy with Wildcard SSL (uses DNS-01 challenge via Porkbun)
-  services.caddy-proxy = {
+  modules.services.caddy-proxy = {
     enable = false;
     domain = "brancen.world";
     porkbunCredentialsFile = config.sops.secrets."porkbun/credentials".path;
@@ -257,12 +257,12 @@
   users.users.brancengregory.extraGroups = ["media"];
 
   # Enable media stack and download stack
-  services.media = {
+  modules.services.media = {
     enable = true;
     mediaDir = "/mnt/storage/standard/media";
   };
 
-  services.download-stack = {
+  modules.services.download-stack = {
     enable = true;
     downloadDir = "/mnt/storage/ephemeral/downloads";
   };
@@ -277,7 +277,7 @@
   ];
 
   # Enable storage stack with mergerfs, SnapRAID, NFS, and Minio
-  services.storage = {
+  modules.services.storage = {
     enable = true;
     mergerfs.enable = true;
     snapraid.enable = true;
@@ -296,14 +296,14 @@
   };
 
   # Ollama LLM server - models stored on NVMe for fast access
-  services.ollama-server = {
+  modules.services.ollama-server = {
     enable = true;
     acceleration = null; # CPU-only (no GPU on this server)
     modelsDir = "/var/lib/ollama"; # NVMe storage for fast model loading
   };
 
   # Forgejo Git server - repos on NVMe for fast git operations
-  services.git-server = {
+  modules.services.git-server = {
     enable = true;
     forgejo = {
       enable = true;
@@ -336,7 +336,7 @@
   nix.settings.auto-optimise-store = true;
 
   # Monitoring (Orbital runs the full monitoring server stack)
-  services.monitoring = {
+  modules.services.monitoring = {
     enable = true;
     exporters.enable = true; # Also run exporters on self
     exporters.collectors = ["systemd" "cpu" "memory" "disk" "filesystem" "loadavg"];
@@ -345,14 +345,14 @@
   };
 
   # Virtualization (Capacitor runs containers, not VMs)
-  virtualization.podman = {
+  modules.virtualization.podman = {
     enable = true;
     dockerCompat = true;
     dnsEnabled = true;
   };
 
-  virtualization.hypervisor.enable = false; # Server doesn't run VMs
-  virtualization.guest.enable = false; # Not a VM
+  modules.virtualization.hypervisor.enable = false; # Server doesn't run VMs
+  modules.virtualization.guest.enable = false; # Not a VM
 
   # Ensure home-manager waits for sops-nix to provide secrets
   systemd.services.home-manager-brancengregory = {

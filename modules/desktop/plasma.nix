@@ -6,9 +6,9 @@
   ...
 }:
 with lib; let
-  cfg = config.desktop.plasma;
+  cfg = config.modules.desktop.plasma;
 in {
-  options.desktop.plasma = {
+  options.modules.desktop.plasma = {
     enable = mkEnableOption "KDE Plasma 6 desktop environment with plasma-manager";
 
     lookAndFeel = mkOption {

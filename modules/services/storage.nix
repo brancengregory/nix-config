@@ -7,9 +7,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.storage;
+  cfg = config.modules.services.storage;
 in {
-  options.services.storage = {
+  options.modules.services.storage = {
     enable = mkEnableOption "Storage stack (mergerfs, SnapRAID, NFS, Minio)";
 
     mergerfs = {

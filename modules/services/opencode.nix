@@ -10,7 +10,7 @@
   ...
 }:
 with lib; let
-  cfg = config.services.opencode-server;
+  cfg = config.modules.services.opencode-server;
   # Only define package on Linux (NixOS)
   # Use opencode from nixpkgs-unstable for latest version (NixOS only)
   opencodePackage =
@@ -18,7 +18,7 @@ with lib; let
     then inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.opencode
     else null;
 in {
-  options.services.opencode-server = {
+  options.modules.services.opencode-server = {
     enable = mkEnableOption "OpenCode server (remote coding agent backend)";
 
     port = mkOption {

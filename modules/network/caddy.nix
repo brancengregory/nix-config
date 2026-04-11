@@ -7,9 +7,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.caddy-proxy;
+  cfg = config.modules.services.caddy-proxy;
 in {
-  options.services.caddy-proxy = {
+  options.modules.services.caddy-proxy = {
     enable = mkEnableOption "Caddy reverse proxy with wildcard SSL";
 
     domain = mkOption {

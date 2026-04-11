@@ -6,9 +6,9 @@
   ...
 }:
 with lib; let
-  cfg = config.services.download-stack;
+  cfg = config.modules.services.download-stack;
 in {
-  options.services.download-stack = {
+  options.modules.services.download-stack = {
     enable = mkEnableOption "Download stack (qBittorrent, SABnzbd)";
 
     qbittorrent = {

@@ -40,12 +40,12 @@
   networking.hostName = "voyager";
 
   # Enable Plasma desktop environment
-  desktop.plasma.enable = true;
-  desktop.plasma.scale = 1.5;
-  desktop.sddm.enable = true;
+  modules.desktop.plasma.enable = true;
+  modules.desktop.plasma.scale = 1.5;
+  modules.desktop.sddm.enable = true;
 
   # Enable gaming support (AMD iGPU)
-  desktop.gaming = {
+  modules.desktop.gaming = {
     enable = true;
     gpuVendor = "amd";
   };
@@ -155,20 +155,20 @@
   # The age key is derived from the SSH host key at /etc/ssh/ssh_host_ed25519_key
 
   # GPG hardware token support (Nitrokey)
-  security.gpg.enable = true;
+  modules.security.gpg.enable = true;
 
   # Podman container engine (Docker replacement)
-  virtualization.podman.enable = true;
+  modules.virtualization.podman.enable = true;
 
   # QEMU/KVM hypervisor for running VMs
-  virtualization.hypervisor.enable = true;
+  modules.virtualization.hypervisor.enable = true;
 
   # Stylix unified theming (Tokyo Night dark theme)
-  themes.stylix.enable = true;
+  modules.themes.stylix.enable = true;
 
   # Node exporter for system metrics (lightweight)
-  services.monitoring.enable = true;
-  services.monitoring.exporters.enable = true;
+  modules.services.monitoring.enable = true;
+  modules.services.monitoring.exporters.enable = true;
 
   # Enable flakes
   nix.settings.experimental-features = ["nix-command" "flakes"];

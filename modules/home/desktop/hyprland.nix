@@ -5,9 +5,9 @@
   ...
 }:
 with lib; let
-  cfg = config.home.desktop.hyprland;
+  cfg = config.modules.home.desktop.hyprland;
 in {
-  options.home.desktop.hyprland = {
+  options.modules.home.desktop.hyprland = {
     enable = mkEnableOption "Hyprland window manager configuration";
 
     enableNvidiaPatches = mkOption {

@@ -19,27 +19,27 @@ imports = [
 ];
 
 # Explicitly choose what to enable
-desktop.plasma.enable = true;
-desktop.sddm.enable = true;
-desktop.sddm.theme = "sugar-dark";  # Optional configuration
+modules.desktop.plasma.enable = true;
+modules.desktop.sddm.enable = true;
+modules.desktop.sddm.theme = "sugar-dark";  # Optional configuration
 
 # Other options available but NOT active:
-# desktop.hyprland.enable = false;  # Implicit - not enabled
+# modules.desktop.hyprland.enable = false;  # Implicit - not enabled
 ```
 
 ## Module Categories
 
 ### Desktop Bundle (`modules/desktop/`)
 Available options:
-- `desktop.plasma.enable` - KDE Plasma 6 desktop environment
-- `desktop.plasma.lookAndFeel` - Theme selection
-- `desktop.sddm.enable` - SDDM display manager
-- `desktop.sddm.theme` - Optional theme (e.g., "sugar-dark")
+- `modules.desktop.plasma.enable` - KDE Plasma 6 desktop environment
+- `modules.desktop.plasma.lookAndFeel` - Theme selection
+- `modules.desktop.sddm.enable` - SDDM display manager
+- `modules.desktop.sddm.theme` - Optional theme (e.g., "sugar-dark")
 
 **User-level** (`modules/home/desktop/`):
-- `home.desktop.plasma.enable` - Plasma user settings via plasma-manager
-- `home.desktop.hyprland.enable` - Hyprland window manager
-- `home.desktop.hyprland.enableNvidiaPatches` - GPU-specific fixes
+- `modules.home.desktop.plasma.enable` - Plasma user settings via plasma-manager
+- `modules.home.desktop.hyprland.enable` - Hyprland window manager
+- `modules.home.desktop.hyprland.enableNvidiaPatches` - GPU-specific fixes
 
 ### Hardware Bundle (`modules/hardware/`)
 Available options:
@@ -52,17 +52,17 @@ Available options:
 
 ### Media Bundle (`modules/media/`)
 Available options:
-- `media.audio.enable` - PipeWire audio stack
-- `media.audio.server` - Choose: "pipewire" | "pulse" | "alsa" | "none"
-- `media.audio.lowLatency` - Use Zen kernel (⚠️ changes kernel!)
-- `media.audio.proAudio` - JACK support, real-time limits, Bitwig Studio
-- `media.audio.user` - User to add to audio group (default: "brancengregory")
+- `modules.media.audio.enable` - PipeWire audio stack
+- `modules.media.audio.server` - Choose: "pipewire" | "pulse" | "alsa" | "none"
+- `modules.media.audio.lowLatency` - Use Zen kernel (⚠️ changes kernel!)
+- `modules.media.audio.proAudio` - JACK support, real-time limits, Bitwig Studio
+- `modules.media.audio.user` - User to add to audio group (default: "brancengregory")
 
 ### Network Modules (`modules/network/`)
 Already using Pure Module pattern:
-- `networking.wireguard-mesh.enable` - WireGuard VPN mesh
-- `services.caddy.enable` - Reverse proxy
-- `services.netbird.enable` - Netbird VPN
+- `modules.networking.wireguard-mesh.enable` - WireGuard VPN mesh
+- `modules.services.caddy-proxy.enable` - Reverse proxy
+- `modules.services.netbird-server.enable` - Netbird VPN
 
 ### OS Modules (`modules/os/`)
 Base system modules (always-on):
@@ -74,42 +74,42 @@ These are imported directly by `lib.mkHost`, not via bundles.
 
 ### Security Modules (`modules/security/`)
 Already using Pure Module pattern:
-- `security.gpg.enable` - Declarative GPG key import
-- `security.ssh.hostKeysDeclarative.enable` - SSH host key management
+- `modules.security.gpg.enable` - Declarative GPG key import
+- `modules.services.openssh.hostKeysDeclarative.enable` - SSH host key management
 - `sops` (via sops-nix module) - Secret management
 
 ### Services Bundle (`modules/services/`)
 Available options (all using Pure Module pattern):
-- `services.backup.enable` - Restic backup with configurable repository, paths
-- `services.monitoring.enable` - Prometheus/Grafana stack
-  - `services.monitoring.exporters.enable` - Lightweight node exporters (all nodes)
-  - `services.monitoring.server.enable` - Heavy Prometheus/Grafana server (monitoring host only)
-- `services.download-stack.enable` - qBittorrent, SABnzbd
-- `services.git-server.enable` - Forgejo Git server
-- `services.media.enable` - Jellyfin, *arr apps
-- `services.ollama-server.enable` - Ollama LLM server
-- `services.opencode-server.enable` - OpenCode server
-- `services.storage.enable` - Minio, NFS, mergerfs, SnapRAID
+- `modules.services.backup.enable` - Restic backup with configurable repository, paths
+- `modules.services.monitoring.enable` - Prometheus/Grafana stack
+  - `modules.services.monitoring.exporters.enable` - Lightweight node exporters (all nodes)
+  - `modules.services.monitoring.server.enable` - Heavy Prometheus/Grafana server (monitoring host only)
+- `modules.services.download-stack.enable` - qBittorrent, SABnzbd
+- `modules.services.git-server.enable` - Forgejo Git server
+- `modules.services.media.enable` - Jellyfin, *arr apps
+- `modules.services.ollama-server.enable` - Ollama LLM server
+- `modules.services.opencode-server.enable` - OpenCode server
+- `modules.services.storage.enable` - Minio, NFS, mergerfs, SnapRAID
 
 ### Virtualization Bundle (`modules/virtualization/`)
 Available options:
-- `virtualization.podman.enable` - Container engine (Docker replacement)
-- `virtualization.podman.dockerCompat` - Create 'docker' alias
-- `virtualization.podman.dnsEnabled` - Container-to-container DNS
-- `virtualization.hypervisor.enable` - Run VMs (libvirtd, virt-manager, QEMU)
-- `virtualization.hypervisor.virtManager` - Enable virt-manager GUI
-- `virtualization.hypervisor.swtpm` - Software TPM (for Windows 11 VMs)
-- `virtualization.hypervisor.spice` - SPICE protocol support
-- `virtualization.guest.enable` - QEMU guest agent (for when this machine IS a VM)
+- `modules.virtualization.podman.enable` - Container engine (Docker replacement)
+- `modules.virtualization.podman.dockerCompat` - Create 'docker' alias
+- `modules.virtualization.podman.dnsEnabled` - Container-to-container DNS
+- `modules.virtualization.hypervisor.enable` - Run VMs (libvirtd, virt-manager, QEMU)
+- `modules.virtualization.hypervisor.virtManager` - Enable virt-manager GUI
+- `modules.virtualization.hypervisor.swtpm` - Software TPM (for Windows 11 VMs)
+- `modules.virtualization.hypervisor.spice` - SPICE protocol support
+- `modules.virtualization.guest.enable` - QEMU guest agent (for when this machine IS a VM)
 
 **Critical**: Use `hypervisor` when running VMs, `guest` when this is a VM. Never enable hypervisor inside a VM!
 
 ### Themes Bundle (`modules/themes/`)
 Available options:
-- `themes.stylix.enable` - Unified theming system
-- `themes.stylix.image` - Wallpaper path
-- `themes.stylix.base16Scheme` - Color scheme file
-- `themes.stylix.autoEnable` - Auto-enable all targets (default: false)
+- `modules.themes.stylix.enable` - Unified theming system
+- `modules.themes.stylix.image` - Wallpaper path
+- `modules.themes.stylix.base16Scheme` - Color scheme file
+- `modules.themes.stylix.autoEnable` - Auto-enable all targets (default: false)
 
 ## Host Configuration Pattern
 
@@ -139,15 +139,15 @@ capacitor = lib.mkHost {
   ];
   
   # Enable only what the server needs
-  services.backup.enable = true;
-  services.monitoring = {
+  modules.services.backup.enable = true;
+  modules.services.monitoring = {
     enable = true;
     exporters.enable = true;
     server.enable = true;  # This is the monitoring host
   };
-  
-  virtualization.podman.enable = true;
-  virtualization.hypervisor.enable = false;  # Don't run VMs on server
+
+  modules.virtualization.podman.enable = true;
+  modules.virtualization.hypervisor.enable = false;  # Don't run VMs on server
   
   system.stateVersion = "25.11";
 }
@@ -183,30 +183,30 @@ powerhouse = lib.mkHost {
   ];
   
   # Desktop Environment
-desktop.plasma.enable = true;
-  desktop.sddm.enable = true;
-  themes.stylix.enable = true;
-  
+  modules.desktop.plasma.enable = true;
+  modules.desktop.sddm.enable = true;
+  modules.themes.stylix.enable = true;
+
   # Hardware
   modules.hardware.nvidia.enable = true;
   modules.hardware.bluetooth.enable = true;
-  
+
   # Audio (Pro audio setup)
-  media.audio.enable = true;
-  media.audio.lowLatency = true;
-  media.audio.proAudio = true;
-  
+  modules.media.audio.enable = true;
+  modules.media.audio.lowLatency = true;
+  modules.media.audio.proAudio = true;
+
   # Services
-  services.backup.enable = true;
-  services.monitoring = {
+  modules.services.backup.enable = true;
+  modules.services.monitoring = {
     enable = true;
     exporters.enable = true;  # Just the lightweight exporter
     server.enable = false;    # Don't run heavy server on desktop
   };
-  
+
   # Virtualization (Run VMs, not a VM)
-  virtualization.podman.enable = true;
-  virtualization.hypervisor = {
+  modules.virtualization.podman.enable = true;
+  modules.virtualization.hypervisor = {
     enable = true;
     virtManager = true;
     swtpm = true;  # For Windows 11 VMs
@@ -227,7 +227,7 @@ User configurations (`users/*/home.nix`) are imported automatically by `lib.mkHo
   ];
   
   # Desktop-specific settings
-  home.desktop.plasma = lib.mkIf isDesktop {
+  modules.home.desktop.plasma = lib.mkIf isDesktop {
     enable = true;
     virtualDesktops = 4;
   };
@@ -247,9 +247,9 @@ User configurations (`users/*/home.nix`) are imported automatically by `lib.mkHo
 { config, pkgs, lib, ... }:
 with lib;
 let
-  cfg = config.category.myModule;
+  cfg = config.modules.category.myModule;
 in {
-  options.category.myModule = {
+  options.modules.category.myModule = {
     enable = mkEnableOption "my module description";
     
     someOption = mkOption {
@@ -342,10 +342,10 @@ in {
 ## Complete Option Reference
 
 ### Desktop
-- `desktop.plasma.enable`
-- `desktop.plasma.lookAndFeel`
-- `desktop.sddm.enable`
-- `desktop.sddm.theme`
+- `modules.desktop.plasma.enable`
+- `modules.desktop.plasma.lookAndFeel`
+- `modules.desktop.sddm.enable`
+- `modules.desktop.sddm.theme`
 
 ### Hardware
 - `modules.hardware.nvidia.enable`
@@ -358,50 +358,50 @@ in {
 - `modules.hardware.bluetooth.guiManager`
 
 ### Media
-- `media.audio.enable`
-- `media.audio.server`
-- `media.audio.lowLatency`
-- `media.audio.proAudio`
-- `media.audio.user`
+- `modules.media.audio.enable`
+- `modules.media.audio.server`
+- `modules.media.audio.lowLatency`
+- `modules.media.audio.proAudio`
+- `modules.media.audio.user`
 
 ### Services
-- `services.backup.enable`
-- `services.monitoring.enable`
-- `services.monitoring.exporters.enable`
-- `services.monitoring.exporters.port`
-- `services.monitoring.exporters.collectors`
-- `services.monitoring.server.enable`
-- `services.monitoring.server.prometheusPort`
-- `services.monitoring.server.grafanaPort`
-- `services.monitoring.server.grafanaBind`
-- `services.download-stack.enable`
-- `services.git-server.enable`
-- `services.media.enable`
-- `services.ollama-server.enable`
-- `services.opencode-server.enable`
-- `services.storage.enable`
+- `modules.services.backup.enable`
+- `modules.services.monitoring.enable`
+- `modules.services.monitoring.exporters.enable`
+- `modules.services.monitoring.exporters.port`
+- `modules.services.monitoring.exporters.collectors`
+- `modules.services.monitoring.server.enable`
+- `modules.services.monitoring.server.prometheusPort`
+- `modules.services.monitoring.server.grafanaPort`
+- `modules.services.monitoring.server.grafanaBind`
+- `modules.services.download-stack.enable`
+- `modules.services.git-server.enable`
+- `modules.services.media.enable`
+- `modules.services.ollama-server.enable`
+- `modules.services.opencode-server.enable`
+- `modules.services.storage.enable`
 
 ### Virtualization
-- `virtualization.podman.enable`
-- `virtualization.podman.dockerCompat`
-- `virtualization.podman.dnsEnabled`
-- `virtualization.podman.extraPackages`
-- `virtualization.hypervisor.enable`
-- `virtualization.hypervisor.virtManager`
-- `virtualization.hypervisor.swtpm`
-- `virtualization.hypervisor.spice`
-- `virtualization.guest.enable`
-- `virtualization.guest.spice`
+- `modules.virtualization.podman.enable`
+- `modules.virtualization.podman.dockerCompat`
+- `modules.virtualization.podman.dnsEnabled`
+- `modules.virtualization.podman.extraPackages`
+- `modules.virtualization.hypervisor.enable`
+- `modules.virtualization.hypervisor.virtManager`
+- `modules.virtualization.hypervisor.swtpm`
+- `modules.virtualization.hypervisor.spice`
+- `modules.virtualization.guest.enable`
+- `modules.virtualization.guest.spice`
 
 ### Themes
-- `themes.stylix.enable`
-- `themes.stylix.image`
-- `themes.stylix.base16Scheme`
-- `themes.stylix.autoEnable`
+- `modules.themes.stylix.enable`
+- `modules.themes.stylix.image`
+- `modules.themes.stylix.base16Scheme`
+- `modules.themes.stylix.autoEnable`
 
 ### Home Desktop
-- `home.desktop.plasma.enable`
-- `home.desktop.plasma.lookAndFeel`
-- `home.desktop.plasma.virtualDesktops`
-- `home.desktop.hyprland.enable`
-- `home.desktop.hyprland.enableNvidiaPatches`
+- `modules.home.desktop.plasma.enable`
+- `modules.home.desktop.plasma.lookAndFeel`
+- `modules.home.desktop.plasma.virtualDesktops`
+- `modules.home.desktop.hyprland.enable`
+- `modules.home.desktop.hyprland.enableNvidiaPatches`

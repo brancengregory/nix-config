@@ -2,10 +2,10 @@
 with lib;
 
 let
-  cfg = config.desktop.gaming;
+  cfg = config.modules.desktop.gaming;
 in
 {
-  options.desktop.gaming = {
+  options.modules.desktop.gaming = {
     enable = mkEnableOption "gaming setup" // {
       default = isDesktop;
     };
