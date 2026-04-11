@@ -77,7 +77,7 @@
       fd
       glow
       gnupg
-      htop
+      btop
       hwatch
       jaq
       jnv
