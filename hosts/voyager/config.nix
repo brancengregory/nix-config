@@ -20,6 +20,9 @@
     # Desktop environment
     ../../modules/desktop
 
+    # Media (audio, gaming)
+    ../../modules/media
+
     # Hardware support
     ../../modules/hardware
 
@@ -40,6 +43,12 @@
   desktop.plasma.enable = true;
   desktop.plasma.scale = 1.5;
   desktop.sddm.enable = true;
+
+  # Enable gaming support (AMD iGPU)
+  desktop.gaming = {
+    enable = true;
+    gpuVendor = "amd";
+  };
 
   # System state version
   system.stateVersion = "25.11";

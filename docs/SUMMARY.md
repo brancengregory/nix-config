@@ -11,6 +11,7 @@
 
 - [Cross-Platform Development](./CROSS_COMPILATION.md)
 - [Homebrew Integration (macOS)](./HOMEBREW.md)
+- [Gaming](./GAMING.md)
 
 # Security & Authentication
 
