@@ -30,8 +30,8 @@ creation_rules:
         - *host_voyager
 
   # Optional: Restricted secrets (e.g., only specific hosts)
-  # - path_regex: secrets/powerhouse/.*$
+  # - path_regex: secrets/basestation/.*$
   #   key_groups:
   #     - age:
   #       - *user_core
-  #       - *host_powerhouse
+  #       - *host_basestation

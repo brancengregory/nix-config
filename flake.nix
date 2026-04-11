@@ -10,12 +10,6 @@
     # Unstable
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Darwin (Mac)
-    nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Home Manager
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -68,7 +62,6 @@
   outputs = {
     self,
     nixpkgs,
-    nix-darwin,
     home-manager,
     sops-nix,
     disko,
@@ -77,23 +70,6 @@
     lib = import ./lib {inherit inputs;};
   in {
     nixosConfigurations = {
-      # DEPRECATED: powerhouse will become basestation after orbital is stable
-      # powerhouse = lib.mkHost {
-      #   hostname = "powerhouse";
-      #   system = "x86_64-linux";
-      #   user = "brancengregory";
-      #   builder = nixpkgs.lib.nixosSystem;
-      #   homeManagerModule = home-manager.nixosModules.home-manager;
-      #   sopsModule = sops-nix.nixosModules.sops;
-      #   isDesktop = true;
-      #   extraModules = [
-      #     inputs.disko.nixosModules.disko
-      #   ];
-      #   extraHomeModules = [
-      #     inputs.plasma-manager.homeModules.plasma-manager
-      #   ];
-      # };
-
       orbital = lib.mkHost {
         hostname = "orbital";
         system = "x86_64-linux";
@@ -161,14 +137,8 @@
       # See docs/DEPLOYMENT.md for current workflow
     };
 
-    # Darwin configurations - currently none active
-    darwinConfigurations = {};
-
     # Create a VM for testing and cross-compilation targets
     packages.x86_64-linux = {
-      # DEPRECATED: powerhouse-vm commented
-      # powerhouse-vm = self.nixosConfigurations.powerhouse.config.system.build.vm;
-
       # Orbital system configuration
       orbital = self.nixosConfigurations.orbital.config.system.build.toplevel;
 
@@ -178,9 +148,6 @@
       # NOTE: ISO installers removed - use standard NixOS ISO + nix-anywhere
       # See docs/DEPLOYMENT.md for deployment workflow
     };
-
-    # Darwin packages - currently none active
-    packages.x86_64-darwin = {};
 
     # Development shells for cross-platform work
     devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShell {
@@ -338,28 +305,8 @@
       '';
     };
 
-    devShells.x86_64-darwin.default = nixpkgs.legacyPackages.x86_64-darwin.mkShell {
-      buildInputs = with nixpkgs.legacyPackages.x86_64-darwin; [
-        nix-output-monitor
-        alejandra # Nix formatter
-        mise # Universal task runner
-        mdbook # Documentation generator
-      ];
-      shellHook = ''
-        echo "🚀 Cross-platform Nix development environment"
-        echo "💡 Available commands:"
-        echo "  - mise build-darwin (build darwin config)"
-        echo "  - mise check-darwin (validate darwin config)"
-        echo "  - mise format (format Nix files)"
-        echo "  - mise docs-serve (serve documentation locally)"
-        echo "  - mise docs-build (build documentation)"
-        echo "  - mise help (show all commands)"
-      '';
-    };
-
     formatter = {
       x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
-      x86_64-darwin = nixpkgs.legacyPackages.x86_64-darwin.alejandra;
     };
 
     # Templates for development environments

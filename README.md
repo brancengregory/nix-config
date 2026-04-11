@@ -4,8 +4,6 @@ A set of configs for my machines using the **Pure Module Pattern**:
 
 - **orbital** (server) - NixOS homelab server
 - **voyager** (laptop) - Framework 16 with AMD Ryzen AI 300
-- **powerhouse** (desktop) - NixOS with Plasma, NVIDIA, Pro Audio (deprecated)
-- **capacitor** (server) - NixOS headless server (deprecated)
 
 ## Features
 
@@ -30,8 +28,8 @@ A set of configs for my machines using the **Pure Module Pattern**:
 ```
 ├── docs/               # Documentation
 ├── hosts/              # Host-specific configurations
-│   ├── capacitor/      # NixOS homelab server
-│   └── powerhouse/     # NixOS desktop
+│   ├── orbital/        # NixOS homelab server
+│   └── voyager/        # Framework 16 laptop
 ├── lib/                # Shared library functions (mkHost abstraction)
 ├── modules/            # Modular components (20+ Pure Modules)
 │   ├── desktop/        # Desktop environments bundle (plasma, sddm)

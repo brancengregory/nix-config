@@ -9,11 +9,6 @@ description = "Show available mise tasks"
 run = "mise tasks"
 
 # Build commands - Individual Hosts
-# DEPRECATED: powerhouse will become basestation
-# [tasks.build-powerhouse]
-# description = "Build powerhouse NixOS configuration"
-# run = "nix build .#powerhouse"
-
 [tasks.build-orbital]
 description = "Build orbital NixOS configuration"
 run = "nix build .#orbital"
@@ -23,11 +18,6 @@ description = "Build voyager NixOS configuration"
 run = "nix build .#voyager"
 
 # Validation / Dry-run
-# DEPRECATED: powerhouse tasks
-# [tasks.dry-run-powerhouse]
-# description = "Dry-run powerhouse config (no build)"
-# run = "nixos-rebuild dry-build --flake .#powerhouse"
-
 [tasks.dry-run-orbital]
 description = "Dry-run orbital config (no build)"
 run = "nixos-rebuild dry-build --flake .#orbital"

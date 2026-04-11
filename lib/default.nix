@@ -1,17 +1,11 @@
 {inputs, ...}: let
   inherit (inputs.nixpkgs) lib;
-
-  # Helper to get the appropriate stylix module for a system type
-  getStylixModule = system:
-    if lib.strings.hasSuffix "darwin" system
-    then inputs.stylix.darwinModules.stylix
-    else inputs.stylix.nixosModules.stylix;
 in {
   mkHost = {
     hostname,
     system,
     user,
-    builder, # nixosSystem or darwinSystem
+    builder, # nixosSystem
     homeManagerModule, # The platform-specific HM module
     sopsModule, # The platform-specific sops-nix module
     isDesktop ? false, # Whether this is a desktop (GUI) system
@@ -19,8 +13,8 @@ in {
     extraOverlays ? [], # Host-specific overlays
     extraHomeModules ? [], # Extra modules to import in home-manager
   }: let
-    # Platform detection (Darwin support removed - NixOS only)
-    stylixModule = getStylixModule system;
+    # NixOS only - use nixosModules.stylix
+    stylixModule = inputs.stylix.nixosModules.stylix;
   in
     builder {
       inherit system;

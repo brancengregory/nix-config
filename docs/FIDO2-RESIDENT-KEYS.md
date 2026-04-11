@@ -29,7 +29,7 @@ FIDO2 Resident Keys (also called "discoverable credentials") are SSH keys stored
    - When you can't/don't want to set up full GPG environment
 
 2. **Server-to-Server SSH**
-   - `powerhouse` or `capacitor` authenticating to other infrastructure
+   - `desktop` or `server` authenticating to other infrastructure
    - Automated but hardware-backed access
    - When GPG agent is undesirable
 
@@ -116,7 +116,7 @@ FIDO2 Resident Keys (also called "discoverable credentials") are SSH keys stored
 **`-O application=ssh:NAME`**: Label the resident key
 - Helps identify which key is which on the hardware
 - Useful if you have multiple resident keys
-- Name should describe purpose: `ssh:powerhouse-A`, `ssh:capacitor-backup`
+- Name should describe purpose: `ssh:desktop-A`, `ssh:server-backup`
 
 **`-O verify-required`**: Require user verification (PIN)
 - In addition to touch, requires PIN entry
@@ -148,23 +148,23 @@ ssh -V  # Should show "with FIDO2 support"
 # Generate key
 ssh-keygen -t ed25519-sk -O resident -O application=ssh:HOSTNAME-X -f ~/.ssh/id_fido2_HOSTNAME
 
-# Example for powerhouse:
-ssh-keygen -t ed25519-sk -O resident -O application=ssh:powerhouse-A -f ~/.ssh/id_fido2_powerhouse
+# Example for desktop:
+ssh-keygen -t ed25519-sk -O resident -O application=ssh:desktop-A -f ~/.ssh/id_fido2_desktop
 
 # Output:
 # Generating public/private ed25519-sk key pair.
 # You may need to touch your authenticator to authorize the generation.
 # (Touch Nitrokey when LED blinks)
 # Enter passphrase (empty for no passphrase):
-# Your identification has been saved in ~/.ssh/id_fido2_powerhouse
-# Your public key has been saved in ~/.ssh/id_fido2_powerhouse.pub
+# Your identification has been saved in ~/.ssh/id_fido2_desktop
+# Your public key has been saved in ~/.ssh/id_fido2_desktop.pub
 ```
 
 ### Step 3: Record Key Information
 
 ```bash
 # View public key
-cat ~/.ssh/id_fido2_powerhouse.pub
+cat ~/.ssh/id_fido2_desktop.pub
 
 # Format:
 # sk-ssh-ed25519@openssh.com AAAAC3NzaC... cardno:000F_XXXXXXXX
@@ -179,11 +179,11 @@ cat ~/.ssh/id_fido2_powerhouse.pub
 
 **Add to server authorized_keys:**
 ```bash
-# On server (e.g., capacitor)
+# On server (e.g., remote-server)
 echo "sk-ssh-ed25519@openssh.com AAAAC3NzaC... cardno:000F_XXXXXXXX" >> ~/.ssh/authorized_keys
 
 # Or via SSH:
-ssh-copy-id -i ~/.ssh/id_fido2_powerhouse.pub user@capacitor
+ssh-copy-id -i ~/.ssh/id_fido2_desktop.pub user@remote-server
 ```
 
 ---
@@ -236,7 +236,7 @@ nitropy nk3 list-credentials
 ssh-add -D
 
 # Or remove specific key
-ssh-add -d ~/.ssh/id_fido2_powerhouse.pub
+ssh-add -d ~/.ssh/id_fido2_desktop.pub
 ```
 
 ### Delete from Hardware Token
@@ -301,19 +301,19 @@ nitropy nk3 factory-reset
 
 ## Implementation Scenarios
 
-### Scenario 1: Powerhouse Access from Capacitor
+### Scenario 1: Desktop Access from Server
 
 **Use Case:** Server-to-server SSH
 
 ```bash
-# On powerhouse:
-ssh-keygen -t ed25519-sk -O resident -O application=ssh:capacitor-access -f ~/.ssh/id_fido2_to_capacitor
+# On desktop:
+ssh-keygen -t ed25519-sk -O resident -O application=ssh:server-access -f ~/.ssh/id_fido2_to_server
 
-# Add public key to capacitor authorized_keys
-ssh-copy-id -i ~/.ssh/id_fido2_to_capacitor.pub capacitor
+# Add public key to server authorized_keys
+ssh-copy-id -i ~/.ssh/id_fido2_to_server.pub remote-server
 
-# Test from powerhouse
-ssh capacitor
+# Test from desktop
+ssh remote-server
 
 # Result: Direct hardware-backed SSH without GPG agent
 ```
