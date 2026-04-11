@@ -74,7 +74,7 @@ modules.desktop.sddm.enable = true;
 
 ### Declarative API Examples
 
-**Desktop/Workstation (powerhouse):**
+**Desktop/Workstation (voyager):**
 ```nix
 # Desktop Environment
 modules.desktop.plasma.enable = true;
@@ -82,13 +82,15 @@ modules.desktop.sddm.enable = true;
 modules.themes.stylix.enable = true;
 
 # Hardware
-modules.hardware.nvidia.enable = true;
 modules.hardware.bluetooth.enable = true;
-modules.media.audio.enable = true;
-modules.media.audio.lowLatency = true;
+
+# Gaming (AMD iGPU)
+modules.desktop.gaming = {
+  enable = true;
+  gpuVendor = "amd";
+};
 
 # Services
-modules.services.backup.enable = true;
 modules.services.monitoring.enable = true;
 modules.services.monitoring.exporters.enable = true;
 
@@ -97,7 +99,7 @@ modules.virtualization.podman.enable = true;
 modules.virtualization.hypervisor.enable = true;  # Run VMs
 ```
 
-**Server (capacitor):**
+**Server (orbital):**
 ```nix
 # No desktop environment - headless server
 # modules.services.backup.enable = true;  # Already enabled via service config

@@ -115,12 +115,12 @@ Available options:
 
 Modern host configurations use the `lib.mkHost` abstraction:
 
-### Example: Server (capacitor)
+### Example: Server (orbital)
 
 ```nix
 # flake.nix
-capacitor = lib.mkHost {
-  hostname = "capacitor";
+orbital = lib.mkHost {
+  hostname = "orbital";
   system = "x86_64-linux";
   user = "brancengregory";
   builder = nixpkgs.lib.nixosSystem;
@@ -130,14 +130,14 @@ capacitor = lib.mkHost {
   extraModules = [ inputs.disko.nixosModules.disko ];
 };
 
-# hosts/capacitor/config.nix
+# hosts/orbital/config.nix
 { config, pkgs, ... }: {
   imports = [
     ../../modules/services  # All services available
     ../../modules/virtualization  # Podman available
     # No desktop, hardware, or media bundles - this is a server!
   ];
-  
+
   # Enable only what the server needs
   modules.services.backup.enable = true;
   modules.services.monitoring = {
@@ -148,56 +148,58 @@ capacitor = lib.mkHost {
 
   modules.virtualization.podman.enable = true;
   modules.virtualization.hypervisor.enable = false;  # Don't run VMs on server
-  
+
   system.stateVersion = "25.11";
 }
 ```
 
-### Example: Desktop (powerhouse)
+### Example: Desktop (voyager)
 
 ```nix
 # flake.nix
-powerhouse = lib.mkHost {
-  hostname = "powerhouse";
+voyager = lib.mkHost {
+  hostname = "voyager";
   system = "x86_64-linux";
   user = "brancengregory";
   builder = nixpkgs.lib.nixosSystem;
   homeManagerModule = home-manager.nixosModules.home-manager;
   sopsModule = sops-nix.nixosModules.sops;
   isDesktop = true;
-  extraModules = [ 
+  extraModules = [
     inputs.disko.nixosModules.disko
-    inputs.plasma-manager.homeModules.plasma-manager
+    inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
   ];
 };
 
-# hosts/powerhouse/config.nix
+# hosts/voyager/config.nix
 { config, pkgs, ... }: {
   imports = [
+    ./hardware.nix  # Framework 16 hardware config
+    ./disks.nix     # Disk configuration
+
     ../../modules/desktop     # Plasma, SDDM available
-    ../../modules/hardware    # NVIDIA, Bluetooth available
-    ../../modules/media       # Audio available
-    ../../modules/services    # Backup, monitoring available
+    ../../modules/hardware    # Bluetooth available
+    ../../modules/media       # Audio, gaming available
+    ../../modules/services    # Monitoring available
     ../../modules/virtualization  # Podman, QEMU available
     ../../modules/themes      # Stylix available
   ];
-  
+
   # Desktop Environment
   modules.desktop.plasma.enable = true;
   modules.desktop.sddm.enable = true;
   modules.themes.stylix.enable = true;
 
   # Hardware
-  modules.hardware.nvidia.enable = true;
   modules.hardware.bluetooth.enable = true;
 
-  # Audio (Pro audio setup)
-  modules.media.audio.enable = true;
-  modules.media.audio.lowLatency = true;
-  modules.media.audio.proAudio = true;
+  # Gaming (AMD iGPU)
+  modules.desktop.gaming = {
+    enable = true;
+    gpuVendor = "amd";
+  };
 
   # Services
-  modules.services.backup.enable = true;
   modules.services.monitoring = {
     enable = true;
     exporters.enable = true;  # Just the lightweight exporter
@@ -206,12 +208,8 @@ powerhouse = lib.mkHost {
 
   # Virtualization (Run VMs, not a VM)
   modules.virtualization.podman.enable = true;
-  modules.virtualization.hypervisor = {
-    enable = true;
-    virtManager = true;
-    swtpm = true;  # For Windows 11 VMs
-  };
-  
+  modules.virtualization.hypervisor.enable = true;
+
   system.stateVersion = "25.11";
 }
 ```

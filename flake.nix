@@ -84,52 +84,17 @@
       };
 
       # Framework 16 Laptop - AMD Ryzen AI 300 Series
-      # Bootstrap config: no sops initially, add after age key generation
-      voyager = nixpkgs.lib.nixosSystem {
+      voyager = lib.mkHost {
+        hostname = "voyager";
         system = "x86_64-linux";
-        specialArgs = {
-          inherit inputs;
-          isDesktop = true;
-        };
-        modules = [
-          # Core configuration
-          ./hosts/voyager/config.nix
-          ./hosts/voyager/hardware.nix
-          ./hosts/voyager/disks.nix
-
-          # Overlays
-          {
-            nixpkgs.overlays = [
-              (import ./overlays/ojodb.nix)
-            ];
-          }
-
-          # Framework 16 hardware support
-          inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
-
-          # Disk partitioning
+        user = "brancengregory";
+        builder = nixpkgs.lib.nixosSystem;
+        homeManagerModule = home-manager.nixosModules.home-manager;
+        sopsModule = sops-nix.nixosModules.sops;
+        isDesktop = true;
+        extraModules = [
           inputs.disko.nixosModules.disko
-
-          # Home Manager
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = {
-              inherit inputs;
-              isDesktop = true;
-            };
-            home-manager.users.brancengregory = {
-              imports = [
-                ./users/brancengregory/home.nix
-                # NOTE: plasma-manager is now imported at system level via desktop.plasma module
-              ];
-            };
-          }
-
-          # Stylix
-          inputs.stylix.nixosModules.stylix
+          inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
         ];
       };
 

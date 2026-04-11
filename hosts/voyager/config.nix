@@ -13,8 +13,11 @@
     ../../modules/os/common.nix
     ../../modules/os/nixos.nix
 
-    # Security and secrets
-    ../../modules/security/sops.nix
+    # Hardware-specific configuration
+    ./hardware.nix
+    ./disks.nix
+
+    # Security modules
     ../../modules/security/gpg.nix
 
     # Desktop environment
