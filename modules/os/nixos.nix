@@ -124,6 +124,12 @@
     dmidecode
     git
     google-chrome
+
+    # Media/Video
+    mpv
+    obs-studio
+    davinci-resolve
+    zotero
   ];
 
   # --- Default Browser ---
