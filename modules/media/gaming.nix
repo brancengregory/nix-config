@@ -1,48 +1,69 @@
-{ config, pkgs, lib, isDesktop, ... }:
-with lib;
-
-let
-  cfg = config.modules.desktop.gaming;
-in
 {
+  config,
+  pkgs,
+  lib,
+  isDesktop,
+  ...
+}:
+with lib; let
+  cfg = config.modules.desktop.gaming;
+in {
   options.modules.desktop.gaming = {
-    enable = mkEnableOption "gaming setup" // {
-      default = isDesktop;
-    };
+    enable =
+      mkEnableOption "gaming setup"
+      // {
+        default = isDesktop;
+      };
 
     gpuVendor = mkOption {
-      type = types.enum [ "amd" "nvidia" "intel" null ];
+      type = types.enum ["amd" "nvidia" "intel" null];
       default = null;
       description = "GPU vendor for vendor-specific optimizations";
     };
 
     # Optional components (default true)
-    prismLauncher.enable = mkEnableOption "Prism Launcher (Minecraft)" // {
-      default = true;
-    };
-    mangohud.enable = mkEnableOption "MangoHud overlay" // {
-      default = true;
-    };
-    gamescope.enable = mkEnableOption "Gamescope compositor" // {
-      default = true;
-    };
-    protonupQt.enable = mkEnableOption "ProtonUp-Qt" // {
-      default = true;
-    };
+    prismLauncher.enable =
+      mkEnableOption "Prism Launcher (Minecraft)"
+      // {
+        default = true;
+      };
+    mangohud.enable =
+      mkEnableOption "MangoHud overlay"
+      // {
+        default = true;
+      };
+    gamescope.enable =
+      mkEnableOption "Gamescope compositor"
+      // {
+        default = true;
+      };
+    protonupQt.enable =
+      mkEnableOption "ProtonUp-Qt"
+      // {
+        default = true;
+      };
 
     # Optional components (default false)
-    lutris.enable = mkEnableOption "Lutris game launcher" // {
-      default = false;
-    };
-    heroic.enable = mkEnableOption "Heroic Games Launcher (GOG/Epic)" // {
-      default = false;
-    };
-    dolphin.enable = mkEnableOption "Dolphin emulator (GameCube/Wii)" // {
-      default = false;
-    };
-    pcsx2.enable = mkEnableOption "PCSX2 emulator (PS2)" // {
-      default = false;
-    };
+    lutris.enable =
+      mkEnableOption "Lutris game launcher"
+      // {
+        default = false;
+      };
+    heroic.enable =
+      mkEnableOption "Heroic Games Launcher (GOG/Epic)"
+      // {
+        default = false;
+      };
+    dolphin.enable =
+      mkEnableOption "Dolphin emulator (GameCube/Wii)"
+      // {
+        default = false;
+      };
+    pcsx2.enable =
+      mkEnableOption "PCSX2 emulator (PS2)"
+      // {
+        default = false;
+      };
   };
 
   config = mkIf cfg.enable {
@@ -85,28 +106,28 @@ in
     hardware.graphics.enable32Bit = true;
 
     # Core: Gaming packages (always included)
-    environment.systemPackages = with pkgs; [
-      # RetroArch frontend
-      retroarch
-      
-      # RetroArch cores (declarative)
-      libretro.snes9x      # SNES
-      libretro.mgba        # Game Boy/Advance
-      libretro.genesis-plus-gx  # Genesis/Mega Drive
-      libretro.nestopia    # NES
-      libretro.desmume     # Nintendo DS
-    ]
-    # Optional packages (default true)
-    ++ optionals cfg.prismLauncher.enable [ prismlauncher jdk25 ]
-    ++ optionals cfg.mangohud.enable [ mangohud ]
-    ++ optionals cfg.gamescope.enable [ gamescope ]
-    ++ optionals cfg.protonupQt.enable [ protonup-qt ]
-    # Optional packages (default false)
-    ++ optionals cfg.lutris.enable [ lutris ]
-    ++ optionals cfg.heroic.enable [ heroic ]
-    ++ optionals cfg.dolphin.enable [ dolphin-emu ]
-    ++ optionals cfg.pcsx2.enable [ pcsx2 ]
-    ;
+    environment.systemPackages = with pkgs;
+      [
+        # RetroArch frontend
+        retroarch
+
+        # RetroArch cores (declarative)
+        libretro.snes9x # SNES
+        libretro.mgba # Game Boy/Advance
+        libretro.genesis-plus-gx # Genesis/Mega Drive
+        libretro.nestopia # NES
+        libretro.desmume # Nintendo DS
+      ]
+      # Optional packages (default true)
+      ++ optionals cfg.prismLauncher.enable [prismlauncher jdk25]
+      ++ optionals cfg.mangohud.enable [mangohud]
+      ++ optionals cfg.gamescope.enable [gamescope]
+      ++ optionals cfg.protonupQt.enable [protonup-qt]
+      # Optional packages (default false)
+      ++ optionals cfg.lutris.enable [lutris]
+      ++ optionals cfg.heroic.enable [heroic]
+      ++ optionals cfg.dolphin.enable [dolphin-emu]
+      ++ optionals cfg.pcsx2.enable [pcsx2];
 
     # Wine is auto-installed as dependency of lutris/heroic when enabled
 

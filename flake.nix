@@ -56,7 +56,6 @@
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
     };
-
   };
 
   outputs = {
@@ -214,11 +213,27 @@
       };
       rPackages = with pkgs.rPackages; [
         # Core tidyverse
-        dplyr ggplot2 tidyr readr purrr tibble stringr forcats lubridate
+        dplyr
+        ggplot2
+        tidyr
+        readr
+        purrr
+        tibble
+        stringr
+        forcats
+        lubridate
         # Development tools
-        devtools usethis testthat roxygen2 pkgdown knitr rmarkdown
+        devtools
+        usethis
+        testthat
+        roxygen2
+        pkgdown
+        knitr
+        rmarkdown
         # Data tools
-        arrow duckdb DBI
+        arrow
+        duckdb
+        DBI
         # Cloud storage
         googleCloudStorageR
         # Ojodb
@@ -231,12 +246,25 @@
             sha256 = "sha256-Sa5XjUTYmfV2lTjx8ajLYvvHBaBFQjwRihtQPLJ7f44=";
           };
           propagatedBuildInputs = with pkgs.rPackages; [
-            DBI RPostgres dplyr dbplyr ggplot2 pool rlang stringr purrr
-            tidyr janitor lubridate hms fs glue
+            DBI
+            RPostgres
+            dplyr
+            dbplyr
+            ggplot2
+            pool
+            rlang
+            stringr
+            purrr
+            tidyr
+            janitor
+            lubridate
+            hms
+            fs
+            glue
           ];
         })
       ];
-      R = pkgs.rWrapper.override { packages = rPackages; };
+      R = pkgs.rWrapper.override {packages = rPackages;};
 
       # Wrap RStudio with packages
       rstudio-wrapped = pkgs.rstudioWrapper.override {
@@ -245,30 +273,31 @@
 
       # R library path for tools that need it
       rLibsPath = pkgs.lib.makeLibraryPath rPackages;
-    in pkgs.mkShell {
-      name = "r-dev";
-      buildInputs = [ R pkgs.air-formatter pkgs.jarl pkgs.quarto rstudio-wrapped ];
-      shellHook = ''
-        export PATH="${R}/bin:$PATH"
-        export R_LIBS_SITE="${rLibsPath}"
+    in
+      pkgs.mkShell {
+        name = "r-dev";
+        buildInputs = [R pkgs.air-formatter pkgs.jarl pkgs.quarto rstudio-wrapped];
+        shellHook = ''
+          export PATH="${R}/bin:$PATH"
+          export R_LIBS_SITE="${rLibsPath}"
 
-        echo "🚀 R Development Environment"
-        echo ""
-        echo "Available tools:"
-        echo "  - R (with tidyverse, devtools, ojodb, etc.)"
-        echo "  - air (R formatter)"
-        echo "  - jarl (R linter)"
-        echo "  - quarto"
-        echo "  - rstudio (R IDE)"
-        echo ""
-        echo "Quick start:"
-        echo "  R                    # Start R console"
-        echo "  air format .         # Format R code"
-        echo "  jarl .               # Lint R code"
-        echo "  rstudio              # Launch RStudio IDE"
-        echo ""
-      '';
-    };
+          echo "🚀 R Development Environment"
+          echo ""
+          echo "Available tools:"
+          echo "  - R (with tidyverse, devtools, ojodb, etc.)"
+          echo "  - air (R formatter)"
+          echo "  - jarl (R linter)"
+          echo "  - quarto"
+          echo "  - rstudio (R IDE)"
+          echo ""
+          echo "Quick start:"
+          echo "  R                    # Start R console"
+          echo "  air format .         # Format R code"
+          echo "  jarl .               # Lint R code"
+          echo "  rstudio              # Launch RStudio IDE"
+          echo ""
+        '';
+      };
 
     formatter = {
       x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;

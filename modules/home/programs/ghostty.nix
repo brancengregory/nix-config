@@ -1,6 +1,4 @@
-{
-  ...
-}: {
+{...}: {
   # Ghostty configuration
   # Based on chezmoi: private_dot_config/ghostty/config
   home.file.".config/ghostty/config".text = ''
