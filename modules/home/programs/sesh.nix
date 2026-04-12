@@ -8,22 +8,10 @@
     [[session]]
     name = "home"
     path = "~"
-    startup_command = "l"
 
     [[session]]
-    name = "tmux"
-    path = "~"
-    startup_command = "nvim -c ':e .tmux.conf'"
-
-    [[session]]
-    name = "nvim"
-    path = "~/.config/nvim/"
-    startup_command = "nvim -c ':Telescope find-files'"
-
-    [[session]]
-    name = "tic"
-    path = "~/.local/share/com.nesbox.tic/TIC-80/commiemami/"
-    startup_command = "nvim"
+    name = "nix"
+    path = "~/code/brancengregory/nix-config/"
   '';
 
   # Add sesh shell alias
